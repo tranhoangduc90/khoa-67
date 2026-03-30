@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IELTS Part 1 - Flash Drill</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #f4f7f6; padding: 50px; margin: 0; }
+    #card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+    
+    #counter { position: absolute; top: 20px; right: 20px; font-size: 14px; font-weight: bold; color: #6c757d; background: #e9ecef; padding: 5px 10px; border-radius: 10px; }
+    #zone-label { font-size: 18px; font-weight: bold; padding: 8px 15px; border-radius: 20px; margin-bottom: 20px; transition: 0.3s; margin-top: 20px; }
+    
+    .zone-1 { background: #e8f5e9; color: #2e7d32; border: 2px solid #a5d6a7; } 
+    .zone-2 { background: #fce4ec; color: #c2185b; border: 2px solid #f48fb1; } 
+    .zone-done { background: #e2e3e5; color: #383d41; border: 2px solid #d6d8db; }
+    
+    #question { font-size: 28px; font-weight: 600; color: #333; margin-bottom: 30px; line-height: 1.4; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+    
+    button { background: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; box-shadow: 0 4px 6px rgba(0,123,255,0.2); }
+    button:hover { background: #0056b3; transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <div id="card">
+    <div id="counter">Câu: 0/30</div>
+    <div id="zone-label" class="zone-1">Ready?</div>
+    <div id="question">Nhấn nút bên dưới để bắt đầu luyện tập</div>
+    <button id="btn-next" onclick="nextQuestion()">Next Question 🎯</button>
+  </div>
+
+  <script>
+    const originalQuestions = [
+      // Set 1
+      { q: "Do you like chatting with your friends?", zone: 1 },
+      { q: "How often do you chat online?", zone: 1 },
+      { q: "Who do you usually chat with the most?", zone: 1 },
+      { q: "Have you ever worked or studied with older people?", zone: 2 },
+      { q: "Do you find it easy to talk to people who are much older than you?", zone: 2 },
+      // Set 2
+      { q: "Do you like buying shoes?", zone: 1 },
+      { q: "How many pairs of shoes do you have?", zone: 1 },
+      { q: "Do you usually wear the same shoes every day?", zone: 1 },
+      { q: "Have you ever tried growing your own vegetables?", zone: 2 },
+      { q: "Would you like to grow your own food in the future?", zone: 2 },
+      // Set 3
+      { q: "Do you like visiting museums?", zone: 1 },
+      { q: "When was the last time you went to a museum?", zone: 1 },
+      { q: "Do you prefer going to museums alone or with friends?", zone: 1 },
+      { q: "Do you often take short breaks during your work or study?", zone: 2 },
+      { q: "Do you think it’s important to take regular breaks?", zone: 2 },
+      // Set 4
+      { q: "Do you like sharing things with your friends?", zone: 1 },
+      { q: "Do you prefer sharing or having things of your own?", zone: 1 },
+      { q: "Have you ever shared something important with someone?", zone: 1 },
+      { q: "Do you pay attention to advertisements?", zone: 2 },
+      { q: "What kind of advertisements do you usually find annoying?", zone: 2 },
+      // Set 5
+      { q: "What is your favorite color?", zone: 1 },
+      { q: "Did you like the same colors when you were a child?", zone: 1 },
+      { q: "Are there any colors you dislike?", zone: 1 },
+      { q: "Do you often remember your dreams when you wake up?", zone: 2 },
+      { q: "Do you think dreams have special meanings?", zone: 2 },
+      // Set 6
+      { q: "How do you usually travel to work or school?", zone: 1 },
+      { q: "Do you prefer using public transport or driving?", zone: 1 },
+      { q: "How is the traffic in your city?", zone: 1 },
+      { q: "Would you like to have a robot helping you at home?", zone: 2 },
+      { q: "Do you think robots will be common in every household in the future?", zone: 2 }
+    ];
+
+    let remainingQuestions = [];
+    let currentCount = 0;
+    let totalQuestions = originalQuestions.length;
+
+    function init() {
+      remainingQuestions = [...originalQuestions];
+      currentCount = 0;
+      document.getElementById('counter').innerText = `Câu: 0/${totalQuestions}`;
+      document.getElementById('btn-next').innerText = "Next Question 🎯";
+    }
+
+    init();
+
+    function nextQuestion() {
+      const label = document.getElementById('zone-label');
+      const questionEl = document.getElementById('question');
+
+      if (remainingQuestions.length === 0) {
+        questionEl.innerText = "Tuyệt vời! Đã hoàn thành bộ Drill.";
+        label.innerText = "DONE";
+        label.className = "zone-done";
+        document.getElementById('btn-next').innerText = "Restart Drill 🔄";
+        document.getElementById('btn-next').onclick = () => { init(); nextQuestion(); };
+        return;
+      }
+
+      currentCount++;
+      document.getElementById('counter').innerText = `Câu: ${currentCount}/${totalQuestions}`;
+      
+      let randIndex;
+
+      if (currentCount === 1) {
+        const zone1Questions = remainingQuestions.filter(q => q.zone === 1);
+        const firstQ = zone1Questions[Math.floor(Math.random() * zone1Questions.length)];
+        randIndex = remainingQuestions.indexOf(firstQ);
+      } else {
+        randIndex = Math.floor(Math.random() * remainingQuestions.length);
+      }
+
+      const data = remainingQuestions.splice(randIndex, 1)[0];
+
+      questionEl.innerText = data.q;
+      
+      if(data.zone === 1) {
+        label.innerText = "ZONE 1: SAFE (Fluency only!)";
+        label.className = "zone-1";
+      } else {
+        label.innerText = "ZONE 2: FLEX (Show your vocab!)";
+        label.className = "zone-2";
+      }
+    }
+  </script>
+</body>
+</html>
