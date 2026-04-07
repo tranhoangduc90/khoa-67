@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IELTS Part 1 - Flash Drill</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #f4f7f6; padding: 50px; margin: 0; }
+    #card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+    
+    #counter { position: absolute; top: 20px; right: 20px; font-size: 14px; font-weight: bold; color: #6c757d; background: #e9ecef; padding: 5px 10px; border-radius: 10px; }
+    
+    #question { font-size: 28px; font-weight: 600; color: #333; margin-bottom: 30px; line-height: 1.4; min-height: 80px; display: flex; align-items: center; justify-content: center; margin-top: 30px; }
+    
+    button { background: #007bff; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: bold; box-shadow: 0 4px 6px rgba(0,123,255,0.2); }
+    button:hover { background: #0056b3; transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <div id="card">
+    <div id="counter">Câu: 0/33</div>
+    <div id="question">Nhấn nút bên dưới để bắt đầu luyện tập</div>
+    <button id="btn-next" onclick="nextQuestion()">Next Question 🎯</button>
+  </div>
+
+  <script>
+    const originalQuestions = [
+  "Do you enjoy cooking? (Why/Why not?)",
+  "How can schools encourage students to be more creative?",
+  "Do you prefer watching movies at home or at the cinema? (Why?)",
+  "Why do you think so many people want to travel abroad nowadays?",
+  "How do you usually plan your weekends to make the most of them?",
+  "What are the main differences between the way children and adults use the internet?",
+  "Is it important to learn how to cook? (Why?)",
+  "What is the best way for teachers to help students who are struggling?",
+  "Do you think people spend too much time on social media? (Why?)",
+  "What are the benefits of traveling to a foreign country?",
+  "How can a person learn new vocabulary effectively?",
+  "Is it better to travel alone or with other people? (Why?)",
+  "What are the main advantages and disadvantages of children using technology from a young age?",
+  "How can individuals contribute to solving environmental problems like climate change?",
+  "Do you like living in a big city or a small town?",
+  "Do you think it's important for people to have a hobby? (Why?)",
+  "How do you relax after a busy day at work or school?",
+  "Compare the importance of salary versus job satisfaction when people choose a career.",
+  "Why do you think some people are afraid of new technology, like AI?",
+  "What's a good way to prepare for an important exam?",
+  "Do you think communication today is better than it was in the past?",
+  "What's your favorite way to relax? (Why do you like it?)",
+  "What steps should governments take to encourage people to use public transport?",
+  "Is your life today different from your life five years ago? (How?)",
+  "Some people say tourism is bad for the environment. What do you think? (Why?)",
+  "How can a person make new friends when they move to a new city?",
+  "What are the differences between a good leader and a good manager?",
+  "Do you enjoy taking photos with your phone? (Why?)",
+  "How can education systems prepare students for the future job market?",
+  "Do you prefer studying in the morning or in the evening? (Why?)",
+  "In what ways has technology made our work-life easier, and in what ways has it made it more complicated?",
+  "What's the best way to stay healthy?",
+  "How does the pace of life in your country today compare to the past?",
+  "Do you like using social media? (Why/Why not?)",
+  "How can we protect endangered animals?",
+  "Compare the experience of reading a physical book with reading on an e-reader.",
+  "Why do some people prefer working from home while others prefer working in an office?",
+  "How do you stay focused when you are studying?",
+  "What are the main differences between living in the city and the countryside?",
+  "What are the good things about using social media?",
+  "How can cities be designed to be safer for residents?",
+  "How does the role of grandparents in the family today compare to their role in the past?",
+  "What are the benefits of studying a foreign language?",
+  "How do people in your country usually celebrate birthdays?",
+  "Is the way you study different from when you were a child?",
+  "Do you think it's healthy to eat street food? (Why/Why not?)",
+  "What measures should be taken to reduce the gap between the rich and the poor?",
+  "What are the differences between how people shop for food today and how they did in the past?",
+  "Why is it important for companies to invest in employee training?",
+  "What's the best way to maintain a long-distance friendship?",
+  "Compare the advantages of private transport (like cars) with public transport (like buses or trains).",
+  "How can communities build a stronger sense of connection among neighbors?"
+];
+
+    let remainingQuestions = [];
+    let currentCount = 0;
+    let totalQuestions = originalQuestions.length;
+
+    function init() {
+      remainingQuestions = [...originalQuestions];
+      currentCount = 0;
+      document.getElementById('counter').innerText = `Câu: 0/${totalQuestions}`;
+      document.getElementById('question').innerText = "Nhấn nút bên dưới để bắt đầu luyện tập";
+      document.getElementById('btn-next').innerText = "Next Question 🎯";
+      document.getElementById('btn-next').onclick = nextQuestion;
+    }
+
+    init();
+
+    function nextQuestion() {
+      const questionEl = document.getElementById('question');
+
+      if (remainingQuestions.length === 0) {
+        questionEl.innerText = "Tuyệt vời! Đã hoàn thành bộ Drill.";
+        document.getElementById('btn-next').innerText = "Restart Drill 🔄";
+        document.getElementById('btn-next').onclick = init;
+        return;
+      }
+
+      currentCount++;
+      document.getElementById('counter').innerText = `Câu: ${currentCount}/${totalQuestions}`;
+      
+      const randIndex = Math.floor(Math.random() * remainingQuestions.length);
+      const questionText = remainingQuestions.splice(randIndex, 1)[0];
+
+      questionEl.innerText = questionText;
+    }
+  </script>
+</body>
+</html>
