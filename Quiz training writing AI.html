@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Đào Tạo Truyền Thông - IZONE Writing AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #e2e8f0; }
+        .option-btn { transition: all 0.2s ease; }
+        .option-btn:hover:not(:disabled) { background-color: #f1f5f9; border-color: #94a3b8; }
+        .option-btn.selected-correct { background-color: #dcfce7; border-color: #22c55e; color: #166534; }
+        .option-btn.selected-incorrect { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
+        .option-btn.show-correct { background-color: #dcfce7; border-color: #22c55e; color: #166534; }
+        .hide { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 lg:p-8">
+
+    <div class="max-w-4xl w-full bg-white rounded-xl shadow-2xl overflow-hidden border-t-8 border-red-700">
+        <!-- Header -->
+        <div class="bg-slate-50 p-5 lg:p-8 border-b border-slate-200 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl lg:text-3xl font-extrabold text-blue-900 uppercase tracking-tight">IZONE Writing AI</h1>
+                <p class="text-slate-500 font-semibold text-sm mt-1 uppercase tracking-wider">Kiểm Tra Mức Độ Nắm Bắt Plan Truyền Thông</p>
+            </div>
+            <div id="header-counter" class="hide text-right bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
+                <span id="question-counter" class="text-xl font-bold text-red-700">1 / 10</span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-100 h-2">
+            <div id="progress-bar" class="bg-red-600 h-2 transition-all duration-300 rounded-r-full" style="width: 0%;"></div>
+        </div>
+
+        <!-- Start Area (Registration) -->
+        <div id="start-container" class="p-10 lg:p-16 text-center">
+            <div class="text-6xl mb-6">📝</div>
+            <h2 class="text-3xl font-extrabold text-blue-900 mb-4 tracking-tight">Thông Tin Người Làm Bài</h2>
+            <p class="text-slate-600 mb-8 font-medium">Vui lòng nhập đầy đủ họ và tên của bạn để bắt đầu bài kiểm tra.</p>
+            
+            <div class="max-w-md mx-auto text-left">
+                <label class="block text-slate-700 font-bold mb-2">Họ tên đầy đủ *</label>
+                <input type="text" id="user-name" placeholder="Ví dụ: Nguyễn Văn A" class="w-full p-4 border-2 border-slate-300 rounded-lg focus:border-blue-900 focus:outline-none transition-colors text-lg">
+                <p id="name-error" class="text-red-600 text-sm font-semibold mt-2 hide">⚠️ Yêu cầu nhập đầy đủ họ tên (ít nhất 2 từ).</p>
+            </div>
+
+            <button id="start-btn" class="mt-10 bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 px-10 rounded-lg transition-colors shadow-md text-lg uppercase tracking-wide w-full max-w-md">
+                Bắt đầu Quiz
+            </button>
+        </div>
+
+        <!-- Quiz Area -->
+        <div id="quiz-container" class="p-6 lg:p-10 hide">
+            <h2 id="question-text" class="text-xl lg:text-2xl font-bold text-slate-800 mb-8 leading-relaxed">
+                Đang tải câu hỏi...
+            </h2>
+
+            <div id="options-container" class="space-y-4">
+                <!-- Options injected by JS -->
+            </div>
+
+            <!-- Feedback Area -->
+            <div id="feedback-area" class="mt-8 p-5 rounded-lg hide shadow-sm border">
+                <div class="flex items-start gap-3">
+                    <span id="feedback-icon" class="text-2xl mt-0.5"></span>
+                    <div>
+                        <p id="feedback-status" class="font-bold text-lg mb-1"></p>
+                        <p id="feedback-rationale" class="text-slate-700 font-medium"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="mt-10 flex justify-end">
+                <button id="next-btn" class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg transition-colors hide shadow-md">
+                    Câu tiếp theo ➔
+                </button>
+            </div>
+        </div>
+
+        <!-- Processing Area -->
+        <div id="processing-container" class="p-10 lg:p-16 text-center hide bg-slate-50 flex-col items-center justify-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-900 mb-6 mx-auto"></div>
+            <h2 class="text-2xl font-extrabold text-blue-900 mb-3 uppercase tracking-tight">Đang xử lý bài làm...</h2>
+            <p class="text-slate-600 font-medium">Vui lòng đợi trong giây lát để hệ thống ghi nhận kết quả của bạn.</p>
+        </div>
+
+        <!-- Result Area -->
+        <div id="result-container" class="p-10 lg:p-16 text-center hide bg-slate-50">
+            <div class="text-7xl mb-6">🎯</div>
+            <h2 class="text-4xl font-extrabold text-blue-900 mb-3 uppercase tracking-tight">Hoàn Thành!</h2>
+            <p class="text-xl text-slate-600 mb-8 font-medium"><span id="display-user-name" class="font-bold text-blue-900"></span> đã trả lời đúng:</p>
+            
+            <div class="inline-block bg-white p-6 rounded-2xl shadow-lg border border-slate-200 mb-10">
+                <div class="text-6xl font-black text-red-700 tracking-tighter">
+                    <span id="score-text">0</span><span class="text-4xl text-slate-400">/10</span>
+                </div>
+            </div>
+            
+            <div id="result-message" class="max-w-2xl mx-auto text-slate-700 bg-white p-6 rounded-lg shadow-sm border border-slate-200 mb-6 font-semibold text-lg leading-relaxed"></div>
+            
+            <p class="text-sm font-bold text-green-600 mb-8">✓ Kết quả của bạn đã được lưu lại hệ thống</p>
+
+            <button id="restart-btn" class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 px-10 rounded-lg transition-colors shadow-md text-lg uppercase tracking-wide">
+                Làm lại bài test
+            </button>
+        </div>
+    </div>
+
+<script>
+    const quizData = [
+        {
+            question: "Theo chiến lược kinh doanh, sản phẩm Writing AI đóng vai trò cốt lõi là gì?",
+            options: [
+                "Nền tảng EdTech độc lập cạnh tranh trực tiếp với các web giá rẻ.",
+                "Công cụ 'mồi câu' (funnel) lột trần vấn đề để chốt sale khóa học.",
+                "Kênh tạo doanh thu chủ lực thông qua việc bán các gói Premium.",
+                "Hệ thống tự động hóa nhằm thay thế hoàn toàn giáo viên dạy Writing."
+            ],
+            correct: 1,
+            rationale: "Sản phẩm đóng vai trò 'bác sĩ bắt mạch', giúp người dùng nhận ra họ cần một phương pháp bài bản từ các khóa học của IZONE."
+        },
+        {
+            question: "KPI ưu tiên hàng đầu của team truyền thông trong giai đoạn Launch là gì?",
+            options: [
+                "Định vị vững chắc trên thị trường, gom traffic và xây dựng uy tín.",
+                "Đẩy mạnh chuyển đổi toàn bộ traffic thành Lead chất lượng cho Sale.",
+                "Đạt doanh thu 100 triệu từ việc bán các gói tài khoản 99k-299k.",
+                "Tách biệt hoàn toàn Writing AI ra khỏi thương hiệu IZONE để bán."
+            ],
+            correct: 0,
+            rationale: "Giai đoạn đầu cần 'flex' độ sâu của tool để chiếm thị phần người dùng trước, thay vì ép chuyển đổi ngay lập tức."
+        },
+        {
+            question: "Tính năng Overview (sắp tới) gài mồi chuyển đổi bằng cách nào?",
+            options: [
+                "Liệt kê toàn bộ lỗi sai ngữ pháp và tự động sửa lại cho đúng.",
+                "Đưa ra dự đoán điểm số (Band Score) chính xác tuyệt đối kèm biểu đồ.",
+                "Chỉ ra 3 lỗi cần sửa ngay, cho cách tự sửa và upsell khóa học.",
+                "Yêu cầu người dùng nhập số điện thoại trước khi xem mọi phản hồi."
+            ],
+            correct: 2,
+            rationale: "Giới hạn 3 điều giúp thông điệp sắc nét, kết hợp với phương án khả thi để lấy lòng tin, sau đó điều hướng người dùng về khóa học."
+        },
+        {
+            question: "Web giải quyết tình trạng 'Feedback vô dụng' bằng phương pháp nào?",
+            options: [
+                "Cung cấp kết quả chấm thi ngay lập tức trong vòng vài giây.",
+                "Bóc tách 4 tiêu chí thành các khía cạnh nhỏ như giám khảo thật.",
+                "Gửi bài viết tự động cho giáo viên chuyên môn chấm lại chi tiết.",
+                "Cung cấp biểu đồ Tracking lưu lại toàn bộ bài viết theo timeline."
+            ],
+            correct: 1,
+            rationale: "Việc phân tích chi tiết từng khía cạnh (như sự nhất quán, phát triển ý) giúp người học biết rõ gốc rễ vấn đề."
+        },
+        {
+            question: "Tính năng nào giúp feedback của web mang tính 'Actionable' (dùng được ngay)?",
+            options: [
+                "Biểu đồ theo dõi tiến độ (Progress Tracking).",
+                "Gợi ý sửa câu trực tiếp (Rewrite Suggestion).",
+                "Tính năng chấm chữa bài cũ (On-demand).",
+                "Giao bài tập thực hành cá nhân (AI Buddy)."
+            ],
+            correct: 1,
+            rationale: "Gợi ý sửa câu giúp học viên đọc là hiểu và biết cách tự áp dụng sửa ngay lập tức."
+        },
+        {
+            question: "Đóng vai trò AI Writing Coach, hệ thống KHÔNG có chức năng nào?",
+            options: [
+                "Phân tích các lỗi sai mang tính hệ thống của người học.",
+                "Viết lại đoạn văn Band 6.0 thành phiên bản Band 7.0.",
+                "Tự động khóa tài khoản nếu học viên lặp lại lỗi quá nhiều.",
+                "Giải thích nguyên lý tại sao cách viết mới lại được điểm cao."
+            ],
+            correct: 2,
+            rationale: "Hệ thống là môi trường luyện tập, không có tính năng phạt hay khóa tài khoản. Mục tiêu là khuyến khích học viên."
+        },
+        {
+            question: "Tính năng AI Buddy (sắp ra mắt) phục vụ mục đích phễu như thế nào?",
+            options: [
+                "Thay thế hoàn toàn lộ trình học ở trên lớp của học viên.",
+                "Làm bản preview (sneak peek) kích thích tò mò về Bác sĩ AI.",
+                "Trở thành công cụ thu phí duy nhất trị giá 299k để lọc khách.",
+                "Cung cấp kho bài mẫu Band 9.0 khổng lồ để học viên học thuộc."
+            ],
+            correct: 1,
+            rationale: "Việc nhận diện lỗ hổng và cho làm bài tập cá nhân hóa giúp user 'nếm thử' giải pháp độc quyền của IZONE."
+        },
+        {
+            question: "Vì sao IZONE dùng subdomain (writing.izone.edu.vn) thay vì tạo brand mới?",
+            options: [
+                "Tiết kiệm chi phí đóng thuế kinh doanh cho một sản phẩm mới.",
+                "Giảm thiểu rủi ro pháp lý khi cạnh tranh với các đối thủ khác.",
+                "Tận dụng uy tín sẵn có, đồng bộ trải nghiệm và dồn sức mạnh SEO.",
+                "Các nền tảng AI luyện thi IELTS khác đã mua hết tên miền đẹp."
+            ],
+            correct: 2,
+            rationale: "Giúp người dùng nhận diện ngay đây là sản phẩm của IZONE, tăng độ tin tưởng và hỗ trợ chuyển đổi mượt mà."
+        },
+        {
+            question: "Trong phễu IZONE, giai đoạn nào kích hoạt 'nhu cầu học' mạnh nhất?",
+            options: [
+                "Khi nhận ra lỗi sai và thấy có phương pháp bài bản để sửa.",
+                "Khi người dùng đăng ký tài khoản miễn phí thành công trên web.",
+                "Khi thanh toán gói cước 99k lần đầu tiên để xem toàn bộ lỗi.",
+                "Khi hoàn thành bài Placement Test đầu vào để đo trình độ."
+            ],
+            correct: 0,
+            rationale: "Chỉ khi user hiểu rõ tại sao sai và nhận ra có cách làm bài bản hơn, họ mới phát sinh nhu cầu đóng tiền học."
+        },
+        {
+            question: "Tính năng nào giải quyết nỗi đau 'Không thấy mình tiến bộ' (Pain 5)?",
+            options: [
+                "Nền tảng chấm chữa On-demand cho mọi bài viết.",
+                "Hệ thống Tracking lưu timeline và đối chiếu biểu đồ.",
+                "Công cụ phân tích Pattern lỗi cá nhân của AI Coach.",
+                "Cơ chế cài cắm Upsell của tính năng Overview ở đầu."
+            ],
+            correct: 1,
+            rationale: "Đối chiếu sự tiến bộ qua biểu đồ trực quan chứng minh cho user thấy họ đang tăng band thật sự."
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let hasAnswered = false;
+    let fullName = "";
+
+    const DOM = {
+        startContainer: document.getElementById('start-container'),
+        quizContainer: document.getElementById('quiz-container'),
+        processingContainer: document.getElementById('processing-container'),
+        resultContainer: document.getElementById('result-container'),
+        
+        userNameInput: document.getElementById('user-name'),
+        nameError: document.getElementById('name-error'),
+        startBtn: document.getElementById('start-btn'),
+        headerCounter: document.getElementById('header-counter'),
+
+        questionText: document.getElementById('question-text'),
+        optionsContainer: document.getElementById('options-container'),
+        counterText: document.getElementById('question-counter'),
+        progressBar: document.getElementById('progress-bar'),
+        
+        feedbackArea: document.getElementById('feedback-area'),
+        feedbackIcon: document.getElementById('feedback-icon'),
+        feedbackStatus: document.getElementById('feedback-status'),
+        feedbackRationale: document.getElementById('feedback-rationale'),
+        nextBtn: document.getElementById('next-btn'),
+        
+        scoreText: document.getElementById('score-text'),
+        displayUserName: document.getElementById('display-user-name'),
+        resultMessage: document.getElementById('result-message'),
+        restartBtn: document.getElementById('restart-btn')
+    };
+
+    // Bắt đầu Quiz khi nhấn nút
+    DOM.startBtn.onclick = () => {
+        const nameVal = DOM.userNameInput.value.trim();
+        // Kiểm tra phải có ít nhất 2 từ
+        if (nameVal.split(/\s+/).length < 2) {
+            DOM.nameError.classList.remove('hide');
+            return;
+        }
+        DOM.nameError.classList.add('hide');
+        fullName = nameVal;
+        
+        DOM.startContainer.classList.add('hide');
+        DOM.headerCounter.classList.remove('hide');
+        DOM.quizContainer.classList.remove('hide');
+        
+        currentQuestion = 0;
+        score = 0;
+        loadQuestion();
+    };
+
+    function loadQuestion() {
+        hasAnswered = false;
+        const qData = quizData[currentQuestion];
+        
+        DOM.counterText.innerText = `${currentQuestion + 1} / ${quizData.length}`;
+        DOM.progressBar.style.width = `${((currentQuestion) / quizData.length) * 100}%`;
+        DOM.questionText.innerText = qData.question;
+        
+        DOM.feedbackArea.classList.add('hide');
+        DOM.nextBtn.classList.add('hide');
+        
+        DOM.optionsContainer.innerHTML = '';
+        qData.options.forEach((optText, index) => {
+            const btn = document.createElement('button');
+            btn.className = "option-btn w-full text-left p-4 lg:p-5 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-semibold text-base lg:text-lg cursor-pointer flex items-start gap-4 shadow-sm";
+            btn.innerHTML = `<span class="bg-slate-100 text-slate-600 rounded px-3 py-1 text-sm font-bold mt-0.5 border border-slate-200">${String.fromCharCode(65 + index)}</span> <span>${optText}</span>`;
+            btn.onclick = () => selectOption(index, btn);
+            DOM.optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectOption(selectedIndex, btnElement) {
+        if (hasAnswered) return;
+        hasAnswered = true;
+        
+        const qData = quizData[currentQuestion];
+        const isCorrect = selectedIndex === qData.correct;
+        const allButtons = DOM.optionsContainer.querySelectorAll('.option-btn');
+        
+        allButtons.forEach((btn, idx) => {
+            btn.disabled = true;
+            btn.classList.remove('hover:bg-slate-100', 'shadow-sm');
+            
+            if (idx === qData.correct) {
+                btn.classList.add('show-correct');
+            } else if (idx === selectedIndex && !isCorrect) {
+                btn.classList.add('selected-incorrect');
+            } else {
+                btn.style.opacity = '0.4';
+            }
+        });
+
+        DOM.feedbackArea.classList.remove('hide');
+        DOM.feedbackArea.className = `mt-8 p-6 rounded-xl border ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`;
+        DOM.feedbackIcon.innerText = isCorrect ? "✅" : "❌";
+        DOM.feedbackStatus.innerText = isCorrect ? "Chính xác!" : "Chưa chính xác!";
+        DOM.feedbackStatus.className = `font-extrabold text-xl mb-1 ${isCorrect ? 'text-green-800' : 'text-red-800'}`;
+        DOM.feedbackRationale.innerText = qData.rationale;
+        
+        if (isCorrect) score++;
+
+        DOM.nextBtn.classList.remove('hide');
+        DOM.nextBtn.innerText = currentQuestion === quizData.length - 1 ? "Xem kết quả ➔" : "Câu tiếp theo ➔";
+    }
+
+    DOM.nextBtn.onclick = () => {
+        if (currentQuestion < quizData.length - 1) {
+            currentQuestion++;
+            loadQuestion();
+        } else {
+            processAndSendResult();
+        }
+    };
+
+    function processAndSendResult() {
+        DOM.quizContainer.classList.add('hide');
+        DOM.headerCounter.classList.add('hide');
+        DOM.processingContainer.classList.remove('hide');
+        DOM.processingContainer.classList.add('flex'); // Add flex để center spinner
+
+        const webhookUrl = "https://script.google.com/macros/s/AKfycbwTgQ7yj3X0Nq_XAMs4qnsmRbwz0AsaBTUnefvTCbS3OTPx1ZgGKTkpIayqBOcEDvk5/exec";
+        
+        const payload = JSON.stringify({
+            text: `Họ tên: ${fullName} | Kết quả: ${score}/10`
+        }) + "\n";
+
+        fetch(webhookUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: payload
+        }).then(() => {
+            showResult();
+        }).catch(err => {
+            console.error("Webhook error:", err);
+            showResult(); // Vẫn show kết quả nếu mạng chập chờn để user không bị kẹt
+        });
+    }
+
+    function showResult() {
+        DOM.processingContainer.classList.add('hide');
+        DOM.processingContainer.classList.remove('flex');
+        DOM.resultContainer.classList.remove('hide');
+        
+        DOM.scoreText.innerText = score;
+        DOM.displayUserName.innerText = fullName;
+        DOM.progressBar.style.width = '100%';
+        
+        let msg = "";
+        if (score === 10) msg = "Tuyệt vời! Bạn đã nắm vững 100% định hướng truyền thông của sản phẩm. Sẵn sàng chiến đấu!";
+        else if (score >= 7) msg = "Rất tốt! Bạn đã hiểu rõ bản chất sản phẩm, hãy xem lại một vài câu sai để nắm chắc hơn nhé.";
+        else msg = "Bạn cần xem lại tài liệu Plan Truyền Thông. Đừng quên bản chất sản phẩm là mồi câu (funnel), không phải bán lấy tiền lẻ!";
+        
+        DOM.resultMessage.innerText = msg;
+    }
+
+    // Nút làm lại chỉ reset điểm và quay về màn hình câu 1 (không cần nhập lại tên)
+    DOM.restartBtn.onclick = () => {
+        DOM.resultContainer.classList.add('hide');
+        DOM.headerCounter.classList.remove('hide');
+        DOM.quizContainer.classList.remove('hide');
+        currentQuestion = 0;
+        score = 0;
+        loadQuestion();
+    };
+
+</script>
+</body>
+</html>
