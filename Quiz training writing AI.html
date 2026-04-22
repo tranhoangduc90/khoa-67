@@ -14,6 +14,8 @@
         .option-btn.selected-incorrect { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
         .option-btn.show-correct { background-color: #dcfce7; border-color: #22c55e; color: #166534; }
         .hide { display: none !important; }
+        .timer-pulse { animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 lg:p-8">
@@ -25,8 +27,16 @@
                 <h1 class="text-2xl lg:text-3xl font-extrabold text-blue-900 uppercase tracking-tight">IZONE Writing AI</h1>
                 <p class="text-slate-500 font-semibold text-sm mt-1 uppercase tracking-wider">Kiểm Tra Mức Độ Nắm Bắt Plan Truyền Thông</p>
             </div>
-            <div id="header-counter" class="hide text-right bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
-                <span id="question-counter" class="text-xl font-bold text-red-700">1 / 10</span>
+            
+            <div id="header-counters" class="hide flex items-center gap-3">
+                <!-- Timer -->
+                <div id="timer-display" class="font-mono text-lg font-bold text-slate-600 bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 flex items-center gap-2 transition-colors">
+                    <span>⏱</span> <span id="timer-text">15s</span>
+                </div>
+                <!-- Question Counter -->
+                <div class="bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
+                    <span id="question-counter" class="text-xl font-bold text-red-700">1 / 10</span>
+                </div>
             </div>
         </div>
 
@@ -39,7 +49,7 @@
         <div id="start-container" class="p-10 lg:p-16 text-center">
             <div class="text-6xl mb-6">📝</div>
             <h2 class="text-3xl font-extrabold text-blue-900 mb-4 tracking-tight">Thông Tin Người Làm Bài</h2>
-            <p class="text-slate-600 mb-8 font-medium">Vui lòng nhập đầy đủ họ và tên của bạn để bắt đầu bài kiểm tra.</p>
+            <p class="text-slate-600 mb-8 font-medium">Vui lòng nhập đầy đủ họ và tên của bạn để bắt đầu bài kiểm tra.<br><i>(Giới hạn thời gian: 15 giây/câu)</i></p>
             
             <div class="max-w-md mx-auto text-left">
                 <label class="block text-slate-700 font-bold mb-2">Họ tên đầy đủ *</label>
@@ -228,6 +238,11 @@
     let score = 0;
     let hasAnswered = false;
     let fullName = "";
+    
+    // Timer Variables
+    const TIME_LIMIT = 15;
+    let timerInterval;
+    let timeLeft;
 
     const DOM = {
         startContainer: document.getElementById('start-container'),
@@ -238,13 +253,16 @@
         userNameInput: document.getElementById('user-name'),
         nameError: document.getElementById('name-error'),
         startBtn: document.getElementById('start-btn'),
-        headerCounter: document.getElementById('header-counter'),
+        headerCounters: document.getElementById('header-counters'),
 
         questionText: document.getElementById('question-text'),
         optionsContainer: document.getElementById('options-container'),
         counterText: document.getElementById('question-counter'),
         progressBar: document.getElementById('progress-bar'),
         
+        timerDisplay: document.getElementById('timer-display'),
+        timerText: document.getElementById('timer-text'),
+
         feedbackArea: document.getElementById('feedback-area'),
         feedbackIcon: document.getElementById('feedback-icon'),
         feedbackStatus: document.getElementById('feedback-status'),
@@ -257,10 +275,8 @@
         restartBtn: document.getElementById('restart-btn')
     };
 
-    // Bắt đầu Quiz khi nhấn nút
     DOM.startBtn.onclick = () => {
         const nameVal = DOM.userNameInput.value.trim();
-        // Kiểm tra phải có ít nhất 2 từ
         if (nameVal.split(/\s+/).length < 2) {
             DOM.nameError.classList.remove('hide');
             return;
@@ -269,13 +285,69 @@
         fullName = nameVal;
         
         DOM.startContainer.classList.add('hide');
-        DOM.headerCounter.classList.remove('hide');
+        DOM.headerCounters.classList.remove('hide');
         DOM.quizContainer.classList.remove('hide');
         
         currentQuestion = 0;
         score = 0;
         loadQuestion();
     };
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = TIME_LIMIT;
+        DOM.timerText.innerText = `${timeLeft}s`;
+        
+        // Reset timer UI
+        DOM.timerDisplay.className = "font-mono text-lg font-bold text-slate-600 bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-300 flex items-center gap-2 transition-colors";
+        
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            DOM.timerText.innerText = `${timeLeft}s`;
+
+            if (timeLeft <= 5 && timeLeft > 0) {
+                DOM.timerDisplay.className = "font-mono text-lg font-bold text-red-700 bg-red-100 px-3 py-1.5 rounded-lg border border-red-300 flex items-center gap-2 timer-pulse";
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                handleTimeOut();
+            }
+        }, 1000);
+    }
+
+    function handleTimeOut() {
+        if (hasAnswered) return;
+        hasAnswered = true;
+
+        DOM.timerDisplay.classList.remove('timer-pulse');
+        DOM.timerText.innerText = "Hết giờ!";
+        
+        const qData = quizData[currentQuestion];
+        const allButtons = DOM.optionsContainer.querySelectorAll('.option-btn');
+        
+        allButtons.forEach((btn, idx) => {
+            btn.disabled = true;
+            btn.classList.remove('hover:bg-slate-100', 'shadow-sm');
+            
+            if (idx === qData.correct) {
+                btn.classList.add('show-correct');
+            } else {
+                btn.style.opacity = '0.4';
+            }
+        });
+
+        // Show Timeout Feedback
+        DOM.feedbackArea.classList.remove('hide');
+        DOM.feedbackArea.className = `mt-8 p-6 rounded-xl border bg-orange-50 border-orange-200`;
+        DOM.feedbackIcon.innerText = "⏰";
+        DOM.feedbackStatus.innerText = "Hết thời gian!";
+        DOM.feedbackStatus.className = `font-extrabold text-xl mb-1 text-orange-800`;
+        DOM.feedbackRationale.innerText = qData.rationale;
+
+        DOM.nextBtn.classList.remove('hide');
+        DOM.nextBtn.innerText = currentQuestion === quizData.length - 1 ? "Xem kết quả ➔" : "Câu tiếp theo ➔";
+    }
 
     function loadQuestion() {
         hasAnswered = false;
@@ -296,11 +368,17 @@
             btn.onclick = () => selectOption(index, btn);
             DOM.optionsContainer.appendChild(btn);
         });
+
+        startTimer();
     }
 
     function selectOption(selectedIndex, btnElement) {
         if (hasAnswered) return;
         hasAnswered = true;
+        
+        // Stop the timer
+        clearInterval(timerInterval);
+        DOM.timerDisplay.classList.remove('timer-pulse');
         
         const qData = quizData[currentQuestion];
         const isCorrect = selectedIndex === qData.correct;
@@ -343,9 +421,9 @@
 
     function processAndSendResult() {
         DOM.quizContainer.classList.add('hide');
-        DOM.headerCounter.classList.add('hide');
+        DOM.headerCounters.classList.add('hide');
         DOM.processingContainer.classList.remove('hide');
-        DOM.processingContainer.classList.add('flex'); // Add flex để center spinner
+        DOM.processingContainer.classList.add('flex');
 
         const webhookUrl = "https://script.google.com/macros/s/AKfycbwTgQ7yj3X0Nq_XAMs4qnsmRbwz0AsaBTUnefvTCbS3OTPx1ZgGKTkpIayqBOcEDvk5/exec";
         
@@ -364,7 +442,7 @@
             showResult();
         }).catch(err => {
             console.error("Webhook error:", err);
-            showResult(); // Vẫn show kết quả nếu mạng chập chờn để user không bị kẹt
+            showResult(); 
         });
     }
 
@@ -385,10 +463,9 @@
         DOM.resultMessage.innerText = msg;
     }
 
-    // Nút làm lại chỉ reset điểm và quay về màn hình câu 1 (không cần nhập lại tên)
     DOM.restartBtn.onclick = () => {
         DOM.resultContainer.classList.add('hide');
-        DOM.headerCounter.classList.remove('hide');
+        DOM.headerCounters.classList.remove('hide');
         DOM.quizContainer.classList.remove('hide');
         currentQuestion = 0;
         score = 0;
