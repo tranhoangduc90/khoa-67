@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấp Cứu Từ Vựng - Trở Về Mẫu Giáo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #f8fafc; }
+        .hide { display: none !important; }
+        .timer-pulse { animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .8; transform: scale(1.05); } }
+        
+        /* Hiệu ứng hiện gợi ý */
+        .fade-in-up {
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Giao diện thẻ Flashcard */
+        .flashcard-bg {
+            background-image: repeating-linear-gradient(transparent, transparent 31px, #e2e8f0 31px, #e2e8f0 32px);
+            background-attachment: local;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 lg:p-8">
+
+    <div class="max-w-5xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden border-t-[10px] border-orange-600 flex flex-col h-[85vh] lg:h-auto min-h-[650px]">
+        
+        <!-- Header -->
+        <div class="bg-slate-50 p-5 border-b border-slate-200 flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-4">
+                <div class="bg-orange-100 text-orange-600 p-3 rounded-lg">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-xl lg:text-2xl font-black text-slate-800 uppercase tracking-tight">Trạm 2: Cấp Cứu Từ Vựng</h1>
+                    <p class="text-orange-600 font-bold text-sm mt-0.5 uppercase tracking-wider">Downgrading & Circumlocution</p>
+                </div>
+            </div>
+            
+            <div id="header-counters" class="hide flex items-center gap-3">
+                <div class="bg-white px-5 py-2 rounded-xl border-2 border-slate-200 shadow-sm flex flex-col items-center">
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Câu hỏi</span>
+                    <span id="question-counter" class="text-xl font-black text-orange-600 leading-none">1 / 10</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-100 h-2.5 shrink-0">
+            <div id="progress-bar" class="bg-orange-500 h-2.5 transition-all duration-300 rounded-r-full" style="width: 0%;"></div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 overflow-y-auto relative bg-slate-50/50">
+            
+            <!-- Bắt đầu (Intro) -->
+            <div id="start-container" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center h-full bg-white">
+                <div class="text-7xl mb-6">🚑</div>
+                <h2 class="text-3xl lg:text-5xl font-black text-slate-800 mb-6 tracking-tight">Luật Chơi "Trở Về Mẫu Giáo"</h2>
+                <div class="text-slate-700 mb-10 text-lg font-medium space-y-4 max-w-2xl text-left bg-orange-50 p-8 rounded-2xl border-2 border-orange-100">
+                    <p class="flex items-start gap-3"><span class="text-2xl">🚫</span> <span><b class="text-orange-700">CẤM DIỄN ĐẠT TỪ KHÓ:</b> Không cần tìm đúng từ vựng tiếng Anh xịn cho các khái niệm tiếng Việt trên màn hình.</span></p>
+                    <p class="flex items-start gap-3"><span class="text-2xl">👶</span> <span><b class="text-orange-700">TIẾNG ANH LỚP 6:</b> Hãy dùng vốn từ vựng cơ bản nhất (hành động, mô tả, cảm xúc) để giải thích khái niệm đó trong 15 giây.</span></p>
+                    <p class="flex items-start gap-3"><span class="text-2xl">⚡</span> <span><b class="text-orange-700">MỤC TIÊU:</b> Thà nói dài dòng và đơn giản còn hơn là đứng hình (Dead air) trong phòng thi!</span></p>
+                </div>
+                <div class="flex gap-4">
+                    <button id="start-btn" class="bg-orange-600 hover:bg-orange-700 text-white font-black py-4 px-12 rounded-xl transition-all shadow-[0_4px_0_rgb(194,65,12)] hover:shadow-[0_2px_0_rgb(194,65,12)] hover:translate-y-[2px] text-xl uppercase tracking-wide">
+                        Bắt Đầu Thực Chiến
+                    </button>
+                </div>
+            </div>
+
+            <!-- Khu vực Drill -->
+            <div id="drill-container" class="p-6 lg:p-10 hide flex flex-col h-full">
+                
+                <!-- Cảnh báo HV -->
+                <div id="speaking-indicator" class="text-center mb-6 text-orange-600 font-black text-xl animate-pulse bg-orange-100 py-3 rounded-xl border border-orange-200">
+                    🎙️ Bật mic và dùng Tiếng Anh lớp 6 để giải thích từ bên dưới!
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-8 items-stretch mb-8">
+                    <!-- Khái niệm cần giải thích (Trái) -->
+                    <div class="flex-1 bg-white p-8 lg:p-12 rounded-3xl border-4 border-slate-200 shadow-lg flex flex-col justify-center items-center text-center relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-3 bg-slate-800"></div>
+                        <span class="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block">Từ khóa cần diễn đạt</span>
+                        <h2 id="question-text" class="text-4xl lg:text-5xl font-black text-slate-800 leading-tight">
+                            Đang tải...
+                        </h2>
+                    </div>
+
+                    <!-- Timer (Phải) -->
+                    <div class="lg:w-64 shrink-0 flex items-center justify-center">
+                        <div id="timer-display" class="w-full font-mono text-6xl font-black text-orange-600 bg-orange-50 py-10 rounded-3xl border-4 border-orange-200 shadow-inner flex flex-col items-center justify-center transition-all duration-300">
+                            <span class="text-sm font-sans text-orange-400 uppercase tracking-widest mb-2">Thời gian</span>
+                            <span id="timer-text">15</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gợi ý (Bị ẩn lúc đầu) -->
+                <div id="suggestions-container" class="hide flex-1">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="bg-green-100 text-green-700 p-2 rounded-lg text-xl">💡</span>
+                        <h3 class="text-xl font-black text-slate-700 uppercase tracking-wide">Giải pháp "Mẫu Giáo":</h3>
+                    </div>
+                    
+                    <div id="suggestions-list" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Thẻ gợi ý sẽ được inject vào đây -->
+                    </div>
+                </div>
+
+                <!-- Khu vực Nút bấm -->
+                <div class="mt-auto pt-8 flex justify-between items-center border-t border-slate-200">
+                    <button id="skip-timer-btn" class="text-slate-400 hover:text-orange-600 font-bold px-4 py-2 rounded-lg hover:bg-orange-50 transition-colors">
+                        Giáo viên: Bỏ qua đếm ngược
+                    </button>
+
+                    <div class="flex gap-4 ml-auto">
+                        <button id="show-suggestions-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 px-8 rounded-xl transition-all shadow-[0_4px_0_rgb(4,120,87)] hover:shadow-[0_2px_0_rgb(4,120,87)] hover:translate-y-[2px] text-lg hide flex items-center gap-2">
+                            <span>Hiện cách giải cứu</span> <span>💡</span>
+                        </button>
+                        
+                        <button id="next-btn" class="bg-slate-800 hover:bg-slate-900 text-white font-black py-4 px-8 rounded-xl transition-all shadow-[0_4px_0_rgb(15,23,42)] hover:shadow-[0_2px_0_rgb(15,23,42)] hover:translate-y-[2px] text-lg hide">
+                            Từ tiếp theo ➔
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Area -->
+            <div id="result-container" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center h-full hide bg-white">
+                <div class="text-8xl mb-8">🎉</div>
+                <h2 class="text-4xl lg:text-5xl font-black text-slate-800 mb-6 uppercase tracking-tight">Cứu Thương Thành Công!</h2>
+                <p class="text-xl text-slate-600 mb-10 font-medium max-w-2xl leading-relaxed">
+                    Bạn đã học được cách sinh tồn. Đừng bao giờ khựng lại 5 giây chỉ để tìm một từ tiếng Anh hoa mỹ.<br><br>
+                    <span class="text-orange-600 font-black bg-orange-50 p-4 rounded-xl border border-orange-100 inline-block">Trôi chảy (Fluency) quan trọng hơn Từ vựng (Vocabulary)!</span>
+                </p>
+                <div class="flex gap-4">
+                    <button id="restart-btn" class="bg-orange-600 hover:bg-orange-700 text-white font-black py-4 px-10 rounded-xl transition-all shadow-[0_4px_0_rgb(194,65,12)] hover:shadow-[0_2px_0_rgb(194,65,12)] hover:translate-y-[2px] text-lg uppercase tracking-wide">
+                        Làm lại bộ từ này
+                    </button>
+                    <button id="new-set-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-black py-4 px-10 rounded-xl transition-all shadow-[0_4px_0_rgb(148,163,184)] hover:shadow-[0_2px_0_rgb(148,163,184)] hover:translate-y-[2px] text-lg uppercase tracking-wide">
+                        Tạo bộ từ mới
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Ngân hàng 20 Khái niệm Tiếng Việt khó và hướng Downgrade tiếng Anh đơn giản
+    const tabooDataPool = [
+        {
+            word: "Lối sống thụ động",
+            target_vocab: "Sedentary lifestyle",
+            suggestions: [
+                "Sit in front of the computer all day",
+                "Don't do any exercise at all",
+                "Just stay at home and sleep"
+            ]
+        },
+        {
+            word: "Xuống cấp / Tồi tệ đi",
+            target_vocab: "Deteriorate",
+            suggestions: [
+                "Get really bad",
+                "Go down quickly",
+                "Not good anymore"
+            ]
+        },
+        {
+            word: "Áp lực đồng trang lứa",
+            target_vocab: "Peer pressure",
+            suggestions: [
+                "Friends force you to do something",
+                "Want to do exactly what friends do",
+                "Feel bad when friends are better than you"
+            ]
+        },
+        {
+            word: "Người ăn chay",
+            target_vocab: "Vegetarian / Vegan",
+            suggestions: [
+                "People who strictly avoid meat",
+                "Only eat vegetables and fruits",
+                "Don't eat anything from animals"
+            ]
+        },
+        {
+            word: "Bắt chước mù quáng",
+            target_vocab: "Imitate / Copy blindly",
+            suggestions: [
+                "Do exactly the same thing without thinking",
+                "Follow other people",
+                "Copy what famous people wear"
+            ]
+        },
+        {
+            word: "Đi lại hàng ngày (Đi làm/Học)",
+            target_vocab: "Commute",
+            suggestions: [
+                "The daily trip between home and work",
+                "Travel to school every morning",
+                "Go to the office and come back"
+            ]
+        },
+        {
+            word: "Giá đắt cắt cổ",
+            target_vocab: "Exorbitant / Prohibitive",
+            suggestions: [
+                "Too expensive for me",
+                "Cost a lot of money",
+                "I don't have enough money to buy it"
+            ]
+        },
+        {
+            word: "Bắt buộc",
+            target_vocab: "Mandatory / Compulsory",
+            suggestions: [
+                "You must do it",
+                "You have no choice",
+                "The rule says everyone has to do it"
+            ]
+        },
+        {
+            word: "Gây hại / Phá hoại",
+            target_vocab: "Detrimental / Destructive",
+            suggestions: [
+                "Very bad for your health",
+                "Make you sick",
+                "Break things easily"
+            ]
+        },
+        {
+            word: "Mơ hồ / Khó hiểu",
+            target_vocab: "Ambiguous / Incomprehensible",
+            suggestions: [
+                "Very hard to understand",
+                "Not clear at all",
+                "I don't know what it means"
+            ]
+        },
+        {
+            word: "Tự lập / Tự túc",
+            target_vocab: "Independent / Self-reliant",
+            suggestions: [
+                "Do everything by yourself",
+                "Don't need help from parents",
+                "Make your own money"
+            ]
+        },
+        {
+            word: "Phân biệt đối xử",
+            target_vocab: "Discrimination",
+            suggestions: [
+                "Treat people badly because they are different",
+                "Not fair to some people",
+                "Hate someone because of their skin color"
+            ]
+        },
+        {
+            word: "Nghèo nàn / Thiếu thốn",
+            target_vocab: "Impoverished / Deprived",
+            suggestions: [
+                "Don't have enough food or money",
+                "Very poor",
+                "Live in a very bad condition"
+            ]
+        },
+        {
+            word: "Xả stress / Giải trí",
+            target_vocab: "Let one's hair down / Unwind",
+            suggestions: [
+                "Relax after a hard working day",
+                "Feel happy and forget about problems",
+                "Do something fun on the weekend"
+            ]
+        },
+        {
+            word: "Người hướng nội",
+            target_vocab: "Introvert",
+            suggestions: [
+                "Shy people",
+                "Like to stay at home alone",
+                "Don't like talking to big groups"
+            ]
+        },
+        {
+            word: "Người tham công tiếc việc",
+            target_vocab: "Workaholic",
+            suggestions: [
+                "Work all the time",
+                "Never stop working",
+                "Love jobs more than family"
+            ]
+        },
+        {
+            word: "Quá tải / Kiệt sức",
+            target_vocab: "Overwhelmed / Exhausted",
+            suggestions: [
+                "Have too much homework to do",
+                "Feel very tired",
+                "Cannot do anything anymore"
+            ]
+        },
+        {
+            word: "Nổi tiếng / Nổi bật",
+            target_vocab: "Renowned / Prominent",
+            suggestions: [
+                "Everyone knows them",
+                "Very famous on the Internet",
+                "Easy to see in a crowd"
+            ]
+        },
+        {
+            word: "Đa nhiệm (Làm nhiều việc)",
+            target_vocab: "Multitasking",
+            suggestions: [
+                "Do many things at the same time",
+                "Watch TV while eating and texting",
+                "Use the phone and study together"
+            ]
+        },
+        {
+            word: "Lỗi thời / Lạc hậu",
+            target_vocab: "Obsolete / Outdated",
+            suggestions: [
+                "Very old",
+                "Nobody uses it anymore",
+                "Not modern at all"
+            ]
+        }
+    ];
+
+    const QUESTIONS_PER_SESSION = 10;
+    let currentSessionData = [];
+    let currentQuestion = 0;
+    
+    // Timer Variables
+    const TIME_LIMIT = 15;
+    let timerInterval;
+    let timeLeft;
+    let isTimerRunning = false;
+
+    const DOM = {
+        startContainer: document.getElementById('start-container'),
+        drillContainer: document.getElementById('drill-container'),
+        resultContainer: document.getElementById('result-container'),
+        
+        startBtn: document.getElementById('start-btn'),
+        headerCounters: document.getElementById('header-counters'),
+        counterText: document.getElementById('question-counter'),
+        progressBar: document.getElementById('progress-bar'),
+        
+        timerDisplay: document.getElementById('timer-display'),
+        timerText: document.getElementById('timer-text'),
+        speakingIndicator: document.getElementById('speaking-indicator'),
+
+        questionText: document.getElementById('question-text'),
+        
+        suggestionsContainer: document.getElementById('suggestions-container'),
+        suggestionsList: document.getElementById('suggestions-list'),
+        
+        showSuggestionsBtn: document.getElementById('show-suggestions-btn'),
+        nextBtn: document.getElementById('next-btn'),
+        skipTimerBtn: document.getElementById('skip-timer-btn'),
+        
+        restartBtn: document.getElementById('restart-btn'),
+        newSetBtn: document.getElementById('new-set-btn')
+    };
+
+    // Hàm trộn mảng ngẫu nhiên
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    function startNewSession() {
+        const shuffledPool = shuffleArray([...tabooDataPool]);
+        currentSessionData = shuffledPool.slice(0, QUESTIONS_PER_SESSION);
+        
+        currentQuestion = 0;
+        
+        DOM.startContainer.classList.add('hide');
+        DOM.resultContainer.classList.add('hide');
+        DOM.headerCounters.classList.remove('hide');
+        DOM.drillContainer.classList.remove('hide');
+        
+        loadQuestion();
+    }
+
+    function restartSession() {
+        currentQuestion = 0;
+        
+        DOM.resultContainer.classList.add('hide');
+        DOM.headerCounters.classList.remove('hide');
+        DOM.drillContainer.classList.remove('hide');
+        
+        loadQuestion();
+    }
+
+    DOM.startBtn.onclick = startNewSession;
+    DOM.newSetBtn.onclick = startNewSession; // Random 10 từ mới
+    DOM.restartBtn.onclick = restartSession; // Giữ nguyên 10 từ cũ
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = TIME_LIMIT;
+        isTimerRunning = true;
+        
+        // Reset UI cho Timer
+        DOM.timerDisplay.className = "w-full font-mono text-6xl font-black text-orange-600 bg-orange-50 py-10 rounded-3xl border-4 border-orange-200 shadow-inner flex flex-col items-center justify-center transition-all duration-300";
+        DOM.timerText.innerText = timeLeft;
+        DOM.speakingIndicator.classList.remove('hide');
+        DOM.skipTimerBtn.classList.remove('hide');
+        
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            DOM.timerText.innerText = timeLeft;
+
+            if (timeLeft <= 5 && timeLeft > 0) {
+                DOM.timerDisplay.className = "w-full font-mono text-6xl font-black text-red-600 bg-red-50 py-10 rounded-3xl border-4 border-red-500 shadow-inner flex flex-col items-center justify-center timer-pulse";
+            }
+
+            if (timeLeft <= 0) {
+                endTimer();
+            }
+        }, 1000);
+    }
+
+    DOM.skipTimerBtn.onclick = () => {
+        if(isTimerRunning) {
+            endTimer();
+        }
+    };
+
+    function endTimer() {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        
+        // UI khi hết giờ
+        DOM.timerDisplay.classList.remove('timer-pulse');
+        DOM.timerDisplay.className = "w-full font-mono text-2xl lg:text-3xl font-black text-slate-400 bg-slate-100 py-10 rounded-3xl border-4 border-slate-200 shadow-inner flex flex-col items-center justify-center";
+        DOM.timerText.innerText = "Hết giờ!";
+        
+        DOM.speakingIndicator.classList.add('hide');
+        DOM.skipTimerBtn.classList.add('hide');
+        
+        // Hiện nút Gợi ý
+        DOM.showSuggestionsBtn.classList.remove('hide');
+    }
+
+    DOM.showSuggestionsBtn.onclick = () => {
+        DOM.showSuggestionsBtn.classList.add('hide');
+        
+        const currentData = currentSessionData[currentQuestion];
+        DOM.suggestionsList.innerHTML = '';
+        
+        // Render Từ vựng Academic (Tham khảo cho GV)
+        const targetCard = document.createElement('div');
+        targetCard.className = `md:col-span-2 bg-slate-800 text-white p-4 rounded-xl shadow-md text-center fade-in-up mb-2`;
+        targetCard.innerHTML = `<span class="text-slate-400 text-sm font-bold uppercase tracking-wider block mb-1">Từ học thuật (Tham khảo):</span> <span class="text-2xl font-black text-emerald-400">${currentData.target_vocab}</span>`;
+        DOM.suggestionsList.appendChild(targetCard);
+
+        // Render Các cách nói lớp 6
+        currentData.suggestions.forEach((sugg, index) => {
+            const delay = (index + 1) * 0.15;
+            const card = document.createElement('div');
+            card.className = `bg-white border-2 border-emerald-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow text-left fade-in-up flashcard-bg flex items-start gap-4`;
+            card.style.animationDelay = `${delay}s`;
+            card.innerHTML = `
+                <div class="bg-emerald-100 text-emerald-700 w-10 h-10 rounded-full flex items-center justify-center font-black text-xl shrink-0">
+                    ${index + 1}
+                </div>
+                <p class="text-slate-700 font-bold text-xl leading-relaxed mt-1">"${sugg}"</p>
+            `;
+            DOM.suggestionsList.appendChild(card);
+        });
+
+        DOM.suggestionsContainer.classList.remove('hide');
+        DOM.nextBtn.classList.remove('hide');
+        
+        if (currentQuestion === currentSessionData.length - 1) {
+            DOM.nextBtn.innerText = "Hoàn thành bài tập ➔";
+        } else {
+            DOM.nextBtn.innerText = "Từ tiếp theo ➔";
+        }
+    };
+
+    function loadQuestion() {
+        const qData = currentSessionData[currentQuestion];
+        
+        DOM.counterText.innerText = `${currentQuestion + 1} / ${currentSessionData.length}`;
+        DOM.progressBar.style.width = `${((currentQuestion) / currentSessionData.length) * 100}%`;
+        
+        DOM.questionText.innerText = qData.word;
+        
+        DOM.suggestionsContainer.classList.add('hide');
+        DOM.showSuggestionsBtn.classList.add('hide');
+        DOM.nextBtn.classList.add('hide');
+        
+        startTimer();
+    }
+
+    DOM.nextBtn.onclick = () => {
+        if (currentQuestion < currentSessionData.length - 1) {
+            currentQuestion++;
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    };
+
+    function showResult() {
+        DOM.drillContainer.classList.add('hide');
+        DOM.headerCounters.classList.add('hide');
+        DOM.progressBar.style.width = '100%';
+        DOM.resultContainer.classList.remove('hide');
+    }
+
+</script>
+</body>
+</html>
