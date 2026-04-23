@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phản Xạ 3 Giây - Speaking Thực Chiến</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #e2e8f0; }
+        .hide { display: none !important; }
+        .timer-pulse { animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .8; transform: scale(1.05); } }
+        
+        /* Hiệu ứng hiện gợi ý */
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 lg:p-8">
+
+    <div class="max-w-5xl w-full bg-white rounded-xl shadow-2xl overflow-hidden border-t-8 border-red-700 flex flex-col h-[85vh] lg:h-auto min-h-[600px]">
+        
+        <!-- Header -->
+        <div class="bg-slate-50 p-5 lg:p-6 border-b border-slate-200 flex justify-between items-center shrink-0">
+            <div>
+                <h1 class="text-xl lg:text-2xl font-extrabold text-blue-900 uppercase tracking-tight">Phản Xạ Ý Tưởng</h1>
+                <p class="text-slate-500 font-semibold text-xs mt-1 uppercase tracking-wider">Hạ cánh an toàn & Tư duy ngược</p>
+            </div>
+            
+            <div id="header-counters" class="hide flex items-center gap-3">
+                <!-- Question Counter -->
+                <div class="bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
+                    <span id="question-counter" class="text-lg font-bold text-red-700">1 / 10</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-100 h-2 shrink-0">
+            <div id="progress-bar" class="bg-red-600 h-2 transition-all duration-300 rounded-r-full" style="width: 0%;"></div>
+        </div>
+
+        <!-- Main Content Area (Scrollable if needed) -->
+        <div class="flex-1 overflow-y-auto relative">
+            
+            <!-- Bắt đầu (Intro) -->
+            <div id="start-container" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center h-full">
+                <div class="text-7xl mb-6">⏱️</div>
+                <h2 class="text-3xl lg:text-4xl font-extrabold text-blue-900 mb-4 tracking-tight">Quy Tắc Sinh Tồn</h2>
+                <div class="text-slate-600 mb-10 text-lg font-medium space-y-3 max-w-2xl text-left bg-blue-50 p-6 rounded-xl border border-blue-100">
+                    <p>👉 <span class="font-bold text-blue-900">BẠN CÓ 15 GIÂY:</span> Không cần nói thành câu hoàn chỉnh.</p>
+                    <p>👉 <span class="font-bold text-blue-900">HÉT LÊN TỪ KHÓA:</span> Chọn idea <b>rẻ rúng, đời thực, cá nhân nhất</b> nảy ra trong đầu.</p>
+                    <p>👉 <span class="font-bold text-blue-900">TRỌNG TÀI ĐÁNH GIÁ:</span> Partner bên cạnh chấm độ nhanh và thực tế của Idea.</p>
+                </div>
+                <button id="start-btn" class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 px-12 rounded-xl transition-colors shadow-lg text-xl uppercase tracking-wide">
+                    Bắt Đầu Huấn Luyện
+                </button>
+            </div>
+
+            <!-- Khu vực Drill -->
+            <div id="drill-container" class="p-6 lg:p-10 hide flex flex-col h-full">
+                
+                <!-- Timer Display (Large & Centered initially) -->
+                <div class="flex justify-center mb-8">
+                    <div id="timer-display" class="font-mono text-4xl lg:text-6xl font-black text-slate-700 bg-slate-100 px-8 py-4 rounded-2xl border-2 border-slate-200 shadow-inner flex items-center gap-4 transition-all duration-300">
+                        <span>⏳</span> <span id="timer-text">15</span>
+                    </div>
+                </div>
+
+                <!-- Cảnh báo HV -->
+                <div id="speaking-indicator" class="text-center mb-6 text-red-600 font-bold text-lg animate-pulse">
+                    🗣️ Hãy nói to ý tưởng của bạn ngay! Partner chú ý lắng nghe!
+                </div>
+
+                <!-- Câu hỏi -->
+                <div class="bg-white p-6 lg:p-8 rounded-2xl border-2 border-blue-100 shadow-md mb-8 text-center">
+                    <span class="text-sm font-bold text-blue-500 uppercase tracking-widest mb-2 block" id="q-type">Part 3 Khó</span>
+                    <h2 id="question-text" class="text-2xl lg:text-4xl font-extrabold text-blue-900 leading-tight">
+                        Đang tải câu hỏi...
+                    </h2>
+                </div>
+
+                <!-- Gợi ý (Bị ẩn lúc đầu) -->
+                <div id="suggestions-container" class="hide flex-1">
+                    <h3 class="text-lg font-bold text-slate-500 uppercase tracking-wider mb-4 border-b pb-2">💡 Gợi ý "Hạ cánh an toàn":</h3>
+                    <div id="suggestions-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Thẻ gợi ý sẽ được inject vào đây -->
+                    </div>
+                </div>
+
+                <!-- Khu vực Nút bấm -->
+                <div class="mt-auto pt-8 flex justify-between items-center">
+                    <!-- Nút dành cho GV bỏ qua đếm ngược -->
+                    <button id="skip-timer-btn" class="text-slate-400 hover:text-slate-600 font-semibold underline text-sm transition-colors">
+                        Bỏ qua đếm ngược
+                    </button>
+
+                    <div class="flex gap-4 ml-auto">
+                        <button id="show-suggestions-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-md text-lg hide">
+                            Hiện gợi ý 💡
+                        </button>
+                        
+                        <button id="next-btn" class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-xl transition-colors shadow-md text-lg hide">
+                            Câu tiếp theo ➔
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Area -->
+            <div id="result-container" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center h-full hide bg-slate-50">
+                <div class="text-7xl mb-6">🎯</div>
+                <h2 class="text-4xl font-extrabold text-blue-900 mb-4 uppercase tracking-tight">Kết Thúc Bài Luyện Tập</h2>
+                <p class="text-xl text-slate-600 mb-8 font-medium max-w-2xl">
+                    Các bạn đã vượt qua bài test áp lực 3 giây. Hãy nhớ: <br><br>
+                    <span class="text-red-600 font-bold bg-red-50 p-2 rounded block">Điểm cao không đến từ idea xuất chúng, mà đến từ idea DỄ NHẤT được nói ra mượt mà nhất.</span>
+                </p>
+                <button id="restart-btn" class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 px-10 rounded-xl transition-colors shadow-md text-lg uppercase tracking-wide">
+                    Làm lại bài tập
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Ngân hàng 20 câu hỏi (Sẽ được random rút ra 10 câu mỗi lần chơi)
+    const drillDataPool = [
+        {
+            type: "Part 3 - Vĩ mô",
+            question: "How will artificial intelligence change education in the future?",
+            suggestions: [
+                { icon: "💻", specific: "Học sinh dùng ChatGPT làm bài tập về nhà", generalized: "Trở thành công cụ tự học đắc lực (Self-study tool)" },
+                { icon: "👨‍🏫", specific: "Giáo viên dùng phần mềm để chấm bài tự động", generalized: "Giúp giảm tải áp lực công việc (Lighten workload)" }
+            ]
+        },
+        {
+            type: "Part 1 - Đời thường",
+            question: "Do you like watching the sky?",
+            suggestions: [
+                { icon: "📱", specific: "Cắm mặt vào điện thoại cả ngày, chả bao giờ nhìn lên", generalized: "Tôi hiếm khi làm vậy vì lối sống quá bận rộn (Hectic lifestyle)" },
+                { icon: "🌅", specific: "Thỉnh thoảng ra Hồ Tây ngắm hoàng hôn", generalized: "Đó là cách tuyệt vời để tôi thư giãn (Unwind / Let my hair down)" }
+            ]
+        },
+        {
+            type: "Part 3 - Hiện tượng xã hội",
+            question: "Why do young people like buying luxury brands?",
+            suggestions: [
+                { icon: "😎", specific: "Mua để khoe lên Facebook/Instagram với bạn bè", generalized: "Do áp lực đồng trang lứa và muốn thể hiện (Peer pressure & Show off)" },
+                { icon: "✨", specific: "Đồ đắt tiền thường bền và dùng được lâu năm", generalized: "Họ coi đó là khoản đầu tư vào chất lượng (Invest in durability)" }
+            ]
+        },
+        {
+            type: "Part 1 - Quá Hiển Nhiên",
+            question: "Do you drink water every day?",
+            suggestions: [
+                { icon: "💧", specific: "Khát thì phải uống thôi chứ sao", generalized: "(Cười) Chắc chắn rồi, đó là nhu cầu sinh tồn cơ bản (A no-brainer / Essential)" },
+                { icon: "🥤", specific: "Luôn để một cốc nước to chà bá cạnh laptop", generalized: "Tôi luôn cố gắng giữ cơ thể đủ nước cả ngày (Stay hydrated)" }
+            ]
+        },
+        {
+            type: "Part 3 - Lợi/Hại",
+            question: "What are the benefits of playing video games?",
+            suggestions: [
+                { icon: "🎮", specific: "Chơi FIFA / Liên Minh với hội bạn thân cuối tuần", generalized: "Là cách giải trí và gắn kết bạn bè cực kỳ hiệu quả (Relieve stress & Bond)" },
+                { icon: "🧠", specific: "Chơi game chiến thuật phải tính toán đường đi nước bước", generalized: "Giúp rèn luyện tư duy logic và phản xạ nhanh (Cognitive skills)" }
+            ]
+        },
+        {
+            type: "Part 1 - Sở thích",
+            question: "Do you enjoy reading books?",
+            suggestions: [
+                { icon: "😴", specific: "Đọc được 5 trang là mắt ríu lại buồn ngủ", generalized: "Thành thật mà nói, tôi không phải là người đam mê đọc sách (Not an avid reader)" },
+                { icon: "🕵️", specific: "Chỉ cày truyện trinh thám như Conan hoặc Sherlock", generalized: "Tôi chỉ có hứng thú với một vài thể loại cụ thể (Specific genres)" }
+            ]
+        },
+        {
+            type: "Part 3 - Giải pháp",
+            question: "How can we protect the environment in cities?",
+            suggestions: [
+                { icon: "🗑️", specific: "Đặt thêm nhiều thùng rác to ở mỗi ngã tư", generalized: "Cải thiện cơ sở hạ tầng quản lý rác thải công cộng (Waste management)" },
+                { icon: "🛵", specific: "Đi xe buýt, tàu điện trên cao thay vì đi xe máy", generalized: "Khuyến khích người dân sử dụng phương tiện công cộng (Public transport)" }
+            ]
+        },
+        {
+            type: "Part 1 - Quá Hiển Nhiên",
+            question: "Do you wear shoes?",
+            suggestions: [
+                { icon: "👟", specific: "Đi chân đất ra đường chắc xước hết chân mất", generalized: "(Hiển nhiên) Có chứ, nó là vật dụng thiết yếu hàng ngày (An essential item)" },
+                { icon: "🏃", specific: "Chỉ thích đi Sneaker vì nó êm và đi bộ không đau chân", generalized: "Tôi luôn ưu tiên sự thoải mái lên hàng đầu (Prioritize comfort)" }
+            ]
+        },
+        {
+            type: "Part 3 - Hành vi",
+            question: "Why do some people stay up very late?",
+            suggestions: [
+                { icon: "🎬", specific: "Cố cày nốt mấy tập phim Hàn Quốc đang gay cấn", generalized: "Vì họ bị cuốn vào các hình thức giải trí trên mạng (Digital entertainment)" },
+                { icon: "📚", specific: "Nước đến chân mới nhảy, chạy deadline bài tập ngày mai", generalized: "Chủ yếu do thói quen trì hoãn công việc (Procrastination)" }
+            ]
+        },
+        {
+            type: "Part 1 - Lựa chọn",
+            question: "What is your favorite color?",
+            suggestions: [
+                { icon: "🖤", specific: "Màu đen, mặc vào nhìn gầy hơn và đỡ lộ vết bẩn", generalized: "Tôi chuộng những màu sắc mang tính thực dụng cao (Practicality)" },
+                { icon: "🤍", specific: "Màu trắng vì mua áo mặc mix với quần nào cũng hợp", generalized: "Tôi thích sự tối giản và linh hoạt trong phối đồ (Minimalism & Versatility)" }
+            ]
+        },
+        // --- 10 Câu Bổ Sung ---
+        {
+            type: "Part 1 - Thói quen",
+            question: "Do you prefer taking a bus or a taxi?",
+            suggestions: [
+                { icon: "🚕", specific: "Taxi, vì không muốn chen chúc với mùi mồ hôi của người khác", generalized: "Tôi ưu tiên sự riêng tư và thoải mái (Prioritize privacy and comfort)" },
+                { icon: "🚌", specific: "Xe buýt, vì đang là sinh viên làm gì có tiền đi taxi", generalized: "Đó là phương án tiết kiệm chi phí hơn rất nhiều (Cost-effective option)" }
+            ]
+        },
+        {
+            type: "Part 3 - Môi trường làm việc",
+            question: "Is it good for people to change jobs frequently?",
+            suggestions: [
+                { icon: "📈", specific: "Có chứ, nhảy việc thì lương mới tăng nhanh được", generalized: "Nó giúp đẩy nhanh tốc độ thăng tiến và thu nhập (Career advancement & financial growth)" },
+                { icon: "🚩", specific: "Không, sếp nhìn CV thấy nhảy nhiều sẽ đánh trượt ngay", generalized: "Nó thể hiện sự thiếu gắn bó và không ổn định (Lack of loyalty and instability)" }
+            ]
+        },
+        {
+            type: "Part 1 - Đời thường",
+            question: "Do you like cooking?",
+            suggestions: [
+                { icon: "🧽", specific: "Ghét cực, nấu xong phải rửa cả đống bát đĩa mệt mỏi", generalized: "Tôi thấy nó quá tốn thời gian và công sức (Time-consuming and labor-intensive)" },
+                { icon: "🍳", specific: "Có, tự chiên trứng ở nhà rẻ hơn nhiều so với ra hàng", generalized: "Đó là một cách tốt để quản lý chi tiêu cá nhân (Manage personal budget)" }
+            ]
+        },
+        {
+            type: "Part 3 - Động lực",
+            question: "Why do people like traveling abroad?",
+            suggestions: [
+                { icon: "📸", specific: "Để chụp ảnh sống ảo up lên Facebook cho bạn bè lác mắt", generalized: "Để thỏa mãn nhu cầu thể hiện địa vị xã hội (Seek validation and social status)" },
+                { icon: "🍣", specific: "Để được ăn Sushi chuẩn vị Nhật Bản thay vì đồ pha tạp", generalized: "Họ muốn trải nghiệm văn hóa đích thực tận mắt (Experience authentic cultures firsthand)" }
+            ]
+        },
+        {
+            type: "Part 1 - Thói quen",
+            question: "What do you usually do in the mornings?",
+            suggestions: [
+                { icon: "⏰", specific: "Tắt báo thức 5 lần rồi mới lết nổi ra khỏi giường", generalized: "Tôi thường chật vật thức dậy vì lịch trình quá bận rộn (Struggle to wake up due to a hectic schedule)" },
+                { icon: "☕", specific: "Phải nốc ngay một cốc cà phê đen đặc để tỉnh ngủ", generalized: "Tôi phụ thuộc vào caffeine để tăng cường sự tỉnh táo (Rely on caffeine to boost alertness)" }
+            ]
+        },
+        {
+            type: "Part 3 - Tác động",
+            question: "How do advertisements influence people?",
+            suggestions: [
+                { icon: "💸", specific: "Đang lướt Shopee thấy sale rẻ quá nên mua dù không cần", generalized: "Chúng kích hoạt hành vi mua sắm bốc đồng (Trigger impulsive buying behavior)" },
+                { icon: "🎵", specific: "Bài hát quảng cáo Điện Máy Xanh cứ ám ảnh trong đầu", generalized: "Chúng tạo ra sự ghi nhớ thương hiệu cực kỳ mạnh mẽ (Create strong brand recall)" }
+            ]
+        },
+        {
+            type: "Part 1 - Sở thích",
+            question: "Do you often listen to music?",
+            suggestions: [
+                { icon: "🎧", specific: "Đeo tai nghe trên công ty để sếp/đồng nghiệp đỡ bắt chuyện", generalized: "Để tạo ranh giới cá nhân và chặn tiếng ồn (Create personal boundaries & block distractions)" },
+                { icon: "🛵", specific: "Vừa nghe vừa lái xe máy cho đỡ chán lúc tắc đường", generalized: "Nó giúp việc di chuyển hàng ngày bớt tẻ nhạt hơn (Make daily commute more bearable)" }
+            ]
+        },
+        {
+            type: "Part 3 - Hiện tượng",
+            question: "Why is fast food so popular?",
+            suggestions: [
+                { icon: "⏳", specific: "Chạy deadline sấp mặt, mua vội cái bánh mì 5 phút là xong", generalized: "Nó hoàn toàn phù hợp với nhịp sống hối hả hiện đại (Suits the fast-paced modern lifestyle)" },
+                { icon: "🍗", specific: "Nó siêu rẻ và đi đâu cũng thấy cửa hàng KFC, Lotteria", generalized: "Vì tính tiếp cận cao và giá cả cực kỳ phải chăng (Highly accessible and affordable)" }
+            ]
+        },
+        {
+            type: "Part 1 - Lựa chọn",
+            question: "Do you care about fashion?",
+            suggestions: [
+                { icon: "👕", specific: "Mặc áo phông quần đùi quanh năm miễn sao mát là được", generalized: "Tôi luôn ưu tiên sự thoải mái hơn là tính thẩm mỹ (Prioritize comfort over aesthetics)" },
+                { icon: "💅", specific: "Có chứ, mặc đẹp thì ra đường mới tự tin tán gái/trai được", generalized: "Nó rất quan trọng trong việc tạo ấn tượng ban đầu (Crucial for making a good first impression)" }
+            ]
+        },
+        {
+            type: "Part 3 - Mối quan hệ",
+            question: "Why do friendships sometimes end?",
+            suggestions: [
+                { icon: "💰", specific: "Cho vay tiền xong đòi mãi không trả nên cạch mặt nhau", generalized: "Những xung đột tài chính phá hủy hoàn toàn niềm tin (Financial conflicts destroy trust)" },
+                { icon: "✈️", specific: "Bạn chuyển đi thành phố khác học, ít nhắn tin dần rồi thôi", generalized: "Mối quan hệ nhạt dần do khoảng cách địa lý (Fade away due to geographical distance)" }
+            ]
+        }
+    ];
+
+    const QUESTIONS_PER_SESSION = 10;
+    let currentSessionData = [];
+    let currentQuestion = 0;
+    
+    // Timer Variables
+    const TIME_LIMIT = 15;
+    let timerInterval;
+    let timeLeft;
+    let isTimerRunning = false;
+
+    const DOM = {
+        startContainer: document.getElementById('start-container'),
+        drillContainer: document.getElementById('drill-container'),
+        resultContainer: document.getElementById('result-container'),
+        
+        startBtn: document.getElementById('start-btn'),
+        headerCounters: document.getElementById('header-counters'),
+        counterText: document.getElementById('question-counter'),
+        progressBar: document.getElementById('progress-bar'),
+        
+        timerDisplay: document.getElementById('timer-display'),
+        timerText: document.getElementById('timer-text'),
+        speakingIndicator: document.getElementById('speaking-indicator'),
+
+        qType: document.getElementById('q-type'),
+        questionText: document.getElementById('question-text'),
+        
+        suggestionsContainer: document.getElementById('suggestions-container'),
+        suggestionsList: document.getElementById('suggestions-list'),
+        
+        showSuggestionsBtn: document.getElementById('show-suggestions-btn'),
+        nextBtn: document.getElementById('next-btn'),
+        skipTimerBtn: document.getElementById('skip-timer-btn'),
+        restartBtn: document.getElementById('restart-btn')
+    };
+
+    // Hàm trộn mảng ngẫu nhiên (Fisher-Yates Shuffle)
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    function startNewSession() {
+        // Random 10 câu từ ngân hàng 20 câu
+        const shuffledPool = shuffleArray([...drillDataPool]);
+        currentSessionData = shuffledPool.slice(0, QUESTIONS_PER_SESSION);
+        
+        currentQuestion = 0;
+        
+        DOM.startContainer.classList.add('hide');
+        DOM.resultContainer.classList.add('hide');
+        DOM.headerCounters.classList.remove('hide');
+        DOM.drillContainer.classList.remove('hide');
+        
+        loadQuestion();
+    }
+
+    function restartSession() {
+        // Chỉ reset biến đếm, KHÔNG random lại mảng currentSessionData
+        currentQuestion = 0;
+        
+        DOM.resultContainer.classList.add('hide');
+        DOM.headerCounters.classList.remove('hide');
+        DOM.drillContainer.classList.remove('hide');
+        
+        loadQuestion();
+    }
+
+    DOM.startBtn.onclick = startNewSession;
+    DOM.restartBtn.onclick = restartSession;
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = TIME_LIMIT;
+        isTimerRunning = true;
+        
+        // Reset UI cho Timer
+        DOM.timerDisplay.className = "font-mono text-4xl lg:text-6xl font-black text-blue-900 bg-blue-50 px-8 py-4 rounded-2xl border-4 border-blue-200 shadow-inner flex items-center gap-4 transition-all duration-300";
+        DOM.timerText.innerText = timeLeft;
+        DOM.speakingIndicator.classList.remove('hide');
+        DOM.skipTimerBtn.classList.remove('hide');
+        
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            DOM.timerText.innerText = timeLeft;
+
+            // Hiệu ứng nhấp nháy đỏ ở 5s cuối
+            if (timeLeft <= 5 && timeLeft > 0) {
+                DOM.timerDisplay.className = "font-mono text-4xl lg:text-6xl font-black text-red-700 bg-red-50 px-8 py-4 rounded-2xl border-4 border-red-500 shadow-inner flex items-center gap-4 timer-pulse";
+            }
+
+            if (timeLeft <= 0) {
+                endTimer();
+            }
+        }, 1000);
+    }
+
+    // Nút giáo viên ép bỏ qua đếm ngược
+    DOM.skipTimerBtn.onclick = () => {
+        if(isTimerRunning) {
+            endTimer();
+        }
+    };
+
+    function endTimer() {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        
+        // UI khi hết giờ
+        DOM.timerDisplay.classList.remove('timer-pulse');
+        DOM.timerDisplay.className = "font-mono text-2xl lg:text-3xl font-bold text-slate-400 bg-slate-100 px-6 py-3 rounded-xl border-2 border-slate-200 flex items-center gap-3";
+        DOM.timerText.innerText = "Hết giờ nghĩ!";
+        
+        DOM.speakingIndicator.classList.add('hide');
+        DOM.skipTimerBtn.classList.add('hide');
+        
+        // Hiện nút "Hiện gợi ý" thay vì bung đáp án ngay lập tức
+        DOM.showSuggestionsBtn.classList.remove('hide');
+    }
+
+    DOM.showSuggestionsBtn.onclick = () => {
+        // Ẩn nút gợi ý sau khi đã bấm
+        DOM.showSuggestionsBtn.classList.add('hide');
+        
+        // Render thẻ Gợi ý
+        const currentData = currentSessionData[currentQuestion];
+        DOM.suggestionsList.innerHTML = '';
+        
+        currentData.suggestions.forEach((sugg, index) => {
+            const delay = index * 0.15; // Tạo hiệu ứng hiện tuần tự
+            const card = document.createElement('div');
+            card.className = `bg-white border-2 border-green-100 p-5 lg:p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow text-left fade-in-up flex flex-col gap-3`;
+            card.style.animationDelay = `${delay}s`;
+            card.innerHTML = `
+                <div class="flex gap-4 items-start">
+                    <div class="text-3xl lg:text-4xl mt-1">${sugg.icon}</div>
+                    <div class="flex-1 w-full">
+                        <!-- Bước 1: Nghĩ Cụ Thể -->
+                        <div class="mb-3">
+                            <span class="inline-block text-[10px] font-extrabold bg-slate-100 text-slate-500 px-2 py-1 rounded uppercase tracking-wider mb-1.5 border border-slate-200">1. Ý tưởng đời thực</span>
+                            <p class="text-slate-600 font-medium text-base italic">"${sugg.specific}"</p>
+                        </div>
+                        
+                        <!-- Bước 2: Khái Quát -->
+                        <div class="bg-green-50 p-4 rounded-xl border border-green-200 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+                            <span class="inline-block text-[10px] font-extrabold bg-green-200 text-green-800 px-2 py-1 rounded uppercase tracking-wider mb-1.5">2. Mở bài khái quát</span>
+                            <p class="text-green-900 font-extrabold text-lg leading-snug">➔ ${sugg.generalized}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            DOM.suggestionsList.appendChild(card);
+        });
+
+        // Bung khu vực gợi ý và nút Next
+        DOM.suggestionsContainer.classList.remove('hide');
+        DOM.nextBtn.classList.remove('hide');
+        
+        if (currentQuestion === currentSessionData.length - 1) {
+            DOM.nextBtn.innerText = "Hoàn thành bài tập ➔";
+        } else {
+            DOM.nextBtn.innerText = "Câu tiếp theo ➔";
+        }
+    };
+
+    function loadQuestion() {
+        const qData = currentSessionData[currentQuestion];
+        
+        // Cập nhật Header & Progress
+        DOM.counterText.innerText = `${currentQuestion + 1} / ${currentSessionData.length}`;
+        DOM.progressBar.style.width = `${((currentQuestion) / currentSessionData.length) * 100}%`;
+        
+        // Cập nhật Câu hỏi
+        DOM.qType.innerText = qData.type;
+        DOM.questionText.innerText = qData.question;
+        
+        // Ẩn/Hiện các thành phần
+        DOM.suggestionsContainer.classList.add('hide');
+        DOM.showSuggestionsBtn.classList.add('hide');
+        DOM.nextBtn.classList.add('hide');
+        
+        // Chạy lại đồng hồ
+        startTimer();
+    }
+
+    DOM.nextBtn.onclick = () => {
+        if (currentQuestion < currentSessionData.length - 1) {
+            currentQuestion++;
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    };
+
+    function showResult() {
+        DOM.drillContainer.classList.add('hide');
+        DOM.headerCounters.classList.add('hide');
+        DOM.progressBar.style.width = '100%';
+        DOM.resultContainer.classList.remove('hide');
+    }
+
+</script>
+</body>
+</html>
