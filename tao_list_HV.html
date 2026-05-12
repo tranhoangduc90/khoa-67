@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chuyển danh sách học viên thành Array</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 420px;
+      resize: vertical;
+      padding: 12px;
+      font-size: 15px;
+      line-height: 1.5;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-family: Consolas, monospace;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      background: #2563eb;
+      color: white;
+    }
+
+    button.secondary {
+      background: #666;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #666;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Chuyển danh sách học viên thành Array</h1>
+
+    <div class="grid">
+      <div class="panel">
+        <label for="inputText">Input</label>
+        <textarea id="inputText" placeholder="Dán danh sách học viên vào đây..."></textarea>
+      </div>
+
+      <div class="panel">
+        <label for="outputText">Output</label>
+        <textarea id="outputText" readonly placeholder="Kết quả sẽ hiện ở đây..."></textarea>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button onclick="convertText()">Chuyển đổi</button>
+      <button onclick="copyOutput()">Copy output</button>
+      <button class="secondary" onclick="clearAll()">Xóa</button>
+    </div>
+
+    <div class="note">
+      Tool sẽ bỏ qua dòng trắng. Dòng đầu tiên được hiểu là tên lớp. Nếu có nhiều lớp, tool sẽ tự nhận diện các dòng có dạng mã lớp như IC2139, IELTS60, PREIELTS01...
+    </div>
+  </div>
+
+  <script>
+    function escapeSingleQuote(text) {
+      return text
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'");
+    }
+
+    function isLikelyClassName(line) {
+      const vietnameseChars =
+        /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ]/;
+
+      return (
+        /^[A-Za-z][A-Za-z0-9 ._-]{1,40}$/.test(line) &&
+        /\d/.test(line) &&
+        !vietnameseChars.test(line)
+      );
+    }
+
+    function convertText() {
+      const rawInput = document.getElementById("inputText").value;
+
+      if (!rawInput.trim()) {
+        document.getElementById("outputText").value = "";
+        return;
+      }
+
+      const lines = rawInput
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
+
+      if (lines.length === 0) {
+        document.getElementById("outputText").value = "";
+        return;
+      }
+
+      const classIndexes = [];
+
+      lines.forEach((line, index) => {
+        if (index === 0 || isLikelyClassName(line)) {
+          classIndexes.push(index);
+        }
+      });
+
+      const uniqueClassIndexes = [...new Set(classIndexes)].sort((a, b) => a - b);
+
+      const output = uniqueClassIndexes
+        .map((startIndex, i) => {
+          const endIndex = uniqueClassIndexes[i + 1] ?? lines.length;
+
+          const className = escapeSingleQuote(lines[startIndex]);
+
+          const students = lines
+            .slice(startIndex + 1, endIndex)
+            .map(name => `'${escapeSingleQuote(name)}'`);
+
+          return `'${className}': [${students.join(", ")}],`;
+        })
+        .join("\n");
+
+      document.getElementById("outputText").value = output;
+    }
+
+    async function copyOutput() {
+      const outputText = document.getElementById("outputText").value;
+
+      if (!outputText) return;
+
+      try {
+        await navigator.clipboard.writeText(outputText);
+        alert("Đã copy output.");
+      } catch (error) {
+        const outputArea = document.getElementById("outputText");
+        outputArea.select();
+        document.execCommand("copy");
+        alert("Đã copy output.");
+      }
+    }
+
+    function clearAll() {
+      document.getElementById("inputText").value = "";
+      document.getElementById("outputText").value = "";
+    }
+  </script>
+</body>
+</html>
