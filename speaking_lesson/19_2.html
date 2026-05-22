@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speaking Flash Drill - HOW Questions (3-Part Master)</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f7f6;
+      margin: 0;
+      padding: 18px;
+      text-align: center;
+      color: #222;
+    }
+
+    #card {
+      background: white;
+      width: 100%;
+      max-width: 480px;
+      min-height: 92vh;
+      margin: 0 auto;
+      padding: 18px;
+      border-radius: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    #top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #666;
+    }
+
+    #counter, #level {
+      background: #eef1f4;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    #task-box {
+      background: #f8f9fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.45;
+      text-align: left;
+    }
+
+    #task-box strong {
+      color: #111;
+    }
+
+    #timer-wrapper {
+      position: relative;
+      width: 108px;
+      height: 108px;
+      margin: 4px auto;
+    }
+
+    #timer-svg {
+      width: 108px;
+      height: 108px;
+      transform: rotate(-90deg);
+    }
+
+    .timer-bg {
+      fill: none;
+      stroke: #e9ecef;
+      stroke-width: 8;
+    }
+
+    .timer-progress {
+      fill: none;
+      stroke: #007bff;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke 0.2s;
+    }
+
+    #timer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      font-weight: 800;
+      color: #007bff;
+    }
+
+    #timer-wrapper.ready .timer-progress {
+      stroke: #dc3545;
+    }
+
+    #timer-wrapper.ready #timer {
+      color: #dc3545;
+      animation: pulse 0.6s ease-in-out 3;
+    }
+
+    #signal {
+      min-height: 28px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #dc3545;
+    }
+
+    #question {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.35;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      color: #1a202c;
+    }
+
+    /* Template suggestion styling */
+    #template-box {
+      background: #eef6ff;
+      border: 1px dashed #007bff;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
+      text-align: left;
+      margin-bottom: 8px;
+    }
+
+    #template-box strong {
+      color: #0056b3;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .template-section {
+      margin-bottom: 8px;
+    }
+
+    .template-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .template-label {
+      font-weight: bold;
+      color: #4a5568;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    #template-text {
+      line-height: 1.45;
+      color: #333;
+    }
+
+    #checklist {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    .check-item {
+      flex: 1;
+      background: #f8f9fa;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .check-item input {
+      width: 18px;
+      height: 18px;
+      accent-color: #007bff;
+      cursor: pointer;
+    }
+
+    button {
+      width: 100%;
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 16px;
+      font-size: 18px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 0 4px 8px rgba(0,123,255,0.22);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .shake {
+      animation: shake 0.35s;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+
+    @media (max-width: 380px) {
+      #question {
+        font-size: 18px;
+        min-height: 80px;
+      }
+
+      #timer-wrapper,
+      #timer-svg {
+        width: 90px;
+        height: 90px;
+      }
+
+      #timer {
+        font-size: 30px;
+      }
+
+      #task-box {
+        font-size: 12px;
+        padding: 10px;
+      }
+
+      #template-box {
+        font-size: 12px;
+        padding: 10px;
+      }
+
+      #checklist {
+        gap: 4px;
+      }
+
+      .check-item {
+        font-size: 10px;
+        padding: 6px 2px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="card">
+    <div>
+      <div id="top-bar">
+        <div id="level">Độ khó: -</div>
+        <div id="counter">Câu: 0/30</div>
+      </div>
+
+      <div id="task-box">
+        <strong>Nhiệm vụ:</strong><br>
+        Nói <strong>2-3 câu</strong> mạch lạc chứa đủ cả 3 mảnh:<br>
+        <strong>Goal</strong> (Mục tiêu) ➜ <strong>Condition/Barrier</strong> (Điều kiện/Rào cản) ➜ <strong>Action/Tool</strong> (Hành động).
+      </div>
+    </div>
+
+    <div>
+      <div id="timer-wrapper">
+        <svg id="timer-svg" viewBox="0 0 108 108">
+          <circle class="timer-bg" cx="54" cy="54" r="46"></circle>
+          <circle id="timer-progress" class="timer-progress" cx="54" cy="54" r="46"></circle>
+        </svg>
+        <div id="timer">5</div>
+      </div>
+
+      <div id="signal"></div>
+
+      <div id="question">Nhấn nút bên dưới để bắt đầu phản xạ</div>
+
+      <!-- Combined Template suggestions for the full 3-part framework -->
+      <div id="template-box">
+        <strong>Khung liên kết ý 3 mảnh (Goal ➜ Condition/Barrier ➜ Action):</strong>
+        <div id="template-text">
+          <div class="template-section">
+            <div class="template-label">Hướng 1: Điều kiện (Condition Route)</div>
+            <em>If you want to [Goal], the first requirement is to [Condition]. A practical way to do this is by [Action-ing]...</em>
+          </div>
+          <div class="template-section" style="margin-top: 8px; border-top: 1px dashed #cbd5e0; padding-top: 6px;">
+            <div class="template-label">Hướng 2: Rào cản (Barrier Route)</div>
+            <em>To [Goal], people often struggle with [Barrier]. To overcome this challenge, they should [Action]...</em>
+          </div>
+        </div>
+      </div>
+
+      <div id="checklist">
+        <label class="check-item">
+          <input type="checkbox" id="check-goal">
+          <span>1. Nêu Goal</span>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox" id="check-condition">
+          <span>2. Có Condition/Barrier</span>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox" id="check-action">
+          <span>3. Có Action/Tool</span>
+        </label>
+      </div>
+    </div>
+
+    <button id="btn-next" onclick="nextQuestion()">Bắt đầu Drill 🎯</button>
+  </div>
+
+  <script>
+    // 30 Fresh daily-life questions: 40% Easy (12), 40% Moderate (12), 20% Challenging (6)
+    const EASY_QUESTIONS = [
+      "How can people make their bedrooms more comfortable?",
+      "How can you make a perfect cup of instant noodles?",
+      "How can someone keep their study desk organized?",
+      "How can people save water at home during daily chores?",
+      "How can you choose a good movie to watch on weekends?",
+      "How can someone prepare for a short weekend getaway?",
+      "How can people keep their shoes clean in rainy weather?",
+      "How can you show appreciation to a helpful neighbor?",
+      "How can someone choose a meaningful birthday gift?",
+      "How can people keep their indoor house plants alive?",
+      "How can someone find lost keys quickly in their house?",
+      "How can you make your daily morning commute less boring?"
+    ];
+
+    const MODERATE_QUESTIONS = [
+      "How can people stay awake during a long afternoon meeting?",
+      "How can someone stop checking their phone before going to sleep?",
+      "How can you handle a disagreement with a close friend?",
+      "How can busy parents find time to exercise regularly?",
+      "How can roommates split household chores fairly?",
+      "How can someone resist buying unnecessary things on online sales?",
+      "How can you cook a healthy meal when you are extremely tired?",
+      "How can someone wake up early without feeling completely exhausted?",
+      "How can families reduce their daily plastic waste?",
+      "How can a group of friends plan a trip on a very limited budget?",
+      "How can someone handle a loud neighbor politely but effectively?",
+      "How can you stay warm at home during an extremely cold winter day?"
+    ];
+
+    const CHALLENGING_QUESTIONS = [
+      "How can someone successfully maintain a long-distance relationship?",
+      "How can a person rebuild trust after breaking an important promise?",
+      "How can you balance a full-time job and a demanding personal passion project?",
+      "How can a small local grocery store survive against giant modern supermarkets?",
+      "How can someone stay positive and motivated during a major career change?",
+      "How can local communities organize better support for elderly neighbors living alone?"
+    ];
+
+    const PREP_TIME = 5;
+
+    let remainingQuestions = [];
+    let currentCount = 0;
+    let totalQuestions = 30;
+    let animationFrame = null;
+
+    const questionEl = document.getElementById("question");
+    const counterEl = document.getElementById("counter");
+    const levelEl = document.getElementById("level");
+    const timerWrapperEl = document.getElementById("timer-wrapper");
+    const timerEl = document.getElementById("timer");
+    const signalEl = document.getElementById("signal");
+    const cardEl = document.getElementById("card");
+    const btnNext = document.getElementById("btn-next");
+    const progressCircle = document.getElementById("timer-progress");
+
+    const checkGoal = document.getElementById("check-goal");
+    const checkCondition = document.getElementById("check-condition");
+    const checkAction = document.getElementById("check-action");
+
+    const radius = 46;
+    const circumference = 2 * Math.PI * radius;
+
+    progressCircle.style.strokeDasharray = circumference;
+    progressCircle.style.strokeDashoffset = 0;
+
+    function shuffleArray(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildSessionQuestions() {
+      const easy = shuffleArray(EASY_QUESTIONS).map(q => ({ text: q, level: "Dễ" }));
+      const moderate = shuffleArray(MODERATE_QUESTIONS).map(q => ({ text: q, level: "Trung bình" }));
+      const challenging = shuffleArray(CHALLENGING_QUESTIONS).map(q => ({ text: q, level: "Khó" }));
+
+      return shuffleArray([
+        ...easy,
+        ...moderate,
+        ...challenging
+      ]);
+    }
+
+    function resetChecklist() {
+      checkGoal.checked = false;
+      checkCondition.checked = false;
+      checkAction.checked = false;
+    }
+
+    function resetTimerDisplay() {
+      cancelAnimationFrame(animationFrame);
+      timerEl.textContent = PREP_TIME;
+      progressCircle.style.strokeDashoffset = 0;
+      timerWrapperEl.classList.remove("ready");
+      signalEl.textContent = "";
+    }
+
+    function init() {
+      resetTimerDisplay();
+      resetChecklist();
+
+      remainingQuestions = buildSessionQuestions();
+      currentCount = 0;
+      totalQuestions = remainingQuestions.length;
+
+      counterEl.textContent = `Câu: 0/${totalQuestions}`;
+      levelEl.textContent = "Độ khó: -";
+      questionEl.textContent = "Nhấn nút bên dưới để bắt đầu phản xạ";
+
+      btnNext.textContent = "Bắt đầu Drill 🎯";
+      btnNext.onclick = nextQuestion;
+    }
+
+    function startTimer() {
+      cancelAnimationFrame(animationFrame);
+
+      const duration = PREP_TIME * 1000;
+      const startTime = performance.now();
+
+      timerWrapperEl.classList.remove("ready");
+      signalEl.textContent = "";
+      progressCircle.style.strokeDashoffset = 0;
+
+      function updateTimer(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const remainingMs = Math.max(duration - elapsed, 0);
+        const remainingSeconds = Math.ceil(remainingMs / 1000);
+
+        timerEl.textContent = remainingSeconds;
+        progressCircle.style.strokeDashoffset = circumference * progress;
+
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(updateTimer);
+        } else {
+          timerEl.textContent = 0;
+          progressCircle.style.strokeDashoffset = circumference;
+
+          timerWrapperEl.classList.add("ready");
+          signalEl.textContent = "SPEAK NOW!";
+
+          cardEl.classList.remove("shake");
+          void cardEl.offsetWidth;
+          cardEl.classList.add("shake");
+
+          if (navigator.vibrate) {
+            navigator.vibrate([120, 80, 120]);
+          }
+        }
+      }
+
+      animationFrame = requestAnimationFrame(updateTimer);
+    }
+
+    function nextQuestion() {
+      if (remainingQuestions.length === 0) {
+        resetTimerDisplay();
+        resetChecklist();
+
+        questionEl.textContent = "Tuyệt vời! Đã hoàn thành bộ luyện tập phản xạ HOW.";
+        counterEl.textContent = `Câu: ${totalQuestions}/${totalQuestions}`;
+        levelEl.textContent = "Độ khó: Done";
+        timerEl.textContent = "✓";
+        progressCircle.style.strokeDashoffset = circumference;
+        signalEl.textContent = "";
+
+        btnNext.textContent = "Luyện tập lại 🔄";
+        btnNext.onclick = init;
+        return;
+      }
+
+      resetChecklist();
+      currentCount++;
+
+      const nextItem = remainingQuestions.shift();
+
+      counterEl.textContent = `Câu: ${currentCount}/${totalQuestions}`;
+      levelEl.textContent = `Độ khó: ${nextItem.level}`;
+      questionEl.textContent = nextItem.text;
+
+      btnNext.textContent = "Câu tiếp theo ➜";
+
+      startTimer();
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
