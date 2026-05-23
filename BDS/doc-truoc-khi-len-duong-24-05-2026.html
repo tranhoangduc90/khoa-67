@@ -1,0 +1,1488 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đọc trước khi lên đường - thực địa 24/05/2026</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      --bg: #f4f6f3;
+      --paper: #ffffff;
+      --ink: #1f2528;
+      --muted: #667276;
+      --line: #d8dedb;
+      --line-strong: #b9c3c0;
+      --green: #19705c;
+      --blue: #245f9c;
+      --amber: #a86500;
+      --red: #b7332f;
+      --purple: #6953a0;
+      --cyan: #087887;
+      --soft-green: #e8f3ee;
+      --soft-blue: #e8f0f8;
+      --soft-amber: #fff3df;
+      --soft-red: #fae9e7;
+      --soft-purple: #eeeaf7;
+      --shadow: 0 10px 24px rgba(25, 36, 40, 0.08);
+      --radius: 8px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font: 15px/1.55 "Segoe UI", Arial, sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    strong {
+      font-weight: 750;
+    }
+
+    .shell {
+      width: min(var(--max), calc(100% - 28px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(244, 246, 243, 0.96);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner {
+      min-height: 58px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    .brand-title {
+      display: block;
+      font-size: 16px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-sub {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 36px;
+      border: 1px solid var(--line-strong);
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 7px 11px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn.primary {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+    }
+
+    .btn:focus,
+    input:focus,
+    summary:focus {
+      outline: 3px solid rgba(36, 95, 156, 0.22);
+      outline-offset: 2px;
+    }
+
+    .hero {
+      padding: 22px 0 14px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+      gap: 14px;
+    }
+
+    .hero-main,
+    .hero-side,
+    .panel,
+    .price-card,
+    .script-box,
+    .question-card,
+    .flag-card,
+    .note-card,
+    .route-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-main {
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .hero-side {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      max-width: 820px;
+      font-size: clamp(28px, 4vw, 48px);
+    }
+
+    h2 {
+      font-size: clamp(22px, 2.4vw, 30px);
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .lead {
+      max-width: 780px;
+      color: #374044;
+      font-size: 17px;
+    }
+
+    .keyline {
+      border-left: 5px solid var(--green);
+      background: var(--soft-green);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-weight: 750;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .status-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfb;
+    }
+
+    .status-item b {
+      display: block;
+      font-size: 20px;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .status-item span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .nav-band {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .nav-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 0;
+      scrollbar-width: thin;
+    }
+
+    .nav-scroll a {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #283236;
+      background: #f9faf9;
+      font-weight: 750;
+      font-size: 13px;
+    }
+
+    main {
+      padding: 18px 0 56px;
+    }
+
+    section {
+      scroll-margin-top: 124px;
+      margin-top: 22px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-end;
+      margin-bottom: 12px;
+    }
+
+    .section-head p {
+      max-width: 740px;
+      color: var(--muted);
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .quick-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfb;
+      min-height: 120px;
+    }
+
+    .quick-item .num {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--soft-blue);
+      color: var(--blue);
+      font-weight: 850;
+      margin-bottom: 8px;
+    }
+
+    .quick-item strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .quick-item p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .price-card {
+      padding: 14px;
+      min-height: 180px;
+      display: grid;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .price-card .area {
+      font-weight: 850;
+    }
+
+    .price-card .price {
+      font-size: 22px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .price-card .tag {
+      width: fit-content;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tag.green {
+      background: var(--soft-green);
+      color: var(--green);
+    }
+
+    .tag.blue {
+      background: var(--soft-blue);
+      color: var(--blue);
+    }
+
+    .tag.amber {
+      background: var(--soft-amber);
+      color: var(--amber);
+    }
+
+    .tag.red {
+      background: var(--soft-red);
+      color: var(--red);
+    }
+
+    .tag.purple {
+      background: var(--soft-purple);
+      color: var(--purple);
+    }
+
+    .price-card p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      min-width: 780px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef3f1;
+      font-size: 13px;
+      color: #283236;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    td.price-cell {
+      white-space: nowrap;
+      font-weight: 850;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .route-card {
+      padding: 16px;
+      border-left: 5px solid var(--blue);
+    }
+
+    .route-card:nth-child(2n) {
+      border-left-color: var(--amber);
+    }
+
+    .route-card:nth-child(3n) {
+      border-left-color: var(--green);
+    }
+
+    .route-card h3 {
+      margin-bottom: 8px;
+    }
+
+    .route-card p {
+      color: var(--muted);
+    }
+
+    .script-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .script-box {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .script-quote {
+      border-left: 5px solid var(--green);
+      background: var(--soft-green);
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .script-box ul,
+    .panel ul,
+    .flag-card ul,
+    .note-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .script-box li,
+    .panel li,
+    .flag-card li,
+    .note-card li {
+      margin: 7px 0;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .search-row input {
+      min-height: 42px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 9px 12px;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .question-card {
+      padding: 14px;
+      min-height: 185px;
+    }
+
+    .question-card h3 {
+      margin-bottom: 8px;
+      color: var(--blue);
+    }
+
+    .question-card p {
+      margin: 7px 0;
+    }
+
+    .question-card .ask {
+      font-weight: 750;
+    }
+
+    .question-card .why {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .flags-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .flag-card {
+      padding: 14px;
+      border-top: 5px solid var(--red);
+    }
+
+    .flag-card h3 {
+      color: var(--red);
+      margin-bottom: 8px;
+    }
+
+    .threshold-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .note-card {
+      padding: 14px;
+      min-height: 170px;
+    }
+
+    .note-card h3 {
+      margin-bottom: 8px;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .map-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 100%;
+    }
+
+    .map-card.featured {
+      grid-column: span 2;
+    }
+
+    .map-card a {
+      display: block;
+      background: #e9eeeb;
+    }
+
+    .map-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      background: #f4f6f3;
+    }
+
+    .map-card.wide img {
+      aspect-ratio: 16 / 9;
+    }
+
+    .map-body {
+      padding: 12px 13px 14px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .map-body strong {
+      display: block;
+      line-height: 1.25;
+    }
+
+    .map-body p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .map-pill {
+      width: fit-content;
+      border-radius: 999px;
+      background: #eef3f1;
+      color: #394448;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .inline-map-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    details.panel {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    details > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px 18px;
+      font-weight: 850;
+      border-bottom: 1px solid transparent;
+    }
+
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details[open] > summary {
+      border-bottom-color: var(--line);
+      background: #f9faf9;
+    }
+
+    .details-body {
+      padding: 16px 18px 18px;
+    }
+
+    .footer {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 28px 0 42px;
+      border-top: 1px solid var(--line);
+    }
+
+    .compact .detail-heavy {
+      display: none;
+    }
+
+    .compact section {
+      margin-top: 16px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .script-grid,
+      .compare-grid,
+      .threshold-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-grid,
+      .price-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .question-grid,
+      .flags-grid,
+      .note-grid,
+      .map-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .map-card.featured {
+        grid-column: span 1;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        font-size: 14px;
+      }
+
+      .shell {
+        width: min(100% - 18px, var(--max));
+      }
+
+      .topbar-inner {
+        grid-template-columns: 1fr;
+        padding: 8px 0;
+      }
+
+      .toolbar {
+        justify-content: stretch;
+      }
+
+      .toolbar .btn {
+        flex: 1 1 auto;
+      }
+
+      .hero-main {
+        padding: 18px;
+      }
+
+      .hero-side {
+        padding: 14px;
+      }
+
+      .status-grid,
+      .quick-grid,
+      .price-grid,
+      .question-grid,
+      .flags-grid,
+      .note-grid,
+      .map-grid,
+      .inline-map-row {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .section-head p {
+        margin-top: 6px;
+      }
+
+      .search-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="brand">
+        <span class="brand-title">Đọc trước khi lên đường - thực địa 24/05</span>
+        <span class="brand-sub">Hợp nhất thực địa 17/05, tiền thực địa 24/05, ảnh bản đồ và kịch bản môi giới</span>
+      </div>
+      <div class="toolbar">
+        <button class="btn" id="toggleCompact" type="button">Đọc nhanh</button>
+        <button class="btn primary" id="copyScript" type="button">Sao chép kịch bản</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="shell hero-grid">
+      <div class="hero-main">
+        <div>
+          <div class="eyebrow">Mục tiêu chuyến đi</div>
+          <h1>Tìm vùng còn giá hợp lý, không mua theo câu chuyện bán hàng.</h1>
+        </div>
+        <p class="lead">Chuyến 17/05 cho thấy Hà Đông/Yên Nghĩa đã cao, Thanh Oai bị kéo bởi Vin/Olympic, Thường Tín mềm hơn nhưng nhiều lỗi, Thanh Trì gần lõi hơn. Chuyến 24/05 cần kiểm Chương Mỹ/Xuân Mai/Ứng Hòa theo 4 thứ: hạ tầng thật, dân cư thật, giá chốt thật, pháp lý thật.</p>
+        <div class="keyline">Câu nhớ chính: rẻ tương quan chưa phải cơ hội. Cơ hội là rẻ hơn đúng loại tài sản, đúng vị trí, đúng pháp lý, còn người mua cuối rõ ràng.</div>
+      </div>
+      <aside class="hero-side">
+        <div class="status-grid">
+          <div class="status-item">
+            <b>17/05</b>
+            <span>Thước giá Nam - Tây Nam Hà Nội</span>
+          </div>
+          <div class="status-item">
+            <b>24/05</b>
+            <span>Kiểm Chương Mỹ - Xuân Mai - Ứng Hòa</span>
+          </div>
+          <div class="status-item">
+            <b>3-5 năm</b>
+            <span>Khung giữ trung hạn, không lướt nóng</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Vai đi với môi giới</h3>
+          <p>Nhóm đã đi Hà Đông, Thanh Oai, Thường Tín, Thanh Trì. Đang tìm vùng giá hợp lý hơn, pháp lý sạch, tổng tiền vừa, có thanh khoản thật.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <nav class="nav-band">
+    <div class="shell nav-scroll">
+      <a href="#brief">60 giây</a>
+      <a href="#ban-do">Bản đồ</a>
+      <a href="#gia-17">Thước giá 17/05</a>
+      <a href="#dong-luc">Động lực</a>
+      <a href="#nguong-gia">Ngưỡng phản biện</a>
+      <a href="#moi-gioi">Kịch bản môi giới</a>
+      <a href="#hoi-nhanh">Hỏi nhanh</a>
+      <a href="#red-flag">Red flag</a>
+      <a href="#ghi-nhan">Ghi nhận</a>
+      <a href="#ket-luan">Kết luận</a>
+    </div>
+  </nav>
+
+  <main class="shell">
+    <section id="brief">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Đọc 60 giây</div>
+          <h2>5 ý phải giữ trong đầu</h2>
+        </div>
+        <p>Dùng phần này khi đang trên xe hoặc trước lúc gặp môi giới.</p>
+      </div>
+      <div class="quick-grid">
+        <div class="quick-item">
+          <span class="num">1</span>
+          <strong>Không mua narrative</strong>
+          <p>Chỉ ghi nhận thứ kiểm được: sổ, đường, quy hoạch, dân cư, giao dịch thật.</p>
+        </div>
+        <div class="quick-item">
+          <span class="num">2</span>
+          <strong>QL6 mạnh hơn QL21</strong>
+          <p>QL6/AH13 là trục hướng tâm Hà Đông - Xuân Mai. QL21 rẻ hơn chưa chắc là vùng trũng.</p>
+        </div>
+        <div class="quick-item">
+          <span class="num">3</span>
+          <strong>Sân bay là dài hạn</strong>
+          <p>Không trả giá như sân bay sắp làm. Phải hỏi trong ranh, sát ranh hay chỉ ăn theo truyền thông.</p>
+        </div>
+        <div class="quick-item">
+          <span class="num">4</span>
+          <strong>Tổng tiền quyết định thanh khoản</strong>
+          <p>Đơn giá đẹp nhưng tổng tiền kẹt khách thì vẫn khó ra hàng.</p>
+        </div>
+        <div class="quick-item">
+          <span class="num">5</span>
+          <strong>Rẻ phải có lý do tốt</strong>
+          <p>Rẻ vì bị bỏ sót khác với rẻ vì ngập, xa, thiếu cầu, sổ yếu hoặc dính quy hoạch.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="ban-do">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Bản đồ mở nhanh</div>
+          <h2>Ảnh minh họa đã xếp theo tình huống</h2>
+        </div>
+        <p>Bấm vào ảnh để mở lớn. Dùng ảnh để định vị câu chuyện, không dùng thay trích lục quy hoạch theo thửa.</p>
+      </div>
+      <div class="map-grid">
+        <article class="map-card featured wide">
+          <a href="assets/thuc-dia-24-05/image9.png" target="_blank" rel="noopener">
+            <img src="assets/thuc-dia-24-05/image9.png" alt="Bản đồ Chương Mỹ với QL6, QL21, ĐT419 và ĐT429">
+          </a>
+          <div class="map-body">
+            <span class="map-pill">Chương Mỹ - khung trục</span>
+            <strong>QL6 là xương sống; QL21/ĐT419/ĐT429 là trục phụ để tìm vùng mềm hơn.</strong>
+            <p>Khi môi giới nói “gần trục”, hỏi cụ thể gần QL6 hay QL21, đi thật bao nhiêu phút, qua mấy ngoặt, đường có ô tô tránh được không.</p>
+          </div>
+        </article>
+        <article class="map-card wide">
+          <a href="assets/thuc-dia-24-05/image1.png" target="_blank" rel="noopener">
+            <img src="assets/thuc-dia-24-05/image1.png" alt="Bản đồ Chương Mỹ với QPK Xuân Mai, KCN Phú Nghĩa và CCN">
+          </a>
+          <div class="map-body">
+            <span class="map-pill">Xuân Mai - KCN/CCN/QPK</span>
+            <strong>Tách 3 hệ câu chuyện: QPK Xuân Mai, QL6, KCN/CCN.</strong>
+            <p>Đừng để môi giới dùng QPK Xuân Mai để bán lô Phú Nghĩa/Chúc Sơn nếu lô không hưởng lợi trực tiếp.</p>
+          </div>
+        </article>
+        <article class="map-card">
+          <a href="assets/thuc-dia-24-05/image8.png" target="_blank" rel="noopener">
+            <img src="assets/thuc-dia-24-05/image8.png" alt="Bản đồ phân lớp khu vực Ứng Hòa">
+          </a>
+          <div class="map-body">
+            <span class="map-pill">Ứng Hòa - phân lớp</span>
+            <strong>Không có một mặt bằng giá Ứng Hòa chung.</strong>
+            <p>Vân Đình/QL21B là lõi; phía Bắc giáp Thanh Oai khác logic với phía Đông Nam giáp Phú Xuyên và vùng sân bay.</p>
+          </div>
+        </article>
+        <article class="map-card">
+          <a href="assets/thuc-dia-24-05/image7.png" target="_blank" rel="noopener">
+            <img src="assets/thuc-dia-24-05/image7.png" alt="Bản đồ Ứng Hòa với QL21B và ĐT428">
+          </a>
+          <div class="map-body">
+            <span class="map-pill">Ứng Hòa - trục hiện hữu</span>
+            <strong>QL21B là lõi đi qua Vân Đình; ĐT428 kéo sang phía Đông.</strong>
+            <p>Đất xa QL21B/ĐT428 phải rẻ hơn rõ, trừ khi có cầu sử dụng thật hoặc kết nối đặc biệt.</p>
+          </div>
+        </article>
+        <article class="map-card">
+          <a href="assets/thuc-dia-24-05/image6.png" target="_blank" rel="noopener">
+            <img src="assets/thuc-dia-24-05/image6.png" alt="Bản đồ các xã huyện Ứng Hòa">
+          </a>
+          <div class="map-body">
+            <span class="map-pill">Ứng Hòa - địa danh</span>
+            <strong>Dùng để hỏi đúng xã/cụm khi môi giới nói tên cũ.</strong>
+            <p>Nhớ các cụm: Vân Đình - Liên Bạt - Phương Tú; Trầm Lộng - Kim Đường; Đồng Lỗ - Đại Cường - Đại Hùng.</p>
+          </div>
+        </article>
+        <article class="map-card featured wide">
+          <a href="assets/thuc-dia-24-05/image3.png" target="_blank" rel="noopener">
+            <img src="assets/thuc-dia-24-05/image3.png" alt="Bản đồ giao thông Hà Nội với sân bay thứ hai phía Nam">
+          </a>
+          <div class="map-body">
+            <span class="map-pill">Sân bay 2 - trong mạng vùng</span>
+            <strong>Sân bay là câu chuyện dài hạn của cả mạng giao thông, không phải lý do mua mọi lô gần đó.</strong>
+            <p>Hỏi lô nằm trong ranh, sát ranh, hay chỉ ăn theo truyền thông. Không trả giá như sân bay đã khởi công.</p>
+          </div>
+        </article>
+        <article class="map-card">
+          <a href="assets/thuc-dia-24-05/image5.png" target="_blank" rel="noopener">
+            <img src="assets/thuc-dia-24-05/image5.png" alt="Bản đồ sân bay phía Nam và các tuyến cao tốc, quốc lộ">
+          </a>
+          <div class="map-body">
+            <span class="map-pill">Sân bay - kết nối</span>
+            <strong>Logic tốt nhất là logistics/kết nối, không phải “càng gần càng tốt”.</strong>
+            <p>Ưu tiên ngoài ranh, có đường thật ra QL1A/cao tốc/QL38/ĐT428, pháp lý đất ở sạch.</p>
+          </div>
+        </article>
+        <article class="map-card">
+          <a href="assets/thuc-dia-24-05/image2.png" target="_blank" rel="noopener">
+            <img src="assets/thuc-dia-24-05/image2.png" alt="Ảnh vệ tinh vùng sân bay thứ hai Ứng Hòa - Phú Xuyên">
+          </a>
+          <div class="map-body">
+            <span class="map-pill">Sân bay - vệ tinh</span>
+            <strong>Vùng sân bay hiện vẫn là cấu trúc nông thôn/ruộng/làng xen kẽ.</strong>
+            <p>Nếu giá đã nhảy mạnh, phải hỏi người mua cuối là ai trong 3-5 năm tới.</p>
+          </div>
+        </article>
+        <article class="map-card wide">
+          <a href="assets/thuc-dia-24-05/image4.png" target="_blank" rel="noopener">
+            <img src="assets/thuc-dia-24-05/image4.png" alt="Bản đồ quy hoạch sử dụng đất huyện Ứng Hòa đến năm 2030">
+          </a>
+          <div class="map-body">
+            <span class="map-pill">Ứng Hòa - QHSDĐ 2030</span>
+            <strong>Ảnh nhắc rủi ro lớn: đất nông nghiệp, thủy lợi, dân cư xen kẽ.</strong>
+            <p>Không mua nếu chưa rõ loại đất, thổ cư, hành lang đường/mương/thủy lợi và kế hoạch sử dụng đất theo thửa.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="gia-17">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Benchmark</div>
+          <h2>Thước giá từ thực địa 17/05</h2>
+        </div>
+        <p>Dùng để phản biện giá hôm nay. Giá là dữ liệu thực địa/rao/môi giới, chưa mặc định là giá công chứng.</p>
+      </div>
+      <div class="price-grid">
+        <div class="price-card">
+          <span class="tag green">Có nội lực</span>
+          <div class="area">Dương Nội / Tây Mỗ</div>
+          <div class="price">210-249</div>
+          <p>triệu/m²; file mới ghi khung rộng 140-250. Có Aeon, Smart City, dân cư, tiện ích.</p>
+        </div>
+        <div class="price-card">
+          <span class="tag red">Cảnh giác</span>
+          <div class="area">Yên Nghĩa</div>
+          <div class="price">191-296</div>
+          <p>triệu/m²; lợi suất thuê có ví dụ chỉ khoảng 0,8%/năm. Dùng làm mốc giá căng.</p>
+        </div>
+        <div class="price-card">
+          <span class="tag amber">Kỳ vọng</span>
+          <div class="area">Thanh Oai</div>
+          <div class="price">65-110</div>
+          <p>triệu/m²; bị kéo bởi Olympic, Vin đa mục tiêu, Cienco 5, SVD Trống Đồng.</p>
+        </div>
+        <div class="price-card">
+          <span class="tag blue">Value play</span>
+          <div class="area">Thường Tín / Phú Xuyên</div>
+          <div class="price">58-77</div>
+          <p>triệu/m²; mềm hơn nhưng phải kiểm đường, sổ, cốt nền, mở đường, môi trường.</p>
+        </div>
+        <div class="price-card">
+          <span class="tag purple">Gần lõi</span>
+          <div class="area">Thanh Trì / Nam Phù</div>
+          <div class="price">110-158</div>
+          <p>triệu/m²; gần lõi hơn, một số lô đỡ ảo hơn Yên Nghĩa nhưng giá đã tăng.</p>
+        </div>
+      </div>
+      <div class="detail-heavy table-wrap" style="margin-top: 12px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Khu/lô đáng nhớ</th>
+              <th>Giá</th>
+              <th>Bài học áp dụng hôm nay</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Yên Nghĩa, lô trục kinh doanh gần ga/bến xe</td>
+              <td class="price-cell">~296 triệu/m²</td>
+              <td>Giá có thể vượt nội lực. Hỏi dòng tiền thuê để soi giá ảo.</td>
+            </tr>
+            <tr>
+              <td>Thanh Oai, khu đấu giá Chăn Nuôi/Tân Ước</td>
+              <td class="price-cell">~81,5-94,6 triệu/m²</td>
+              <td>Phải tách lô đẹp, lô lỗi, cột điện, hai mặt đường, ranh Olympic.</td>
+            </tr>
+            <tr>
+              <td>Bình Minh/Sinh Quả</td>
+              <td class="price-cell">~65-110 triệu/m²</td>
+              <td>Giá thấp hơn chưa đủ; đường vào có điểm chỉ khoảng 2 m, cần kiểm thực địa.</td>
+            </tr>
+            <tr>
+              <td>Thượng Phúc/Chương Dương/Phú Xuyên</td>
+              <td class="price-cell">~58-77 triệu/m²</td>
+              <td>Không so lô ngõ với mặt QL1A. Lô dính mở đường phải tính diện tích còn lại.</td>
+            </tr>
+            <tr>
+              <td>TT03 Đông Mỹ/Nam Phù</td>
+              <td class="price-cell">58 m², 6,85 tỷ</td>
+              <td>Lô góc, tổng tiền vừa, đáng chú ý; nhưng đã tăng từ khoảng 5 tỷ nên biên an toàn giảm.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="dong-luc">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">So sánh vùng</div>
+          <h2>Động lực tăng giá: buổi trước và buổi này</h2>
+        </div>
+        <p>Đừng dùng một logic giá cho mọi vùng. Mỗi khu tăng vì một lý do khác nhau.</p>
+      </div>
+      <div class="compare-grid">
+        <div class="route-card">
+          <h3>17/05: Hà Đông - Thanh Oai - Thường Tín - Thanh Trì</h3>
+          <p>Động lực chính là đô thị hóa gần lõi, Olympic/Vin, VĐ4, VĐ3.5, cầu Mễ Sở, cầu Ngọc Hồi, công nghiệp/logistics. Giá cao hơn vì gần lõi hơn hoặc có đại dự án kéo tâm lý.</p>
+        </div>
+        <div class="route-card">
+          <h3>24/05: Chương Mỹ - Xuân Mai - Ứng Hòa</h3>
+          <p>Động lực là QL6, Xuân Mai, KCN Phú Nghĩa, CCN Đông Phú Yên, QPK, trường học, QL21B, Vân Đình, sân bay dài hạn. Giá phải mềm hơn nếu không có cầu thật tương ứng.</p>
+        </div>
+        <div class="route-card">
+          <h3>Chương Mỹ/Xuân Mai</h3>
+          <p>Không so trực tiếp với Thanh Trì/Yên Nghĩa. Khu này có thể rẻ hơn vì xa lõi hơn, nhưng vẫn đáng xem nếu có QL6, trường, KCN/CCN, dân cư, pháp lý sạch.</p>
+        </div>
+        <div class="route-card">
+          <h3>Ứng Hòa</h3>
+          <p>Bản chất là vùng sâu hơn, thanh khoản yếu hơn. Vân Đình/QL21B là lõi tham chiếu. Sân bay là quyền chọn dài hạn, không phải lý do trả giá cao ngay.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="nguong-gia">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Phản biện giá</div>
+          <h2>Ngưỡng giá nên dùng hôm nay</h2>
+        </div>
+        <p>Đây là ngưỡng để hỏi lại môi giới, không phải kết luận mua.</p>
+      </div>
+      <div class="threshold-grid">
+        <div class="panel">
+          <h3>Chương Mỹ / Xuân Mai</h3>
+          <ul>
+            <li><strong>15-25 triệu/m²:</strong> đáng nghe nếu đất ở sạch, dân cư thật, đường ổn, không ngập.</li>
+            <li><strong>25-35 triệu/m²:</strong> hợp với lõi/tuyến tốt, gần QL6, trường, chợ, dân cư, hoặc có cầu thuê.</li>
+            <li><strong>35-50 triệu/m²:</strong> phải chứng minh bằng mặt đường, kinh doanh, đấu giá/TĐC, gần QL6 nhưng không dính chỉ giới.</li>
+            <li><strong>Trên 50 triệu/m²:</strong> chỉ xem nếu vị trí đặc biệt. Không trả mức này chỉ vì “đô thị vệ tinh”, “QPK”, “metro tương lai”.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Ứng Hòa / sân bay</h3>
+          <ul>
+            <li>Phải thấp hơn Thanh Oai và Thường Tín nếu không nằm lõi Vân Đình/QL21B hoặc không có vị trí cực rõ.</li>
+            <li>Nếu môi giới báo 50-70 triệu/m² ở Trầm Lộng, Kim Đường, Đồng Lỗ, Minh Đức chỉ vì sân bay, hỏi giao dịch công chứng nào làm mốc.</li>
+            <li>Đất gần sân bay phải tách: trong ranh dự kiến, sát ranh, gần ranh, hay chỉ hưởng lợi truyền thông.</li>
+            <li>Ưu tiên ngoài ranh, pháp lý đất ở sạch, gần kết nối thật ra QL1A/cao tốc/QL38/ĐT428, không nằm vùng dự trữ/thu hồi.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="moi-gioi">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Kịch bản nói chuyện</div>
+          <h2>Câu chuyện sẽ “diễn” với môi giới</h2>
+        </div>
+        <p>Nói đủ để môi giới hiểu mình có tiền và có hiểu biết, nhưng không lộ là cần mua gấp.</p>
+      </div>
+      <div class="script-grid">
+        <div class="script-box">
+          <h3>Câu mở đầu nên dùng</h3>
+          <p class="script-quote" id="scriptText">Bọn em đã đi Hà Đông, Yên Nghĩa, Thanh Oai, Thường Tín, Thanh Trì rồi. Giá nhiều chỗ đã ăn theo hạ tầng và dự án khá mạnh. Đợt này bọn em đi Chương Mỹ - Xuân Mai - Ứng Hòa để tìm vùng còn giá hợp lý hơn, ưu tiên pháp lý sạch, tổng tiền vừa, giữ trung hạn 3-5 năm. Không cần lô quá hot, cần lô có thanh khoản thật và còn biên.</p>
+          <p><strong>Nếu môi giới hỏi ngân sách:</strong> “Tùy chất lượng lô. Tầm 2-4 tỷ thì dễ ra hàng, 5-8 tỷ vẫn xem nếu vị trí/pháp lý/đường tốt. Nhưng bọn em không trả tiền cho câu chuyện tương lai nếu hiện trạng chưa có gì.”</p>
+          <p><strong>Nếu họ bán bằng sân bay/QPK:</strong> “Câu chuyện đó bọn em có biết. Nhưng bọn em cần biết lô này hưởng lợi trực tiếp bằng gì: đường nào, ranh nào, tiến độ nào, người mua cuối là ai.”</p>
+        </div>
+        <div class="script-box">
+          <h3>Giọng điệu nên giữ</h3>
+          <ul>
+            <li>Đi thị trường, so giá, chưa chốt nóng.</li>
+            <li>Có thể mua nếu đúng giá, đúng pháp lý, đúng người mua cuối.</li>
+            <li>Ưu tiên chủ cần bán thật, không cần lô đang được thổi mạnh.</li>
+            <li>Không nói “bọn em đang cần giải ngân” hoặc “cứ gần sân bay là xem”.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="hoi-nhanh">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Tình huống trên đường</div>
+          <h2>Câu hỏi nhanh để bắt dữ liệu thật</h2>
+        </div>
+        <p>Gõ từ khóa để lọc: giá, quy hoạch, sổ, sân bay, QL6, ngập, thuê, đường.</p>
+      </div>
+      <div class="search-row">
+        <input id="searchBox" type="search" placeholder="Tìm câu hỏi nhanh...">
+        <button class="btn" id="clearSearch" type="button">Xóa lọc</button>
+      </div>
+      <div class="question-grid" id="questionGrid">
+        <div class="question-card" data-keywords="gia giao dich chot rao">
+          <h3>Giá</h3>
+          <p class="ask">“Giá này là giá rao, giá chủ chốt, hay đã có giao dịch thật?”</p>
+          <p class="ask">“30-60 ngày gần nhất khu này có lô nào bán thật không?”</p>
+          <p class="why">Mục tiêu: tách giá rao khỏi giá có thể giao dịch.</p>
+        </div>
+        <div class="question-card" data-keywords="quy hoach duong mo thu hoi chi gioi">
+          <h3>Quy hoạch</h3>
+          <p class="ask">“Có trích lục theo số tờ/số thửa không?”</p>
+          <p class="ask">“Nếu mở đường, lô mất bao nhiêu m²?”</p>
+          <p class="why">Mục tiêu: không định giá trên diện tích sổ cũ nếu bị cắt.</p>
+        </div>
+        <div class="question-card" data-keywords="so phap ly tach thua tho cu">
+          <h3>Sổ và thổ cư</h3>
+          <p class="ask">“Sổ riêng chưa, full thổ cư không?”</p>
+          <p class="ask">“Có chung ngõ, chung đường, chung sổ, lối đi chung không?”</p>
+          <p class="why">Mục tiêu: loại sớm đất chờ tách/chờ ra sổ.</p>
+        </div>
+        <div class="question-card" data-keywords="ql6 ql21 ha tang duong tien do">
+          <h3>QL6 / QL21</h3>
+          <p class="ask">“Lô này hưởng lợi từ QL6, QL21 hay đường nào?”</p>
+          <p class="ask">“Đường đó đang quy hoạch, GPMB, thi công hay đã vận hành?”</p>
+          <p class="why">Mục tiêu: không để môi giới gộp QL6 và QL21 như một.</p>
+        </div>
+        <div class="question-card" data-keywords="san bay ung hoa tram long kim duong dong lo">
+          <h3>Sân bay</h3>
+          <p class="ask">“Lô này trong ranh dự kiến, sát ranh, hay chỉ gần sân bay trên bản đồ?”</p>
+          <p class="ask">“Giá này dựa trên giao dịch nào trước/sau tin sân bay?”</p>
+          <p class="why">Mục tiêu: không trả premium dài hạn quá sớm.</p>
+        </div>
+        <div class="question-card" data-keywords="thue cong nhan cau that kcn ccn">
+          <h3>Cầu thuê</h3>
+          <p class="ask">“Công nhân/kỹ sư thuê ở đâu, giá thuê bao nhiêu, có kín phòng không?”</p>
+          <p class="ask">“Người mua gần đây là dân ở thật hay nhà đầu tư?”</p>
+          <p class="why">Mục tiêu: phân biệt cầu thật với thanh khoản đầu cơ.</p>
+        </div>
+        <div class="question-card" data-keywords="duong ngo oto bop co chai">
+          <h3>Đường vào</h3>
+          <p class="ask">“Từ trục chính vào lô qua mấy ngoặt?”</p>
+          <p class="ask">“Đường trước đất ô tô tránh, đỗ, quay đầu được không?”</p>
+          <p class="why">Mục tiêu: đường là thành phần định giá lớn.</p>
+        </div>
+        <div class="question-card" data-keywords="ngap muong ao cot nen thuy van">
+          <h3>Ngập và cốt nền</h3>
+          <p class="ask">“Mưa lớn khu này có ngập không, nước rút bao lâu?”</p>
+          <p class="ask">“Lô gần mương/ao/sông/hồ nào không?”</p>
+          <p class="why">Mục tiêu: đất sinh thái/view nước có thể là rủi ro no-buy.</p>
+        </div>
+        <div class="question-card" data-keywords="chu can ban ngan hang thanh khoan">
+          <h3>Chủ cần bán</h3>
+          <p class="ask">“Chủ cần tiền thật không, cần trong bao lâu?”</p>
+          <p class="ask">“Có lô nào cần tiền bán nhanh để làm mốc so sánh không?”</p>
+          <p class="why">Mục tiêu: tìm chiết khấu thật trong thị trường giảm nhiệt.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="red-flag">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Dừng lại để kiểm</div>
+          <h2>Red flag cần né</h2>
+        </div>
+        <p>Gặp các dấu hiệu này thì không tranh luận dài; ghi lại và yêu cầu bằng chứng.</p>
+      </div>
+      <div class="flags-grid">
+        <div class="flag-card">
+          <h3>Giá ảo</h3>
+          <ul>
+            <li>Giá vùng sâu neo gần Thanh Oai/Thường Tín chỉ vì “sân bay”.</li>
+            <li>Lô trong ngõ nhỏ nhưng so với mặt đường lớn.</li>
+            <li>Lợi suất thuê quá thấp so với giá tài sản.</li>
+          </ul>
+        </div>
+        <div class="flag-card">
+          <h3>Pháp lý yếu</h3>
+          <ul>
+            <li>“Đang làm sổ”, “2 tháng nữa có sổ”, “sắp tách được”.</li>
+            <li>Đất chung sổ, chung ngõ, lối đi chung không rõ.</li>
+            <li>Đất vườn/nông nghiệp bán bằng câu chuyện lên thổ cư.</li>
+          </ul>
+        </div>
+        <div class="flag-card">
+          <h3>Quy hoạch mờ</h3>
+          <ul>
+            <li>Lô dính mở đường nhưng vẫn tính giá trên diện tích sổ cũ.</li>
+            <li>Không có trích lục theo thửa.</li>
+            <li>Chỉ đưa ảnh bản đồ/infographic, không có văn bản.</li>
+          </ul>
+        </div>
+        <div class="flag-card">
+          <h3>Hiện trạng xấu</h3>
+          <ul>
+            <li>Cốt nền thấp, gần mương/ao/sông nhưng được gọi là view sinh thái.</li>
+            <li>Đường bóp cổ chai, ngõ cụt, ô tô phải lùi.</li>
+            <li>Gần nghĩa trang, trạm điện, xưởng ô nhiễm, đường xe tải.</li>
+          </ul>
+        </div>
+        <div class="flag-card">
+          <h3>Môi giới nhập nhằng</h3>
+          <ul>
+            <li>Nói nhiều về Vin/sân bay/QPK nhưng né sổ và giá chốt.</li>
+            <li>Ảnh đầu chụp hồ/đường đẹp, không phải đường trước đất.</li>
+            <li>Không phân biệt trong ranh, sát ranh, gần ranh, xa ranh.</li>
+          </ul>
+        </div>
+        <div class="flag-card">
+          <h3>Thanh khoản yếu</h3>
+          <ul>
+            <li>Nhiều biển bán nhưng ít nhà sáng đèn.</li>
+            <li>Ít cửa hàng hoạt động, ít người ở thật.</li>
+            <li>Tổng tiền lớn, tệp mua cuối không rõ.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="ghi-nhan">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Trong lúc đi</div>
+          <h2>Cách ghi nhận để sau chuyến không bị lẫn</h2>
+        </div>
+        <p>Tách điều mắt thấy, điều người khác nói và suy luận của team.</p>
+      </div>
+      <div class="note-grid">
+        <div class="note-card">
+          <h3>Tự quan sát</h3>
+          <ul>
+            <li>Đường vào, số ngoặt, điểm bóp cổ chai.</li>
+            <li>Dân cư, nhà sáng đèn, chợ, trường, ủy ban.</li>
+            <li>Xe tải, xưởng, mùi, tiếng ồn, cốt nền, ngập.</li>
+          </ul>
+        </div>
+        <div class="note-card">
+          <h3>Môi giới/người dân nói</h3>
+          <ul>
+            <li>Giá rao, giá chủ chấp nhận, giá đã bán.</li>
+            <li>Tiến độ dự án/hạ tầng/GPMB.</li>
+            <li>Chủ cần bán, lý do bán, lịch sử tăng giá.</li>
+          </ul>
+        </div>
+        <div class="note-card">
+          <h3>Suy luận của team</h3>
+          <ul>
+            <li>Giá đã ăn trước chưa.</li>
+            <li>Người mua cuối là ai.</li>
+            <li>Có đáng quay lại lần 2 để kiểm pháp lý không.</li>
+          </ul>
+        </div>
+      </div>
+      <details class="panel detail-heavy" style="margin-top: 12px;">
+        <summary>Ảnh/video cần chụp</summary>
+        <div class="details-body">
+          <ul>
+            <li>Đường từ trục chính vào lô, gồm điểm rẽ và đoạn xấu.</li>
+            <li>Mặt đường trước đất, hai bên đất, phía đối diện, ranh giới.</li>
+            <li>Mương/ao/ngập/cột điện/nghĩa trang/xưởng nếu có.</li>
+            <li>Ảnh bản đồ vị trí, ảnh quy hoạch, ảnh sổ/trích đo đã che thông tin riêng nếu cần lưu nội bộ.</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <section id="chi-tiet" class="detail-heavy">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Chi tiết vùng</div>
+          <h2>Các ghi chú phải nhớ theo khu</h2>
+        </div>
+      </div>
+      <details class="panel" open>
+        <summary>Chương Mỹ / Xuân Mai</summary>
+        <div class="details-body">
+          <ul>
+            <li>QPK Xuân Mai chỉ nằm ở góc tây Chương Mỹ, không đại diện toàn huyện.</li>
+            <li>QPK khu 1/2/3 đã được phê duyệt theo các quyết định 4199/4200/4201 ngày 02/11/2022. Không nói nhầm là vừa phê duyệt tháng 5/2026.</li>
+            <li>Ảnh QPK có chỗ ghi “Khu 1” cho vùng 1.744,68 ha; vùng này nên hiểu là Khu 3 theo dữ liệu dự án.</li>
+            <li>Khu 1 là vùng ưu tiên nếu có dân cư, cầu thuê, đường, pháp lý và ngoài chỉ giới/GPMB.</li>
+            <li>Khu 2 là vùng rủi ro nước/lũ/hành lang xanh. Không kiểm nước thì không định giá.</li>
+            <li>Khu 3 là watchlist dài hạn; chỉ nâng điểm khi có anchor thật: trường, KCN, công trường, GPMB, dân cư, đường thật.</li>
+          </ul>
+          <div class="inline-map-row">
+            <article class="map-card wide">
+              <a href="assets/thuc-dia-24-05/image9.png" target="_blank" rel="noopener">
+                <img src="assets/thuc-dia-24-05/image9.png" alt="Chương Mỹ: QL6, QL21, ĐT419 và ĐT429">
+              </a>
+              <div class="map-body">
+                <span class="map-pill">Mở khi hỏi đường</span>
+                <strong>QL6 là trục giá mạnh nhất; QL21/ĐT419/ĐT429 dùng để tìm điểm mềm hơn.</strong>
+              </div>
+            </article>
+            <article class="map-card wide">
+              <a href="assets/thuc-dia-24-05/image1.png" target="_blank" rel="noopener">
+                <img src="assets/thuc-dia-24-05/image1.png" alt="Chương Mỹ: QPK Xuân Mai, KCN Phú Nghĩa, CCN">
+              </a>
+              <div class="map-body">
+                <span class="map-pill">Mở khi nghe QPK/KCN</span>
+                <strong>Tách QPK Xuân Mai khỏi câu chuyện KCN Phú Nghĩa và CCN Đông Phú Yên.</strong>
+              </div>
+            </article>
+          </div>
+        </div>
+      </details>
+      <details class="panel" style="margin-top: 10px;">
+        <summary>Ứng Hòa / sân bay 2</summary>
+        <div class="details-body">
+          <ul>
+            <li>Ứng Hòa không phải một mặt bằng giá đồng nhất. Vân Đình/QL21B là lõi tham chiếu.</li>
+            <li>Cụm phía Bắc giáp Thanh Oai hưởng câu chuyện Thanh Oai/Hà Đông hơn là sân bay.</li>
+            <li>Cụm phía Đông/Đông Nam giáp Phú Xuyên mới liên quan mạnh hơn tới công nghiệp/logistics/sân bay.</li>
+            <li>Trầm Lộng, Minh Đức, Kim Đường nằm trong vùng câu chuyện sân bay nhưng rủi ro thu hồi/quy hoạch dài hạn cũng cao hơn.</li>
+            <li>Sân bay là câu chuyện logistics và đô thị sân bay dài hạn; không phải cứ càng gần càng tốt.</li>
+          </ul>
+          <div class="inline-map-row">
+            <article class="map-card">
+              <a href="assets/thuc-dia-24-05/image8.png" target="_blank" rel="noopener">
+                <img src="assets/thuc-dia-24-05/image8.png" alt="Phân lớp khu vực Ứng Hòa">
+              </a>
+              <div class="map-body">
+                <span class="map-pill">Mở khi so giá</span>
+                <strong>Vân Đình/QL21B là lõi; không lấy giá một cụm suy ra toàn Ứng Hòa.</strong>
+              </div>
+            </article>
+            <article class="map-card">
+              <a href="assets/thuc-dia-24-05/image5.png" target="_blank" rel="noopener">
+                <img src="assets/thuc-dia-24-05/image5.png" alt="Sân bay phía Nam và các tuyến kết nối">
+              </a>
+              <div class="map-body">
+                <span class="map-pill">Mở khi nghe sân bay</span>
+                <strong>Hỏi lô này hưởng lợi bằng đường kết nối nào, không chỉ bằng khoảng cách chim bay.</strong>
+              </div>
+            </article>
+          </div>
+          <div class="inline-map-row">
+            <article class="map-card">
+              <a href="assets/thuc-dia-24-05/image2.png" target="_blank" rel="noopener">
+                <img src="assets/thuc-dia-24-05/image2.png" alt="Ảnh vệ tinh khu vực sân bay Ứng Hòa">
+              </a>
+              <div class="map-body">
+                <span class="map-pill">Mở khi xem vùng sân bay</span>
+                <strong>Nhìn cấu trúc hiện hữu: ruộng, làng, kênh mương, kết nối còn phân tán.</strong>
+              </div>
+            </article>
+            <article class="map-card">
+              <a href="assets/thuc-dia-24-05/image4.png" target="_blank" rel="noopener">
+                <img src="assets/thuc-dia-24-05/image4.png" alt="Quy hoạch sử dụng đất Ứng Hòa đến 2030">
+              </a>
+              <div class="map-body">
+                <span class="map-pill">Mở khi hỏi pháp lý</span>
+                <strong>Kiểm đất ở, đất nông nghiệp, thủy lợi, đường quy hoạch trước khi nói giá.</strong>
+              </div>
+            </article>
+          </div>
+        </div>
+      </details>
+      <details class="panel" style="margin-top: 10px;">
+        <summary>Bài học từ 17/05</summary>
+        <div class="details-body">
+          <ul>
+            <li>Thị trường đang giảm nhiệt nhẹ so với cuối 2025; lãi suất và áp lực nợ khiến một số chủ phải thanh khoản.</li>
+            <li>Yên Nghĩa là ví dụ giá vượt nội lực: xa hơn Dương Nội nhưng giá có lúc ngang vùng lõi.</li>
+            <li>Thanh Oai là ví dụ đại dự án kéo giá; phải tách trong ranh, sát ranh, gần ranh, xa ranh.</li>
+            <li>Thường Tín/Phú Xuyên là value play nhưng phải quy đổi mọi lỗi thành chiết khấu: sổ, đường, cốt nền, mở đường.</li>
+            <li>Thanh Trì/Nam Phù đáng kiểm sâu vì gần lõi, nhưng không quên rủi ro hiến đường, ngõ cụt, giá đã tăng.</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <section id="ket-luan">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Chốt trước khi xuống xe</div>
+          <h2>5 câu cần trả lời sau chuyến đi</h2>
+        </div>
+      </div>
+      <div class="panel">
+        <ol>
+          <li>Chương Mỹ/Xuân Mai còn vùng giá hợp lý thật không, hay QL6/QPK đã ăn vào giá?</li>
+          <li>QL21/QL21B rẻ hơn QL6 vì bị bỏ sót, hay vì cầu yếu hơn?</li>
+          <li>Ứng Hòa có điểm nào có cầu thật ngoài câu chuyện sân bay không?</li>
+          <li>Giá môi giới đưa có thấp hơn Thanh Oai/Thường Tín đủ để bù xa lõi và thanh khoản yếu không?</li>
+          <li>Có lô nào pháp lý sạch, tổng tiền vừa, đường thật, dân cư thật, chủ cần bán thật để đưa vào vòng kiểm sâu không?</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell">Tài liệu nội bộ. Dữ liệu giá là mốc tham chiếu từ thực địa và nguồn chuẩn hóa, cần kiểm lại bằng sổ, trích lục quy hoạch, giá chốt và thực địa từng thửa trước khi cọc.</div>
+  </footer>
+
+  <script>
+    const body = document.body;
+    const toggleCompact = document.getElementById("toggleCompact");
+    const copyScript = document.getElementById("copyScript");
+    const scriptText = document.getElementById("scriptText");
+    const searchBox = document.getElementById("searchBox");
+    const clearSearch = document.getElementById("clearSearch");
+    const cards = Array.from(document.querySelectorAll(".question-card"));
+
+    toggleCompact.addEventListener("click", () => {
+      body.classList.toggle("compact");
+      toggleCompact.textContent = body.classList.contains("compact") ? "Đọc đầy đủ" : "Đọc nhanh";
+    });
+
+    copyScript.addEventListener("click", async () => {
+      const text = scriptText.textContent.trim();
+      try {
+        await navigator.clipboard.writeText(text);
+        copyScript.textContent = "Đã sao chép";
+        setTimeout(() => copyScript.textContent = "Sao chép kịch bản", 1400);
+      } catch {
+        copyScript.textContent = "Không sao chép được";
+        setTimeout(() => copyScript.textContent = "Sao chép kịch bản", 1600);
+      }
+    });
+
+    function filterCards() {
+      const raw = searchBox.value.trim().toLowerCase();
+      const normalized = raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      cards.forEach((card) => {
+        const text = (card.textContent + " " + card.dataset.keywords).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        card.style.display = text.includes(normalized) ? "" : "none";
+      });
+    }
+
+    searchBox.addEventListener("input", filterCards);
+    clearSearch.addEventListener("click", () => {
+      searchBox.value = "";
+      filterCards();
+      searchBox.focus();
+    });
+  </script>
+</body>
+</html>
