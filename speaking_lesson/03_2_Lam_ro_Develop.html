@@ -37,9 +37,9 @@
 
 <body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
 
-  <div id="card" class="bg-white w-full max-w-md min-h-[75vh] md:min-h-[65vh] rounded-3xl shadow-xl border border-slate-100 p-5 md:p-6 flex flex-col justify-between gap-5 transition-all">
+  <div id="card" class="bg-white w-full max-w-md min-h-[78vh] md:min-h-[68vh] rounded-3xl shadow-xl border border-slate-100 p-5 md:p-6 flex flex-col justify-between gap-5 transition-all">
     
-    <!-- Top Header Area (Highly Compacted) -->
+    <!-- Top Header Area -->
     <div>
       <div class="flex justify-between items-center mb-3">
         <!-- Badges & Progress Info -->
@@ -74,17 +74,29 @@
     </div>
 
     <!-- Main Drill Display Area -->
-    <div class="flex-1 flex flex-col justify-center items-center py-2 gap-4">
+    <div class="flex-1 flex flex-col justify-center items-center py-1 gap-3">
       <!-- Minimalist Action Signal -->
       <div id="signal" class="h-5 text-xs font-bold tracking-widest text-emerald-500 uppercase"></div>
 
-      <!-- Question display - formatted for standard text flow -->
-      <div id="question" class="text-base md:text-lg font-medium text-slate-700 text-center leading-relaxed px-1 min-h-[70px] block w-full transition-all duration-300">
-        Sẵn sàng phản xạ? Bấm nút bắt đầu ngay phía dưới!
+      <!-- Examiner Question Block -->
+      <div id="examiner-container" class="w-full text-center hidden transition-all duration-300">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">🗣️ Examiner:</span>
+        <p id="examiner-question" class="text-sm md:text-base font-semibold text-slate-500 italic leading-normal px-2"></p>
+        
+        <!-- Tiny elegant connector line -->
+        <div class="w-px h-3 bg-slate-200 mx-auto my-1.5"></div>
+      </div>
+
+      <!-- Candidate First Sentence (Question display formatted as standard block text) -->
+      <div id="candidate-container" class="w-full text-center">
+        <span id="candidate-label" class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-1 hidden">✍️ Your Sentence 1:</span>
+        <div id="question" class="text-base md:text-lg font-bold text-slate-800 text-center leading-relaxed px-1 py-1 block w-full transition-all duration-300">
+          Sẵn sàng phản xạ? Bấm nút bắt đầu ngay phía dưới!
+        </div>
       </div>
 
       <!-- Sequential Socratic Hint Box -->
-      <div id="hint-box" class="w-full space-y-2.5">
+      <div id="hint-box" class="w-full space-y-2.5 mt-2">
         <!-- Step 1: Question Prompt -->
         <div id="hint-prompt-container" class="hidden bg-indigo-50/60 border border-indigo-100/80 rounded-xl p-3 text-left transition-all duration-300">
           <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-0.5">Câu hỏi gợi mở hướng đi:</span>
@@ -99,21 +111,21 @@
       </div>
     </div>
 
-    <!-- Actions Area (Checklist removed, Compact single column button flow) -->
+    <!-- Actions Area -->
     <div class="space-y-2">
       <!-- Gợi ý Câu hỏi (Step 1 Button) -->
       <button id="btn-prompt-hint" onclick="showPromptHint()" class="hidden w-full bg-slate-100 hover:bg-indigo-50 text-indigo-600 border border-indigo-100 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
         <span>Gợi ý câu hỏi ❓</span>
       </button>
 
-      <!-- Gợi ý Đáp án (Step 2 Button - hidden until Step 1 shown) -->
+      <!-- Gợi ý Đáp án (Step 2 Button) -->
       <button id="btn-answer-hint" onclick="showAnswerHint()" class="hidden w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
         <span>Xem đáp án mẫu 💡</span>
       </button>
       
-      <!-- Next Button (Compact and clean) -->
+      <!-- Next Button -->
       <button id="btn-next" onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md shadow-indigo-600/10 active:scale-[0.98] flex items-center justify-center gap-1.5">
-        <span id="btn-text">Bắt đầu luyện tập 🎯</span>
+        <span id="btn-text">Bắt đầu ngay 🎯</span>
         <svg id="btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
       </button>
     </div>
@@ -122,25 +134,115 @@
   <script>
     const QUESTIONS_DB = {
       easy: [
-        { text: "I usually hang out with my close friends at a [shopping mall] on weekends.", level: "Easy", prompt: "What is inside it?", hint: "There are cinemas, food courts, and clothing stores where we can easily spend the whole afternoon." },
-        { text: "To be honest, public transport in my hometown is extremely [unreliable].", level: "Easy", prompt: "Why is it unreliable?", hint: "Buses are always late, arrival schedules change constantly, and vehicles often break down in the middle of the road." },
-        { text: "To unwind after a stressful day, I often [play sports] with my classmates.", level: "Easy", prompt: "What do you play and where?", hint: "We usually gather at the local park to play football or badminton for about an hour." },
-        { text: "My favorite area in the house is definitely the [kitchen].", level: "Easy", prompt: "What does it have inside?", hint: "It is equipped with a large fridge, a modern induction stove, and a cozy dining table where my family eats together." },
-        { text: "I think citizens should drive [cautiously] during peak hours.", level: "Easy", prompt: "What actions should they take?", hint: "They need to keep a safe distance, strictly avoid speeding, and always check their mirrors before turning." },
-        { text: "Personally, I find learning English vocabulary very [challenging].", level: "Easy", prompt: "What makes it challenging?", hint: "There are too many complex idioms, phrasal verbs, and academic terms that are incredibly difficult to memorize." },
-        { text: "On rainy days, I prefer to [stay indoors] instead of going out.", level: "Easy", prompt: "What do you do inside?", hint: "I just lie on my bed, watch movies on Netflix, or listen to some relaxing lo-fi music." }
+        { 
+          examiner: "Where do you usually go on weekends?",
+          text: "I usually hang out with my close friends at a [shopping mall] on weekends.", 
+          level: "Easy", 
+          prompt: "What is inside it?", 
+          hint: "There are cinemas, food courts, and clothing stores where we can easily spend the whole afternoon." 
+        },
+        { 
+          examiner: "What do you think of public transport in your city?",
+          text: "To be honest, public transport in my hometown is extremely [unreliable].", 
+          level: "Easy", 
+          prompt: "Why is it unreliable?", 
+          hint: "Buses are always late, arrival schedules change constantly, and vehicles often break down in the middle of the road." 
+        },
+        { 
+          examiner: "How do you relax after a busy day?",
+          text: "To unwind after a stressful day, I often [play sports] with my classmates.", 
+          level: "Easy", 
+          prompt: "What do you play and where?", 
+          hint: "We usually gather at the local park to play football or badminton for about an hour." 
+        },
+        { 
+          examiner: "Which room in your house do you like the most?",
+          text: "My favorite area in the house is definitely the [kitchen].", 
+          level: "Easy", 
+          prompt: "What does it have inside?", 
+          hint: "It is equipped with a large fridge, a modern induction stove, and a cozy dining table where my family eats together." 
+        },
+        { 
+          examiner: "How should people drive when the roads are crowded?",
+          text: "I think citizens should drive [cautiously] during peak hours.", 
+          level: "Easy", 
+          prompt: "What actions should they take?", 
+          hint: "They need to keep a safe distance, strictly avoid speeding, and always check their mirrors before turning." 
+        },
+        { 
+          examiner: "Do you find it easy to learn English vocabulary?",
+          text: "Personally, I find learning English vocabulary very [challenging].", 
+          level: "Easy", 
+          prompt: "What makes it challenging?", 
+          hint: "There are too many complex idioms, phrasal verbs, and academic terms that are incredibly difficult to memorize." 
+        },
+        { 
+          examiner: "What do you like to do when it rains?",
+          text: "On rainy days, I prefer to [stay indoors] instead of going out.", 
+          level: "Easy", 
+          prompt: "What do you do inside?", 
+          hint: "I just lie on my bed, watch movies on Netflix, or listen to some relaxing lo-fi music." 
+        }
       ],
       moderate: [
-        { text: "Many young people today are becoming increasingly [health-conscious].", level: "Moderate", prompt: "What do they do to stay healthy?", hint: "They actively cut down on fast food, strictly count daily calories, and go to the gym at least three times a week." },
-        { text: "Living in a metropolitan area allows me to [experience various cultures].", level: "Moderate", prompt: "What specific experiences?", hint: "I can taste traditional dishes from different countries and attend international art exhibitions every month." },
-        { text: "Social media has affected our face-to-face communication [negatively].", level: "Moderate", prompt: "What are the negative effects?", hint: "People gradually stop talking in person, prefer texting over calling, and constantly compare themselves to others online." },
-        { text: "To reduce work stress, adults should take up a [creative hobby].", level: "Moderate", prompt: "What examples of hobbies?", hint: "They can try oil painting, learning a musical instrument, or making handmade pottery on weekends." },
-        { text: "Traveling alone helps university students [develop independence].", level: "Moderate", prompt: "What do they have to do by themselves?", hint: "They have to manage their own budget, book accommodation themselves, and solve unexpected problems on the road." }
+        { 
+          examiner: "Do young people care about their health nowadays?",
+          text: "Many young people today are becoming increasingly [health-conscious].", 
+          level: "Moderate", 
+          prompt: "What do they do to stay healthy?", 
+          hint: "They actively cut down on fast food, strictly count daily calories, and go to the gym at least three times a week." 
+        },
+        { 
+          examiner: "What are the benefits of living in a big city?",
+          text: "Living in a metropolitan area allows me to [experience various cultures].", 
+          level: "Moderate", 
+          prompt: "What specific experiences?", 
+          hint: "I can taste traditional dishes from different countries and attend international art exhibitions every month." 
+        },
+        { 
+          examiner: "How has social media changed the way we communicate?",
+          text: "Social media has affected our face-to-face communication [negatively].", 
+          level: "Moderate", 
+          prompt: "What are the negative effects?", 
+          hint: "People gradually stop talking in person, prefer texting over calling, and constantly compare themselves to others online." 
+        },
+        { 
+          examiner: "How can working adults reduce their stress levels?",
+          text: "To reduce work stress, adults should take up a [creative hobby].", 
+          level: "Moderate", 
+          prompt: "What examples of hobbies?", 
+          hint: "They can try oil painting, learning a musical instrument, or making handmade pottery on weekends." 
+        },
+        { 
+          examiner: "Why do some students prefer to travel alone?",
+          text: "Traveling alone helps university students [develop independence].", 
+          level: "Moderate", 
+          prompt: "What do they have to do by themselves?", 
+          hint: "They have to manage their own budget, book accommodation themselves, and solve unexpected problems on the road." 
+        }
       ],
       challenging: [
-        { text: "Artificial Intelligence has made certain traditional jobs completely [obsolete].", level: "Challenging", prompt: "Which specific jobs?", hint: "Data entry clerks, telemarketers, and basic factory assembly workers are rapidly being replaced by automated software." },
-        { text: "Rapid urbanization has caused severe [infrastructure issues] in developing countries.", level: "Challenging", prompt: "What exact problems?", hint: "Power grids frequently fail, drainage systems clog during heavy rains, and narrow roads cannot handle the soaring number of cars." },
-        { text: "Remote working allows employees to manage their daily schedule [flexibly].", level: "Challenging", prompt: "How do they manage their time?", hint: "They can choose their own working hours, take care of family chores in between tasks, and avoid commuting during peak hours." }
+        { 
+          examiner: "What impact does AI have on employment?",
+          text: "Artificial Intelligence has made certain traditional jobs completely [obsolete].", 
+          level: "Challenging", 
+          prompt: "Which specific jobs?", 
+          hint: "Data entry clerks, telemarketers, and basic factory assembly workers are rapidly being replaced by automated software." 
+        },
+        { 
+          examiner: "What problems do growing cities face?",
+          text: "Rapid urbanization has caused severe [infrastructure issues] in developing countries.", 
+          level: "Challenging", 
+          prompt: "What exact problems?", 
+          hint: "Power grids frequently fail, drainage systems clog during heavy rains, and narrow roads cannot handle the soaring number of cars." 
+        },
+        { 
+          examiner: "Why are more companies allowing employees to work from home?",
+          text: "Remote working allows employees to manage their daily schedule [flexibly].", 
+          level: "Challenging", 
+          prompt: "How do they manage their time?", 
+          hint: "They can choose their own working hours, take care of family chores in between tasks, and avoid commuting during peak hours." 
+        }
       ]
     };
 
@@ -161,6 +263,10 @@
     const timerEl = document.getElementById("timer");
     const signalEl = document.getElementById("signal");
     const questionEl = document.getElementById("question");
+    
+    const examinerContainer = document.getElementById("examiner-container");
+    const examinerQuestionEl = document.getElementById("examiner-question");
+    const candidateLabel = document.getElementById("candidate-label");
     
     const btnPromptHint = document.getElementById("btn-prompt-hint");
     const btnAnswerHint = document.getElementById("btn-answer-hint");
@@ -249,6 +355,9 @@
       btnAnswerHint.classList.add("hidden");
       hintPromptContainer.classList.add("hidden");
       hintTextContainer.classList.add("hidden");
+
+      examinerContainer.classList.add("hidden");
+      candidateLabel.classList.add("hidden");
     }
 
     function showPromptHint() {
@@ -324,8 +433,8 @@
     }
 
     function formatQuestionText(text) {
-      // Inline highlight styled with clean color & underline decoration for smooth paragraph text wrapping
-      return text.replace(/\[(.*?)\]/g, `<span class="text-indigo-600 font-extrabold underline decoration-2 decoration-indigo-300 underline-offset-4 px-1 inline">$1</span>`);
+      // Sử dụng duy nhất thuộc tính 'inline' và loại bỏ hoàn toàn padding/margin ngang để chữ tự xuống dòng tự nhiên không bị vỡ bố cục
+      return text.replace(/\[(.*?)\]/g, `<span class="text-indigo-600 font-extrabold underline decoration-2 decoration-indigo-300 underline-offset-4 inline">$1</span>`);
     }
 
     function nextQuestion() {
@@ -363,6 +472,11 @@
       } else {
         levelEl.className = "bg-rose-50 text-rose-700 text-xs font-bold px-2.5 py-1 rounded-lg";
       }
+
+      // Đưa thông tin của Examiner hiển thị lên
+      examinerQuestionEl.textContent = item.examiner;
+      examinerContainer.classList.remove("hidden");
+      candidateLabel.classList.remove("hidden");
 
       questionEl.innerHTML = formatQuestionText(item.text);
 
