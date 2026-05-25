@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấp Cứu Từ Vựng Speaking - Trở Về Mẫu Giáo</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Be Vietnam Pro', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        .timer-pulse {
+            animation: pulse-danger 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes pulse-danger {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            100% { transform: scale(1.03); box-shadow: 0 0 15px 8px rgba(239, 68, 68, 0.2); }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-3 sm:p-6 font-sans selection:bg-orange-500 selection:text-white">
+
+    <!-- Container chính tối ưu hiển thị di động -->
+    <div class="max-w-4xl w-full bg-slate-800 rounded-2xl md:rounded-3xl shadow-2xl border border-slate-700/80 flex flex-col min-h-[580px] md:min-h-[650px] overflow-hidden">
+        
+        <!-- Header điều hướng & điểm số -->
+        <header class="bg-slate-850 p-4 border-b border-slate-700/60 flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-2.5">
+                <div class="bg-orange-500/10 text-orange-400 p-2 rounded-xl border border-orange-500/20">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-sm sm:text-base font-black text-white tracking-tight uppercase leading-none">Cấp cứu từ vựng</h1>
+                    <span class="text-orange-400 font-extrabold text-[9px] sm:text-[10px] tracking-wider uppercase">Speaking Survival Training</span>
+                </div>
+            </div>
+            
+            <div id="counter-panel" class="hidden flex items-center gap-2">
+                <button id="sound-toggle-btn" class="bg-slate-700/80 hover:bg-slate-700 text-slate-300 p-2 rounded-lg transition-colors" title="Bật/Tắt âm thanh">
+                    <svg id="sound-on-icon" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                    <svg id="sound-off-icon" class="w-4 h-4 sm:w-5 sm:h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                </button>
+                <div class="bg-slate-900/60 px-3 py-1 rounded-xl border border-slate-700/50 flex flex-col items-center">
+                    <span class="text-[8px] uppercase font-bold text-slate-400 leading-none">Tiến độ</span>
+                    <span id="question-counter" class="text-xs sm:text-sm font-mono font-black text-orange-400 mt-0.5 leading-none">1 / 20</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Thanh tiến trình -->
+        <div class="w-full bg-slate-900 h-1 shrink-0">
+            <div id="progress-bar" class="bg-gradient-to-r from-orange-500 to-amber-400 h-1 transition-all duration-300 rounded-r-full" style="width: 0%;"></div>
+        </div>
+
+        <!-- Nội dung chính -->
+        <main class="flex-1 overflow-y-auto relative p-4 sm:p-6 flex flex-col justify-between">
+            
+            <!-- MÀN HÌNH BẮT ĐẦU (INTRO) -->
+            <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6 text-center bg-slate-800 z-10">
+                <div class="text-6xl mb-3 animate-bounce">🚑</div>
+                <h2 class="text-xl sm:text-3xl font-black text-white mb-3 tracking-tight uppercase">Thực Chiến "Trở Về Mẫu Giáo"</h2>
+                
+                <div class="text-slate-300 mb-6 text-xs sm:text-sm space-y-3 max-w-xl text-left bg-slate-900/50 p-4 sm:p-6 rounded-2xl border border-slate-700/60">
+                    <p class="flex items-start gap-2.5">
+                        <span class="text-lg shrink-0">💡</span> 
+                        <span><strong class="text-orange-400">LUẬT CHƠI:</strong> Bạn sẽ thấy một câu tiếng Anh có chứa cụm <strong class="text-amber-300 bg-amber-500/10 px-1.5 py-0.5 rounded">ý tưởng tiếng Việt</strong>.</span>
+                    </p>
+                    <p class="flex items-start gap-2.5">
+                        <span class="text-lg shrink-0">⏱️</span> 
+                        <span><strong class="text-orange-400">15 GIÂY SINH TỒN:</strong> Đọc to cả câu, dùng vốn từ cơ bản nhất (Tiếng Anh lớp 6) để paraphrase phần tiếng Việt thật mượt.</span>
+                    </p>
+                    <p class="flex items-start gap-2.5">
+                        <span class="text-lg shrink-0">🛑</span> 
+                        <span><strong class="text-orange-400">CẤM ĐỨNG HÌNH:</strong> Thà giải thích dài dòng và đơn giản còn hơn là im lặng chịu chết trước giám khảo!</span>
+                    </p>
+                </div>
+                
+                <button id="start-btn" class="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white font-extrabold py-3.5 px-8 rounded-xl transition-all shadow-lg shadow-orange-500/20 active:scale-95 text-base uppercase tracking-wide">
+                    Bắt Đầu Thực Chiến (20 Câu)
+                </button>
+            </div>
+
+            <!-- MÀN HÌNH ĐANG LUYỆN TẬP (DRILL) -->
+            <div id="drill-screen" class="hidden flex flex-col flex-1 justify-between h-full">
+
+                <!-- Khu vực đề bài & Đồng hồ (Tối ưu responsive lưới) -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 sm:mb-6">
+                    <!-- Câu hỏi bối cảnh -->
+                    <div class="md:col-span-3 bg-slate-900/40 p-5 sm:p-6 rounded-xl border border-slate-700/60 flex flex-col justify-center min-h-[120px] relative">
+                        <div class="absolute -top-2.5 left-4 bg-slate-700 text-slate-300 px-2.5 py-0.5 rounded text-[8px] uppercase font-bold tracking-widest border border-slate-600">
+                            Context Sentence
+                        </div>
+                        <p id="context-sentence" class="text-base sm:text-xl font-medium text-slate-100 leading-relaxed pt-1.5">
+                            <!-- Nạp động ở đây -->
+                        </p>
+                    </div>
+
+                    <!-- Đồng hồ đếm ngược (Co giãn thông minh theo màn dọc/ngang) -->
+                    <div class="md:col-span-1 flex items-stretch">
+                        <div id="timer-box" class="w-full flex md:flex-col items-center justify-between md:justify-center p-3.5 md:p-4 bg-slate-900/85 rounded-xl border border-slate-700/80 transition-all duration-300">
+                            <span class="text-[9px] md:text-[10px] font-sans text-slate-400 uppercase tracking-wider md:mb-1">Thời gian nói</span>
+                            <span id="timer-seconds" class="text-2xl md:text-4xl font-mono font-black text-orange-500">15</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Khu vực đáp án rút gọn lý tưởng cho di động -->
+                <div id="answers-area" class="hidden flex-1 mb-4 sm:mb-6 fade-in-up">
+                    <div class="space-y-3">
+                        <!-- Giải cứu học thuật -->
+                        <div class="bg-emerald-950/35 border border-emerald-500/35 p-3.5 rounded-xl">
+                            <div class="flex items-center gap-1.5 mb-1.5">
+                                <span class="text-xs">🏆</span>
+                                <span class="text-[9px] sm:text-[10px] font-extrabold text-emerald-400 uppercase tracking-widest block">Từ học thuật chính xác:</span>
+                            </div>
+                            <p id="academic-result" class="text-base sm:text-lg font-semibold text-slate-300">
+                                <!-- Chèn cụm học thuật ngắn -->
+                            </p>
+                        </div>
+
+                        <!-- Giải cứu mẫu giáo -->
+                        <div class="bg-slate-900/60 border border-slate-700/80 p-3.5 rounded-xl">
+                            <div class="flex items-center gap-1.5 mb-2 border-b border-slate-800 pb-1.5">
+                                <span class="text-xs">👶</span>
+                                <span class="text-[9px] sm:text-[10px] font-extrabold text-amber-400 uppercase tracking-widest block">Cách paraphrase "Mẫu giáo" (Cấp độ lớp 6):</span>
+                            </div>
+                            <div id="kindergarten-options" class="space-y-1.5">
+                                <!-- Chèn cụm mẫu giáo siêu ngắn -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thanh công cụ điều khiển chân trang -->
+                <div class="pt-3 border-t border-slate-700/60 flex justify-between items-center shrink-0">
+                    <button id="skip-timer-btn" class="text-slate-400 hover:text-orange-400 text-[11px] sm:text-xs font-bold px-2 py-1 rounded hover:bg-slate-700/30 transition-colors">
+                        Bỏ qua ➔
+                    </button>
+
+                    <div class="flex gap-2">
+                        <button id="show-solutions-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-2.5 px-5 rounded-lg transition-all shadow-md active:scale-95 text-xs sm:text-sm uppercase tracking-wide flex items-center gap-1">
+                            Giải cứu 💡
+                        </button>
+                        
+                        <button id="next-btn" class="bg-slate-700 hover:bg-slate-600 text-white font-extrabold py-2.5 px-5 rounded-lg transition-all active:scale-95 text-xs sm:text-sm uppercase tracking-wide hidden">
+                            Tiếp theo ➔
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MÀN HÌNH HOÀN THÀNH (RESULTS) -->
+            <div id="results-screen" class="hidden absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6 text-center bg-slate-800 z-10">
+                <div class="text-7xl mb-4">🎉</div>
+                <h2 class="text-2xl sm:text-3xl font-black text-white mb-3 tracking-tight uppercase">CỨU THƯƠNG THÀNH CÔNG!</h2>
+                
+                <div class="max-w-xl mx-auto space-y-3 mb-6">
+                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                        Chúc mừng bạn đã hoàn thành bài luyện phản xạ sinh tồn ngôn ngữ cực kỳ xuất sắc.
+                    </p>
+                    <div class="p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+                        <span class="text-orange-400 font-bold text-xs sm:text-sm block">Độ trôi chảy (Fluency) phải luôn đi trước từ vựng nâng cao!</span>
+                    </div>
+                </div>
+
+                <div class="w-full sm:w-auto">
+                    <button id="restart-btn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-3 px-6 rounded-lg transition-all shadow-md active:scale-95 uppercase text-xs sm:text-sm tracking-wide">
+                        Luyện lại bộ này (Trộn ngẫu nhiên)
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // NGÂN HÀNG DỮ LIỆU CHUẨN 20 CÂU BỐI CẢNH IELTS SPEAKING THỰC CHIẾN (CHỈ GIỮ ĐÁP ÁN ĐOẠN CỤM TỪ NGẮN)
+        const questionPool = [
+            {
+                vietnamese: "có lối sống thụ động / ít vận động",
+                contextBefore: "Many office workers today",
+                contextAfter: ", which leads to various health problems like obesity.",
+                academic: "Many office workers today <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>have a sedentary lifestyle</strong>, which ...",
+                kindergarten: [
+                    "Many office workers today <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>have a lifestyle where they just sit all day</strong>, which ...",
+                    "Many office workers today <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>live a way of life without any physical exercise</strong>, which ...",
+                    "Many office workers today <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>have a habit of sitting in front of computers for hours</strong>, which ..."
+                ]
+            },
+            {
+                vietnamese: "áp lực đồng trang lứa",
+                contextBefore: "When I see my university friends buying cars and houses, I feel a lot of",
+                contextAfter: ".",
+                academic: "... feel a lot of <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>peer pressure</strong>.",
+                kindergarten: [
+                    "... feel a lot of <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>stress because my friends are richer than me</strong>.",
+                    "... feel a lot of <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>pressure to be as successful as people around me</strong>.",
+                    "... feel a lot of <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>worry when comparing myself to other classmates</strong>."
+                ]
+            },
+            {
+                vietnamese: "đắt cắt cổ / không thể mua nổi",
+                contextBefore: "I really want to study abroad in London, but the tuition fees there are",
+                contextAfter: " right now.",
+                academic: "... fees there are <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>exorbitant / prohibitive</strong> right now.",
+                kindergarten: [
+                    "... fees there are <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>too high for normal people to pay</strong> right now.",
+                    "... fees there are <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>so expensive that I don't have enough money</strong> right now.",
+                    "... fees there are <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>crazy high</strong> right now."
+                ]
+            },
+            {
+                vietnamese: "kiệt sức / quá tải",
+                contextBefore: "After studying for the IELTS exam 10 hours a day for two months, I am completely",
+                contextAfter: ".",
+                academic: "... am completely <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>burnt out / overwhelmed</strong>.",
+                kindergarten: [
+                    "... am completely <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>too tired to do anything else</strong>.",
+                    "... am completely <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>stressed and have no energy left</strong>.",
+                    "... am completely <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>feeling like my brain stops working</strong>."
+                ]
+            },
+            {
+                vietnamese: "quãng đường đi học/đi làm hàng ngày",
+                contextBefore: "My company moved to the city outskirts, so my",
+                contextAfter: " takes almost two hours now.",
+                academic: "... so my <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>daily commute</strong> takes almost ...",
+                kindergarten: [
+                    "... so my <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>daily trip from my house to the office</strong> takes almost ...",
+                    "... so my <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>time spent traveling to work every morning</strong> takes almost ...",
+                    "... so my <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>journey to go to work and come back home</strong> takes almost ..."
+                ]
+            },
+            {
+                vietnamese: "lỗi thời / lạc hậu",
+                contextBefore: "Using a desktop computer with a huge monitor nowadays is considered",
+                contextAfter: ", but I still like it.",
+                academic: "... is considered <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>obsolete / outdated</strong>, but I ...",
+                kindergarten: [
+                    "... is considered <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>very old and not modern anymore</strong>, but I ...",
+                    "... is considered <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>something that nobody uses today</strong>, but I ...",
+                    "... is considered <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>out of style</strong>, but I ..."
+                ]
+            },
+            {
+                vietnamese: "xuống cấp nghiêm trọng",
+                contextBefore: "Due to heavy traffic and industrial waste, the air quality in Hanoi",
+                contextAfter: " over the years.",
+                academic: "... air quality in Hanoi <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>has deteriorated severely</strong> over the ...",
+                kindergarten: [
+                    "... air quality in Hanoi <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>has become very bad quickly</strong> over the ...",
+                    "... air quality in Hanoi <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>has gone down to a dangerous level</strong> over the ...",
+                    "... air quality in Hanoi <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>has changed from good to terrible</strong> over the ..."
+                ]
+            },
+            {
+                vietnamese: "tham công tiếc việc",
+                contextBefore: "My father is",
+                contextAfter: "; he even checks his business emails during Sunday dinners.",
+                academic: "My father is <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>a true workaholic</strong>; he even ...",
+                kindergarten: [
+                    "My father is <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>a person who loves working too much</strong>; he even ...",
+                    "My father is <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>a man who never stops doing his job</strong>; he even ...",
+                    "My father is <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>always busy with his work and forgets to rest</strong>; he even ..."
+                ]
+            },
+            {
+                vietnamese: "bắt buộc",
+                contextBefore: "I strongly believe that learning a second language should be",
+                contextAfter: " for all primary school students.",
+                academic: "... should be <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>mandatory / compulsory</strong> for all ...",
+                kindergarten: [
+                    "... should be <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>something that every student must do</strong> for all ...",
+                    "... should be <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>a rule that no one can refuse</strong> for all ...",
+                    "... should be <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>required by the school laws</strong> for all ..."
+                ]
+            },
+            {
+                vietnamese: "xả stress / giải tỏa căng thẳng",
+                contextBefore: "Playing video games with my close friends is the fastest way for me to",
+                contextAfter: " after a long exam.",
+                academic: "... way for me to <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>unwind / let my hair down</strong> after a ...",
+                kindergarten: [
+                    "... way for me to <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>make my mind feel relaxed and happy</strong> after a ...",
+                    "... way for me to <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>forget about all the hard work</strong> after a ...",
+                    "... way for me to <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>rest and stop thinking about school</strong> after a ..."
+                ]
+            },
+            {
+                vietnamese: "khoảng cách thế hệ",
+                contextBefore: "There is a clear",
+                contextAfter: " between me and my grandfather when we talk about career choices.",
+                academic: "... is a clear <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>generation gap</strong> between me ...",
+                kindergarten: [
+                    "... is a clear <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>difference in thinking because of age differences</strong> between me ...",
+                    "... is a clear <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>problem because old and young people don't understand each other</strong> between me ...",
+                    "... is a clear <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>big change in ideas between generations</strong> between me ..."
+                ]
+            },
+            {
+                vietnamese: "giật gân / câu view / gây chú ý rẻ tiền",
+                contextBefore: "Tiktokers often create",
+                contextAfter: " videos just to get more followers and likes.",
+                academic: "... often create <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>sensational</strong> videos just ...",
+                kindergarten: [
+                    "... often create <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>shocking but useless</strong> videos just ...",
+                    "... often create <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>silly videos just to make people watch</strong> just ...",
+                    "... often create <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>content that makes people curious but is not true</strong> videos just ..."
+                ]
+            },
+            {
+                vietnamese: "đứng im / không có cơ hội thăng tiến",
+                contextBefore: "I decided to quit my position at the old bank because my career",
+                contextAfter: " there.",
+                academic: "... because my career <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>was stagnant / hit a dead-end</strong> there.",
+                kindergarten: [
+                    "... because my career <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>was staying in one place and could not grow</strong> there.",
+                    "... because my career <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>was not getting any better or higher</strong> there.",
+                    "... because my career <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>had no chance for a promotion</strong> there."
+                ]
+            },
+            {
+                vietnamese: "làm nhiều việc một lúc",
+                contextBefore: "My teacher scolded me because I",
+                contextAfter: ", trying to write an essay while listening to a podcast.",
+                academic: "... because I <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>was multitasking</strong>, trying to ...",
+                kindergarten: [
+                    "... because I <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>was doing too many things at the same time</strong>, trying to ...",
+                    "... because I <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>was studying and listening to other things together</strong>, trying to ...",
+                    "... because I <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>was trying to finish two jobs at once</strong>, trying to ..."
+                ]
+            },
+            {
+                vietnamese: "phụ thuộc quá mức vào",
+                contextBefore: "Many teenagers nowadays",
+                contextAfter: " smartphones to do simple math and read maps.",
+                academic: "Many teenagers nowadays <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>are over-reliant on</strong> smartphones to ...",
+                kindergarten: [
+                    "Many teenagers nowadays <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>depend completely on</strong> smartphones to ...",
+                    "Many teenagers nowadays <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>use phones too much and cannot live without</strong> smartphones to ...",
+                    "Many teenagers nowadays <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>just count heavily on</strong> smartphones to ..."
+                ]
+            },
+            {
+                vietnamese: "du lịch đại trà / quá đông đúc",
+                contextBefore: "Beautiful beaches in Danang are being ruined by",
+                contextAfter: ", which causes severe pollution.",
+                academic: "... ruined by <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>mass tourism</strong>, which causes ...",
+                kindergarten: [
+                    "... ruined by <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>too many tourists coming at the same time</strong>, which causes ...",
+                    "... ruined by <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>thousands of cheap travelers visiting every day</strong>, which causes ...",
+                    "... ruined by <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>huge crowds of holidaymakers</strong>, which causes ..."
+                ]
+            },
+            {
+                vietnamese: "mua sắm bốc đồng / không suy nghĩ",
+                contextBefore: "I need to control my budget because I often",
+                contextAfter: " when walking around the mall.",
+                academic: "... I often <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>buy things impulsively</strong> when ...",
+                kindergarten: [
+                    "... I often <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>buy things immediately without thinking</strong> when ...",
+                    "... I often <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>spend money on things I don't really need</strong> when ...",
+                    "... I often <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>shop suddenly just because I like it at that moment</strong> when ..."
+                ]
+            },
+            {
+                vietnamese: "thực phẩm đã qua chế biến",
+                contextBefore: "Feeding children",
+                contextAfter: " every day will negatively affect their physical development.",
+                academic: "Feeding children <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>processed food</strong> every day ...",
+                kindergarten: [
+                    "Feeding children <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>canned or packaged food</strong> every day ...",
+                    "Feeding children <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>quick food that is not fresh</strong> every day ...",
+                    "Feeding children <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>meals made in factories with chemicals</strong> every day ..."
+                ]
+            },
+            {
+                vietnamese: "có triển vọng phát triển cao / tươi sáng",
+                contextBefore: "She decided to major in Artificial Intelligence because she wants a career",
+                contextAfter: " in the next decade.",
+                academic: "... wants a career <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>with highly promising prospects</strong> in the ...",
+                kindergarten: [
+                    "... wants a career <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>that will be very easy to grow and make money</strong> in the ...",
+                    "... wants a career <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>that has a very bright and exciting future</strong> in the ...",
+                    "... wants a career <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>where she can become more successful with lots of chances</strong> in the ..."
+                ]
+            },
+            {
+                vietnamese: "tắc đường",
+                contextBefore: "I always try to leave my house at 6:30 AM to avoid the",
+                contextAfter: " on the main streets.",
+                academic: "... avoid the <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>traffic congestion / traffic jams</strong> on the ...",
+                kindergarten: [
+                    "... avoid the <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>crowded roads when everyone goes to work</strong> on the ...",
+                    "... avoid the <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>cars and motorbikes stuck</strong> on the ...",
+                    "... avoid the <strong class='text-amber-300 font-extrabold underline decoration-amber-500/30'>terrible traffic</strong> on the ..."
+                ]
+            }
+        ];
+
+        let currentSessionQuestions = [];
+        let currentIndex = 0;
+        let timerInterval;
+        let timeLeft = 15;
+        let isTimerRunning = false;
+        let isSoundEnabled = true;
+
+        // BỘ ENGINE PHÁT ÂM THANH CHUẨN (Sử dụng Web Audio API không phụ thuộc Internet)
+        const AudioEngine = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            playTick() {
+                if (!isSoundEnabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.12);
+            },
+            playAlarm() {
+                if (!isSoundEnabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(110, this.ctx.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.45);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.5);
+            },
+            playSuccess() {
+                if (!isSoundEnabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const notes = [261.63, 329.63, 392.00, 523.25]; // Đồ - Mi - Son - Đố
+                notes.forEach((freq, index) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + index * 0.1);
+                    gain.gain.setValueAtTime(0.08, now + index * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.1 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + index * 0.1);
+                    osc.stop(now + index * 0.1 + 0.3);
+                });
+            }
+        };
+
+        const DOM = {
+            startScreen: document.getElementById('start-screen'),
+            drillScreen: document.getElementById('drill-screen'),
+            resultsScreen: document.getElementById('results-screen'),
+            
+            startBtn: document.getElementById('start-btn'),
+            restartBtn: document.getElementById('restart-btn'),
+            soundToggleBtn: document.getElementById('sound-toggle-btn'),
+            soundOnIcon: document.getElementById('sound-on-icon'),
+            soundOffIcon: document.getElementById('sound-off-icon'),
+            
+            counterPanel: document.getElementById('counter-panel'),
+            questionCounter: document.getElementById('question-counter'),
+            progressBar: document.getElementById('progress-bar'),
+            
+            contextSentence: document.getElementById('context-sentence'),
+            timerBox: document.getElementById('timer-box'),
+            timerSeconds: document.getElementById('timer-seconds'),
+            
+            answersArea: document.getElementById('answers-area'),
+            academicResult: document.getElementById('academic-result'),
+            kindergartenOptions: document.getElementById('kindergarten-options'),
+            
+            skipTimerBtn: document.getElementById('skip-timer-btn'),
+            showSolutionsBtn: document.getElementById('show-solutions-btn'),
+            nextBtn: document.getElementById('next-btn')
+        };
+
+        // Thuật toán trộn Fisher-Yates
+        function shuffle(array) {
+            let m = array.length, t, i;
+            while (m) {
+                i = Math.floor(Math.random() * m--);
+                t = array[m];
+                array[m] = array[i];
+                array[i] = t;
+            }
+            return array;
+        }
+
+        function startSession() {
+            currentSessionQuestions = shuffle([...questionPool]);
+            currentIndex = 0;
+            
+            DOM.startScreen.classList.add('hidden');
+            DOM.resultsScreen.classList.add('hidden');
+            DOM.drillScreen.classList.remove('hidden');
+            DOM.counterPanel.classList.remove('hidden');
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            
+            const q = currentSessionQuestions[currentIndex];
+            
+            // Đồng bộ tiến trình
+            DOM.questionCounter.innerText = `${currentIndex + 1} / ${currentSessionQuestions.length}`;
+            DOM.progressBar.style.width = `${(currentIndex / currentSessionQuestions.length) * 100}%`;
+            
+            // Highlight phần Tiếng Việt
+            DOM.contextSentence.innerHTML = `${q.contextBefore} <span class="bg-orange-500/15 text-orange-400 border border-orange-500/30 px-2 py-0.5 sm:px-3 sm:py-1 rounded-xl font-bold inline-block shadow-sm my-0.5">&lt; ${q.vietnamese} &gt;</span> ${q.contextAfter}`;
+            
+            // Khôi phục đồng hồ
+            timeLeft = 15;
+            DOM.timerSeconds.innerText = timeLeft;
+            DOM.timerBox.className = "w-full flex md:flex-col items-center justify-between md:justify-center p-3.5 md:p-4 bg-slate-900/85 rounded-xl border border-slate-700/80 transition-all duration-300";
+            DOM.timerSeconds.className = "text-2xl md:text-4xl font-mono font-black text-orange-500";
+            
+            // Setup các nút
+            DOM.answersArea.classList.add('hidden');
+            DOM.showSolutionsBtn.classList.remove('hidden');
+            DOM.nextBtn.classList.add('hidden');
+            DOM.skipTimerBtn.classList.remove('hidden');
+            
+            startCountdown();
+        }
+
+        function startCountdown() {
+            isTimerRunning = true;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                DOM.timerSeconds.innerText = timeLeft;
+
+                if (timeLeft <= 5 && timeLeft > 0) {
+                    DOM.timerBox.className = "w-full flex md:flex-col items-center justify-between md:justify-center p-3.5 md:p-4 bg-red-950/40 rounded-xl border border-red-500/40 timer-pulse";
+                    DOM.timerSeconds.className = "text-2xl md:text-4xl font-mono font-black text-red-500";
+                    AudioEngine.playTick();
+                }
+
+                if (timeLeft <= 0) {
+                    stopCountdown(true);
+                }
+            }, 1000);
+        }
+
+        function stopCountdown(timeRanOut = false) {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            
+            DOM.timerBox.classList.remove('timer-pulse');
+            DOM.timerBox.className = "w-full flex md:flex-col items-center justify-between md:justify-center p-3.5 md:p-4 bg-slate-950/60 rounded-xl border border-slate-800 opacity-60";
+            DOM.timerSeconds.innerText = "Xong!";
+            DOM.timerSeconds.className = "text-lg md:text-2xl font-mono font-black text-slate-400";
+            
+            DOM.skipTimerBtn.classList.add('hidden');
+            
+            if (timeRanOut) {
+                // Kích hoạt rung thiết bị (Nếu hỗ trợ) khi hết giờ
+                if ('vibrate' in navigator) {
+                    navigator.vibrate([200, 100, 200, 100, 400]); 
+                }
+                AudioEngine.playAlarm();
+            }
+        }
+
+        function revealSolutions() {
+            if (isTimerRunning) {
+                stopCountdown(false);
+            }
+            
+            const q = currentSessionQuestions[currentIndex];
+            
+            // Chỉ hiển thị từ vựng/cụm từ học thuật ngắn
+            DOM.academicResult.innerHTML = q.academic;
+            
+            // Điền danh sách cụm từ rút gọn của "Mẫu giáo"
+            DOM.kindergartenOptions.innerHTML = '';
+            q.kindergarten.forEach((phrase, idx) => {
+                const opt = document.createElement('div');
+                opt.className = "flex items-center gap-2.5 text-slate-300 text-sm md:text-base border-b border-slate-800/40 pb-2 last:border-0 last:pb-0";
+                opt.innerHTML = `
+                    <span class="bg-slate-800 text-slate-400 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shrink-0">${idx + 1}</span>
+                    <p class="flex-1 font-semibold text-slate-300">${phrase}</p>
+                `;
+                DOM.kindergartenOptions.appendChild(opt);
+            });
+            
+            DOM.showSolutionsBtn.classList.add('hidden');
+            DOM.answersArea.classList.remove('hidden');
+            DOM.nextBtn.classList.remove('hidden');
+            
+            if (currentIndex === currentSessionQuestions.length - 1) {
+                DOM.nextBtn.innerText = "Hoàn thành ➔";
+            } else {
+                DOM.nextBtn.innerText = "Từ tiếp theo ➔";
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < currentSessionQuestions.length - 1) {
+                currentIndex++;
+                loadQuestion();
+            } else {
+                showFinalResults();
+            }
+        }
+
+        function showFinalResults() {
+            DOM.drillScreen.classList.add('hidden');
+            DOM.counterPanel.classList.add('hidden');
+            DOM.progressBar.style.width = "100%";
+            DOM.resultsScreen.classList.remove('hidden');
+            AudioEngine.playSuccess();
+        }
+
+        // Tương tác
+        DOM.startBtn.onclick = startSession;
+        DOM.restartBtn.onclick = startSession;
+        DOM.showSolutionsBtn.onclick = revealSolutions;
+        DOM.nextBtn.onclick = nextQuestion;
+        
+        DOM.skipTimerBtn.onclick = () => {
+            if (isTimerRunning) {
+                stopCountdown(false);
+                revealSolutions();
+            }
+        };
+
+        DOM.soundToggleBtn.onclick = () => {
+            isSoundEnabled = !isSoundEnabled;
+            if (isSoundEnabled) {
+                DOM.soundOnIcon.classList.remove('hidden');
+                DOM.soundOffIcon.classList.add('hidden');
+                AudioEngine.init();
+            } else {
+                DOM.soundOnIcon.classList.add('hidden');
+                DOM.soundOffIcon.classList.remove('hidden');
+            }
+        };
+    </script>
+</body>
+</html>
