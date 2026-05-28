@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speaking Flash Drill - Chèn Điểm Giữa (A-X-B)</title>
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .circular-progress {
+      transition: stroke-dashoffset 0.1s linear;
+    }
+    @keyframes pulse-custom {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    .pulse-ready {
+      animation: pulse-custom 0.8s ease-in-out infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-4px); }
+    }
+    .shake-anim {
+      animation: shake 0.35s ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+
+  <div id="card" class="bg-white w-full max-w-md min-h-[78vh] md:min-h-[68vh] rounded-3xl shadow-xl border border-slate-100 p-5 md:p-6 flex flex-col justify-between gap-5 transition-all">
+    
+    <!-- Top Header Area -->
+    <div>
+      <div class="flex justify-between items-center mb-3">
+        <!-- Badges & Progress Info -->
+        <div class="space-y-1 text-left">
+          <div class="flex items-center gap-2">
+            <span id="level" class="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-lg transition-all">Level: -</span>
+            <span id="counter" class="bg-indigo-50 text-indigo-600 text-xs font-bold px-2.5 py-1 rounded-lg">Câu: 0/0</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Luyện tập: Chèn điểm giữa (A-X-B)</div>
+        </div>
+        
+        <!-- Compact Circular Timer on the top right -->
+        <div class="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+            <circle class="text-slate-100 stroke-current" stroke-width="4.5" fill="transparent" r="18" cx="22" cy="22" />
+            <circle id="timer-progress" class="text-indigo-600 stroke-current circular-progress" stroke-width="4.5" stroke-linecap="round" fill="transparent" r="18" cx="22" cy="22" stroke-dasharray="113.1" stroke-dashoffset="0" />
+          </svg>
+          <div id="timer" class="absolute font-extrabold text-base text-indigo-600">10</div>
+        </div>
+      </div>
+      
+      <!-- Sleek Progress Bar -->
+      <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden mb-3">
+        <div id="progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+      </div>
+
+      <!-- Super Minimalist Banner -->
+      <div class="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs text-slate-500 flex items-center gap-2">
+        <span class="text-indigo-500 font-bold">💡 Tip:</span>
+        <span>Điền ý thích hợp vào <strong class="text-indigo-600">X</strong> để tạo mạch nối logic giữa <strong class="text-indigo-600">A</strong> và <strong class="text-indigo-600">B</strong>.</span>
+      </div>
+    </div>
+
+    <!-- Main Drill Display Area -->
+    <div class="flex-1 flex flex-col justify-center items-center py-1 gap-3">
+      <!-- Minimalist Action Signal -->
+      <div id="signal" class="h-5 text-xs font-bold tracking-widest text-emerald-500 uppercase"></div>
+
+      <!-- Examiner Question Block -->
+      <div id="examiner-container" class="w-full text-center hidden transition-all duration-300">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">🗣️ Examiner:</span>
+        <p id="examiner-question" class="text-sm md:text-base font-semibold text-slate-500 italic leading-normal px-2"></p>
+        
+        <!-- Tiny elegant connector line -->
+        <div class="w-px h-3 bg-slate-200 mx-auto my-1.5"></div>
+      </div>
+
+      <!-- Candidate First Sentence (Question display formatted as standard block text) -->
+      <div id="sentence1-container" class="w-full text-center hidden transition-all duration-300">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-1">✍️ Your Sentence 1 (Direct Answer):</span>
+        <p id="sentence1-text" class="text-sm md:text-base font-semibold text-slate-600 italic leading-normal px-2"></p>
+        
+        <!-- Tiny elegant connector line -->
+        <div class="w-px h-3 bg-slate-200 mx-auto my-1.5"></div>
+      </div>
+
+      <!-- Sentence 2 Block with Gap-fill for X -->
+      <div id="candidate-container" class="w-full text-center">
+        <span id="candidate-label" class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-1 hidden">💡 Your Sentence 2 (A - X - B):</span>
+        <div id="question" class="text-base md:text-lg font-bold text-slate-800 text-center leading-relaxed px-1 py-1 block w-full transition-all duration-300">
+          Sẵn sàng phản xạ? Bấm nút bắt đầu ngay phía dưới!
+        </div>
+      </div>
+
+      <!-- Sequential Socratic Hint Box -->
+      <div id="hint-box" class="w-full space-y-2.5 mt-2">
+        <!-- Step 1: Question Prompt -->
+        <div id="hint-prompt-container" class="hidden bg-indigo-50/60 border border-indigo-100/80 rounded-xl p-3 text-left transition-all duration-300">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-0.5">Câu hỏi gợi mở hướng đi cho (X):</span>
+          <p id="hint-prompt" class="text-slate-800 font-bold text-sm italic"></p>
+        </div>
+        
+        <!-- Step 2: Sample Answer -->
+        <div id="hint-text-container" class="hidden bg-emerald-50/60 border border-emerald-100/80 rounded-xl p-3 text-left transition-all duration-300">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-500 block mb-0.5">Đáp án tham khảo cho (X):</span>
+          <p id="hint-text" class="text-slate-700 text-xs leading-relaxed font-semibold"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions Area -->
+    <div class="space-y-2">
+      <!-- Gợi ý Câu hỏi (Step 1 Button) -->
+      <button id="btn-prompt-hint" onclick="showPromptHint()" class="hidden w-full bg-slate-100 hover:bg-indigo-50 text-indigo-600 border border-indigo-100 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span>Gợi ý câu hỏi ❓</span>
+      </button>
+
+      <!-- Gợi ý Đáp án (Step 2 Button) -->
+      <button id="btn-answer-hint" onclick="showAnswerHint()" class="hidden w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span>Xem đáp án mẫu cho (X) 💡</span>
+      </button>
+      
+      <!-- Next Button -->
+      <button id="btn-next" onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md shadow-indigo-600/10 active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span id="btn-text">Bắt đầu ngay 🎯</span>
+        <svg id="btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 10 Câu hỏi luyện tập trình độ 5.0, paraphrase triệt để không lặp từ và tập trung quan hệ nhân quả A-X-B
+    const QUESTIONS_DB = {
+      easy: [
+        { 
+          examiner: "How does breakfast help your body?",
+          sentence1: "I think a morning meal is very important because it gives you energy for the whole day.",
+          text: "When you eat something right after waking up (A), [ ________ (X) ], so you won't feel tired during long classes later (B).", 
+          level: "Easy", 
+          prompt: "Cơ thể bạn nhận được điều gì ngay sau khi ăn sáng?", 
+          hint: "your body gets energy" 
+        },
+        { 
+          examiner: "What happens when you drink enough water?",
+          sentence1: "I believe getting enough water is great because it wakes you up.",
+          text: "By drinking a few glasses every morning (A), [ ________ (X) ], which naturally stops you from feeling sleepy (B).", 
+          level: "Easy", 
+          prompt: "Các hệ cơ quan và cơ thể bạn sẽ khởi động như thế nào khi có nước?", 
+          hint: "your body starts working faster" 
+        },
+        { 
+          examiner: "What’s one benefit of walking daily?",
+          sentence1: "Taking a short trip on foot is a great habit to improve your health.",
+          text: "When you move your body every day (A), [ ________ (X) ], which leads to a stronger heart and fewer sicknesses (B).", 
+          level: "Easy", 
+          prompt: "Hoạt động đi bộ giúp cơ thể tiêu hao bớt thứ gì dư thừa?", 
+          hint: "you burn a lot of fat" 
+        },
+        { 
+          examiner: "Why does sleeping early help at school?",
+          sentence1: "Going to bed before midnight is vital to help you focus better in class.",
+          text: "If you close your eyes early at night (A), [ ________ (X) ], meaning you can easily listen to the teacher the next morning (B).", 
+          level: "Easy", 
+          prompt: "Bộ não của bạn cần thời gian làm gì khi ngủ sớm?", 
+          hint: "your brain has enough time to rest" 
+        },
+        { 
+          examiner: "How does a homemade lunch help students save money?",
+          sentence1: "Bringing a cooked meal to school is a smart choice to manage your cash.",
+          text: "By making your own food at home (A), [ ________ (X) ], meaning you will have extra money to buy things you like (B).", 
+          level: "Easy", 
+          prompt: "Bạn sẽ tránh được việc phải chi trả cho dịch vụ ăn uống đắt đỏ nào?", 
+          hint: "you don't have to pay for expensive restaurants" 
+        }
+      ],
+      moderate: [
+        { 
+          examiner: "How can phones affect your focus?",
+          sentence1: "Keeping devices in your bag during class is necessary to learn better.",
+          text: "By putting your smartphone away (A), [ ________ (X) ], allowing you to fully understand the lesson without stopping (B).", 
+          level: "Moderate", 
+          prompt: "Bạn sẽ tránh được việc sa đà vào những trò tiêu khiển nào trên điện thoại?", 
+          hint: "you don't look at Facebook or games" 
+        },
+        { 
+          examiner: "Why is it important to review lessons every day?",
+          sentence1: "Reading your notes daily is the best way to get high marks.",
+          text: "When you spend a little time checking the books (A), [ ________ (X) ], so you will easily pass your exams later (B).", 
+          level: "Moderate", 
+          prompt: "Kiến thức sẽ được lưu giữ thế nào trong đầu bạn khi ôn tập?", 
+          hint: "you remember the knowledge longer" 
+        },
+        { 
+          examiner: "How does group work help students?",
+          sentence1: "Doing tasks with friends is excellent to build your teamwork skills.",
+          text: "When you share a project with other classmates (A), [ ________ (X) ], which prepares you for working in a company in the future (B).", 
+          level: "Moderate", 
+          prompt: "Kỹ năng lắng nghe quan trọng nào bạn được học khi làm việc nhóm?", 
+          hint: "you learn how to listen to different ideas" 
+        }
+      ],
+      challenging: [
+        { 
+          examiner: "Why should students ask questions in class?",
+          sentence1: "Talking to teachers is very useful to clear up hard problems.",
+          text: "When you raise your hand and say what you don't know (A), [ ________ (X) ], meaning you can finish your homework easily later (B).", 
+          level: "Challenging", 
+          prompt: "Giáo viên sẽ làm gì giúp bạn dễ tiếp thu hơn khi bạn đặt câu hỏi?", 
+          hint: "the teacher explains it again simply" 
+        },
+        { 
+          examiner: "How can books improve your English?",
+          sentence1: "Looking at English stories is highly effective to learn new words.",
+          text: "When you read foreign texts (A), [ ________ (X) ], which naturally helps you speak better in real life (B).", 
+          level: "Challenging", 
+          prompt: "Bạn sẽ học hỏi được gì từ cách người bản xứ sắp xếp câu từ?", 
+          hint: "you see how people write normal sentences" 
+        }
+      ]
+    };
+
+    const PREP_TIME = 10;
+    const CIRCUMFERENCE = 113.1;
+
+    let remainingQuestions = [];
+    let currentCount = 0;
+    let totalQuestions = 0;
+    let animationFrame = null;
+    let audioContext = null;
+
+    // DOM Elements
+    const levelEl = document.getElementById("level");
+    const counterEl = document.getElementById("counter");
+    const progressBar = document.getElementById("progress-bar");
+    const timerProgress = document.getElementById("timer-progress");
+    const timerEl = document.getElementById("timer");
+    const signalEl = document.getElementById("signal");
+    const questionEl = document.getElementById("question");
+    
+    const examinerContainer = document.getElementById("examiner-container");
+    const examinerQuestionEl = document.getElementById("examiner-question");
+    const sentence1Container = document.getElementById("sentence1-container");
+    const sentence1TextEl = document.getElementById("sentence1-text");
+    const candidateLabel = document.getElementById("candidate-label");
+    
+    const btnPromptHint = document.getElementById("btn-prompt-hint");
+    const btnAnswerHint = document.getElementById("btn-answer-hint");
+    const btnNext = document.getElementById("btn-next");
+    const btnText = document.getElementById("btn-text");
+    const btnIcon = document.getElementById("btn-icon");
+    
+    const hintPromptContainer = document.getElementById("hint-prompt-container");
+    const hintTextContainer = document.getElementById("hint-text-container");
+    const hintPrompt = document.getElementById("hint-prompt");
+    const hintText = document.getElementById("hint-text");
+    const cardEl = document.getElementById("card");
+
+    timerProgress.style.strokeDasharray = CIRCUMFERENCE;
+    timerProgress.style.strokeDashoffset = 0;
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function playAlertBeep(frequency = 600, duration = 0.15) {
+      try {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.06, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + duration);
+        
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (e) {
+        console.warn("Audio error: ", e);
+      }
+    }
+
+    function playStartSignal() {
+      playAlertBeep(880, 0.1);
+      setTimeout(() => playAlertBeep(1200, 0.22), 140);
+    }
+
+    function setupSession() {
+      const shuffledEasy = shuffle(QUESTIONS_DB.easy);
+      const firstTwo = shuffledEasy.slice(0, 2);
+      const remainingEasy = shuffledEasy.slice(2);
+      
+      const pool = [
+        ...remainingEasy,
+        ...QUESTIONS_DB.moderate,
+        ...QUESTIONS_DB.challenging
+      ];
+      
+      const shuffledPool = shuffle(pool);
+      remainingQuestions = [...firstTwo, ...shuffledPool];
+      totalQuestions = remainingQuestions.length;
+      currentCount = 0;
+    }
+
+    function resetUI() {
+      cancelAnimationFrame(animationFrame);
+      timerEl.textContent = PREP_TIME;
+      timerProgress.style.strokeDashoffset = 0;
+      timerProgress.classList.remove("text-rose-500");
+      timerProgress.classList.add("text-indigo-600");
+      timerEl.classList.remove("text-rose-500", "pulse-ready");
+      timerEl.classList.add("text-indigo-600");
+      
+      signalEl.textContent = "";
+      signalEl.className = "h-5 text-xs font-bold tracking-widest text-emerald-500 uppercase";
+      
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.add("hidden");
+      hintPromptContainer.classList.add("hidden");
+      hintTextContainer.classList.add("hidden");
+
+      examinerContainer.classList.add("hidden");
+      sentence1Container.classList.add("hidden");
+      candidateLabel.classList.add("hidden");
+    }
+
+    function showPromptHint() {
+      hintPromptContainer.classList.remove("hidden");
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.remove("hidden");
+    }
+
+    function showAnswerHint() {
+      hintTextContainer.classList.remove("hidden");
+      btnAnswerHint.classList.add("hidden");
+    }
+
+    function init() {
+      resetUI();
+      setupSession();
+      
+      levelEl.textContent = "Level: -";
+      counterEl.textContent = `Câu: 0/${totalQuestions}`;
+      progressBar.style.width = "0%";
+      
+      questionEl.innerHTML = `Sẵn sàng phản xạ? Bấm nút bắt đầu ngay phía dưới!`;
+      
+      btnText.textContent = "Bắt đầu ngay 🎯";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>`;
+      btnNext.onclick = nextQuestion;
+    }
+
+    function startTimer() {
+      cancelAnimationFrame(animationFrame);
+      const duration = PREP_TIME * 1000;
+      const startTime = performance.now();
+
+      function updateTimer(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const remainingMs = Math.max(duration - elapsed, 0);
+        const remainingSeconds = Math.ceil(remainingMs / 1000);
+
+        timerEl.textContent = remainingSeconds;
+        timerProgress.style.strokeDashoffset = CIRCUMFERENCE * progress;
+
+        if (remainingSeconds <= 3) {
+          timerProgress.classList.remove("text-indigo-600");
+          timerProgress.classList.add("text-rose-500");
+          timerEl.classList.remove("text-indigo-600");
+          timerEl.classList.add("text-rose-500");
+        }
+
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(updateTimer);
+        } else {
+          timerEl.textContent = "🗣️";
+          timerProgress.style.strokeDashoffset = CIRCUMFERENCE;
+          timerEl.classList.add("pulse-ready");
+          
+          signalEl.textContent = "ĐIỀN VÀO (X) NGAY!";
+          signalEl.className = "h-5 text-xs font-extrabold tracking-wider text-rose-500 uppercase animate-bounce";
+          
+          playStartSignal();
+          if (navigator.vibrate) {
+            navigator.vibrate([150, 100, 150]);
+          }
+
+          cardEl.classList.add("shake-anim");
+          setTimeout(() => cardEl.classList.remove("shake-anim"), 350);
+
+          btnPromptHint.classList.remove("hidden");
+        }
+      }
+
+      animationFrame = requestAnimationFrame(updateTimer);
+    }
+
+    function formatQuestionText(text) {
+      // Format phần khuyết X thành ô trống bắt mắt để kích thích phản xạ
+      return text.replace(/\[(.*?)\]/g, `<span class="bg-indigo-50 border-b-2 border-indigo-400 text-indigo-600 font-extrabold px-3 py-1 mx-1 rounded inline-block animate-pulse">$1</span>`);
+    }
+
+    function nextQuestion() {
+      if (remainingQuestions.length === 0) {
+        resetUI();
+        questionEl.innerHTML = `🎉 Tuyệt vời! Bạn đã hoàn thành xuất sắc 10 câu luyện tập phản xạ Chèn Điểm Giữa (A-X-B) cấp độ 5.0!`;
+        levelEl.textContent = "Level: Done";
+        counterEl.textContent = `Câu: ${totalQuestions}/${totalQuestions}`;
+        progressBar.style.width = "100%";
+        
+        timerEl.textContent = "✓";
+        timerProgress.style.strokeDashoffset = CIRCUMFERENCE;
+        
+        btnText.textContent = "Luyện tập lại 🔄";
+        btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18"></path>`;
+        btnNext.onclick = init;
+        return;
+      }
+
+      resetUI();
+      currentCount++;
+
+      const item = remainingQuestions.shift();
+
+      counterEl.textContent = `Câu: ${currentCount}/${totalQuestions}`;
+      levelEl.textContent = `Level: ${item.level}`;
+      
+      const pct = (currentCount / totalQuestions) * 100;
+      progressBar.style.width = `${pct}%`;
+
+      if (item.level === "Easy") {
+        levelEl.className = "bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-lg";
+      } else if (item.level === "Moderate") {
+        levelEl.className = "bg-amber-50 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-lg";
+      } else {
+        levelEl.className = "bg-rose-50 text-rose-700 text-xs font-bold px-2.5 py-1 rounded-lg";
+      }
+
+      // Hiện câu hỏi của Examiner
+      examinerQuestionEl.textContent = item.examiner;
+      examinerContainer.classList.remove("hidden");
+
+      // Hiện Câu 1
+      sentence1TextEl.textContent = item.sentence1;
+      sentence1Container.classList.remove("hidden");
+
+      // Hiện Câu 2 (A - X - B)
+      candidateLabel.classList.remove("hidden");
+      questionEl.innerHTML = formatQuestionText(item.text);
+
+      hintPrompt.textContent = item.prompt;
+      hintText.textContent = item.hint;
+
+      btnText.textContent = "Câu Tiếp Theo ➜";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>`;
+
+      startTimer();
+    }
+
+    window.onload = function() {
+      init();
+    };
+  </script>
+</body>
+</html>
