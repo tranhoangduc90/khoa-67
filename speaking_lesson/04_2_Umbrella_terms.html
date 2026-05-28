@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speaking Reverse Drill - Tạo Từ Bao Quát (Umbrella Term)</title>
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .circular-progress {
+      transition: stroke-dashoffset 0.1s linear;
+    }
+    @keyframes pulse-custom {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    .pulse-ready {
+      animation: pulse-custom 0.8s ease-in-out infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-4px); }
+    }
+    .shake-anim {
+      animation: shake 0.35s ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+
+  <div id="card" class="bg-white w-full max-w-md min-h-[78vh] md:min-h-[68vh] rounded-3xl shadow-xl border border-slate-100 p-5 md:p-6 flex flex-col justify-between gap-5 transition-all">
+    
+    <!-- Top Header Area -->
+    <div>
+      <div class="flex justify-between items-center mb-3">
+        <!-- Badges & Progress Info -->
+        <div class="space-y-1 text-left">
+          <div class="flex items-center gap-2">
+            <span id="level" class="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-lg transition-all">Level: -</span>
+            <span id="counter" class="bg-indigo-50 text-indigo-600 text-xs font-bold px-2.5 py-1 rounded-lg">Câu: 0/0</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Luyện tập: Tạo từ bao quát (Umbrella Term)</div>
+        </div>
+        
+        <!-- Compact Circular Timer on the top right -->
+        <div class="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+            <circle class="text-slate-100 stroke-current" stroke-width="4.5" fill="transparent" r="18" cx="22" cy="22" />
+            <circle id="timer-progress" class="text-indigo-600 stroke-current circular-progress" stroke-width="4.5" stroke-linecap="round" fill="transparent" r="18" cx="22" cy="22" stroke-dasharray="113.1" stroke-dashoffset="0" />
+          </svg>
+          <div id="timer" class="absolute font-extrabold text-base text-indigo-600">10</div>
+        </div>
+      </div>
+      
+      <!-- Sleek Progress Bar -->
+      <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden mb-3">
+        <div id="progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+      </div>
+
+      <!-- Super Minimalist Banner -->
+      <div class="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs text-slate-500 flex items-center gap-2">
+        <span class="text-indigo-500 font-bold">💡 Tip:</span>
+        <span>Nói <strong class="text-indigo-600">Câu 1</strong> chứa Direct Answer + Umbrella Term bao quát cho phần chi tiết bên dưới.</span>
+      </div>
+    </div>
+
+    <!-- Main Drill Display Area -->
+    <div class="flex-1 flex flex-col justify-center items-center py-1 gap-3">
+      <!-- Minimalist Action Signal -->
+      <div id="signal" class="h-5 text-xs font-bold tracking-widest text-emerald-500 uppercase"></div>
+
+      <!-- Examiner Question Block -->
+      <div id="examiner-container" class="w-full text-center hidden transition-all duration-300">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">🗣️ Examiner:</span>
+        <p id="examiner-question" class="text-sm md:text-base font-semibold text-slate-500 italic leading-normal px-2"></p>
+        
+        <!-- Tiny elegant connector line -->
+        <div class="w-px h-3 bg-slate-200 mx-auto my-1.5"></div>
+      </div>
+
+      <!-- Given Sentence 2 Block (Task Context - Highlighted as main focus) -->
+      <div id="detail-container" class="w-full text-center hidden transition-all duration-300">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-500 block mb-1">🔍 Given Clarifying Detail (Sentence 2):</span>
+        <p id="detail-sentence" class="text-base md:text-lg font-bold text-slate-700 leading-relaxed px-2"></p>
+        
+        <!-- Tiny elegant connector line -->
+        <div class="w-px h-3 bg-slate-200 mx-auto my-1.5"></div>
+      </div>
+
+      <!-- Task Target Block (Subdued instruction style) -->
+      <div id="candidate-container" class="w-full text-center">
+        <span id="candidate-label" class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1 hidden">✍️ Your Task:</span>
+        <div id="question" class="text-xs md:text-sm font-medium text-slate-400 text-center leading-relaxed px-2 py-1 block w-full transition-all duration-300">
+          Sẵn sàng phản xạ? Bấm nút bắt đầu ngay phía dưới!
+        </div>
+      </div>
+
+      <!-- Sequential Socratic Hint Box -->
+      <div id="hint-box" class="w-full space-y-2.5 mt-2">
+        <!-- Step 1: Question Prompt -->
+        <div id="hint-prompt-container" class="hidden bg-indigo-50/60 border border-indigo-100/80 rounded-xl p-3 text-left transition-all duration-300">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-0.5">Gợi ý tìm từ bao quát (Umbrella Term):</span>
+          <p id="hint-prompt" class="text-slate-800 font-bold text-sm italic"></p>
+        </div>
+        
+        <!-- Step 2: Sample Answer -->
+        <div id="hint-text-container" class="hidden bg-emerald-50/60 border border-emerald-100/80 rounded-xl p-3 text-left transition-all duration-300">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-500 block mb-0.5">Câu mẫu để tham khảo (Sentence 1):</span>
+          <p id="hint-text" class="text-slate-700 text-xs leading-relaxed font-semibold"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions Area -->
+    <div class="space-y-2">
+      <!-- Gợi ý Câu hỏi (Step 1 Button) -->
+      <button id="btn-prompt-hint" onclick="showPromptHint()" class="hidden w-full bg-slate-100 hover:bg-indigo-50 text-indigo-600 border border-indigo-100 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span>Gợi ý hướng đi ❓</span>
+      </button>
+
+      <!-- Gợi ý Đáp án (Step 2 Button) -->
+      <button id="btn-answer-hint" onclick="showAnswerHint()" class="hidden w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span>Xem câu mẫu tham khảo 💡</span>
+      </button>
+      
+      <!-- Next Button -->
+      <button id="btn-next" onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md shadow-indigo-600/10 active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span id="btn-text">Bắt đầu ngay 🎯</span>
+        <svg id="btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Database 10 câu hỏi reverse drill (Cấp độ 5.0, paraphrase triệt để)
+    const QUESTIONS_DB = {
+      easy: [
+        { 
+          examiner: "Do you like using buses in your city?",
+          given_detail: "When you sit on a public bus (A), you don't have to drive through heavy traffic yourself (X), so you can sit back and listen to music (B).", 
+          level: "Easy", 
+          prompt: "Tìm tính từ bao quát chỉ cảm giác thoải mái, dễ chịu, không căng thẳng khi được nghe nhạc và không cần tự lái xe.", 
+          sample_answer: "Yes, I love traveling by bus because it is very [relaxing]." 
+        },
+        { 
+          examiner: "Do you think learning to cook is necessary for young people?",
+          given_detail: "If a teenager knows how to prepare meals (A), they can feed themselves easily when their parents are away (X), meaning they don't have to depend on others (B).", 
+          level: "Easy", 
+          prompt: "Tìm tính từ chỉ tính chất tự lo được cho bản thân, có thể tự lập mà không cần dựa dẫm vào người khác.", 
+          sample_answer: "Yes, I believe cooking is a vital skill because it teaches you how to be [independent]." 
+        },
+        { 
+          examiner: "Do you prefer shopping online or going to real stores?",
+          given_detail: "By buying things on websites (A), you just need to click on your phone screen without leaving your room (X), which cuts down a lot of travel time (B).", 
+          level: "Easy", 
+          prompt: "Tìm tính từ bao quát chỉ sự tiện lợi, nhanh gọn và không tốn công sức đi lại.", 
+          sample_answer: "I prefer online shopping because it is extremely [convenient]." 
+        },
+        { 
+          examiner: "When do you usually listen to music?",
+          given_detail: "When I put on my headphones after a hard test (A), the soft melodies help my mind slow down (X), so all my worries go away quickly (B).", 
+          level: "Easy", 
+          prompt: "Tìm động từ hoặc tính từ chỉ hành động thư giãn, giải tỏa căng thẳng sau những giờ thi cử áp lực.", 
+          sample_answer: "I often listen to music when I feel stressed because it helps me [unwind]." 
+        },
+        { 
+          examiner: "Is it good for children to do chores at home?",
+          given_detail: "If kids clean their own bedrooms every weekend (A), they learn how to organize their personal belongings (X), meaning they will grow into well-behaved adults (B).", 
+          level: "Easy", 
+          prompt: "Tìm danh từ chỉ những nề nếp tốt, thói quen tích cực được xây dựng từ các hoạt động nhỏ hàng tuần.", 
+          sample_answer: "Yes, I think doing housework is beneficial for children because it builds good [habits]." 
+        }
+      ],
+      moderate: [
+        { 
+          examiner: "Do you like the place where you are living?",
+          given_detail: "Because there are many police stations around my house (A), bad people cannot cause any trouble in this area (X), so my family can sleep with open windows (B).", 
+          level: "Moderate", 
+          prompt: "Tìm tính từ chỉ sự yên bình, không lo sợ nguy hiểm, trộm cắp.", 
+          sample_answer: "Yes, I really love my neighborhood because it is very [safe]." 
+        },
+        { 
+          examiner: "Do you prefer hot weather or cold weather?",
+          given_detail: "When the temperature drops below fifteen degrees (A), I can wear my favorite thick jackets and drink warm tea (X), which makes me feel wonderful inside (B).", 
+          level: "Moderate", 
+          prompt: "Tìm tính từ mô tả sự ấm cúng, thoải mái, dễ chịu giữa ngày đông lạnh.", 
+          sample_answer: "I prefer cold weather because I enjoy the [cozy] winter atmosphere." 
+        },
+        { 
+          examiner: "Why do many people eat fast food nowadays?",
+          given_detail: "Since these restaurants serve meals in just five minutes (A), busy workers can grab a quick bite during a short break (X), so they don't miss their office hours (B).", 
+          level: "Moderate", 
+          prompt: "Tìm một tính từ ghép chỉ sự tiết kiệm thời gian, nhanh chóng cho những người bận rộn.", 
+          sample_answer: "In my opinion, people choose fast food because it is very [time-saving]." 
+        }
+      ],
+      challenging: [
+        { 
+          examiner: "Do you like visiting parks in your city?",
+          given_detail: "When you walk around an area with many green trees (A), you can breathe fresh air away from street dust (X), which makes your body feel much stronger (B).", 
+          level: "Challenging", 
+          prompt: "Tìm danh từ chỉ sức khỏe, thể trạng tốt nhờ không khí trong lành.", 
+          sample_answer: "Yes, I enjoy going to parks because they are good for your [health]." 
+        },
+        { 
+          examiner: "Do you like waking up early in the morning?",
+          given_detail: "If you get out of bed at 5 AM (A), you can enjoy the quiet time and finish your work before others wake up (X), so you can achieve more goals in a day (B).", 
+          level: "Challenging", 
+          prompt: "Tìm tính từ chỉ sự năng suất, hoàn thành được nhiều việc hiệu quả.", 
+          sample_answer: "Yes, I prefer waking up early because it makes me more [productive]." 
+        }
+      ]
+    };
+
+    const PREP_TIME = 10;
+    const CIRCUMFERENCE = 113.1;
+
+    let remainingQuestions = [];
+    let currentCount = 0;
+    let totalQuestions = 0;
+    let animationFrame = null;
+    let audioContext = null;
+
+    // DOM Elements
+    const levelEl = document.getElementById("level");
+    const counterEl = document.getElementById("counter");
+    const progressBar = document.getElementById("progress-bar");
+    const timerProgress = document.getElementById("timer-progress");
+    const timerEl = document.getElementById("timer");
+    const signalEl = document.getElementById("signal");
+    const questionEl = document.getElementById("question");
+    
+    const examinerContainer = document.getElementById("examiner-container");
+    const examinerQuestionEl = document.getElementById("examiner-question");
+    
+    const detailContainer = document.getElementById("detail-container");
+    const detailSentenceEl = document.getElementById("detail-sentence");
+    
+    const candidateLabel = document.getElementById("candidate-label");
+    
+    const btnPromptHint = document.getElementById("btn-prompt-hint");
+    const btnAnswerHint = document.getElementById("btn-answer-hint");
+    const btnNext = document.getElementById("btn-next");
+    const btnText = document.getElementById("btn-text");
+    const btnIcon = document.getElementById("btn-icon");
+    
+    const hintPromptContainer = document.getElementById("hint-prompt-container");
+    const hintTextContainer = document.getElementById("hint-text-container");
+    const hintPrompt = document.getElementById("hint-prompt");
+    const hintText = document.getElementById("hint-text");
+    const cardEl = document.getElementById("card");
+
+    timerProgress.style.strokeDasharray = CIRCUMFERENCE;
+    timerProgress.style.strokeDashoffset = 0;
+
+    // Thuật toán xáo trộn Fisher-Yates
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function playAlertBeep(frequency = 600, duration = 0.15) {
+      try {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.06, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + duration);
+        
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (e) {
+        console.warn("Audio error: ", e);
+      }
+    }
+
+    function playStartSignal() {
+      playAlertBeep(880, 0.1);
+      setTimeout(() => playAlertBeep(1200, 0.22), 140);
+    }
+
+    // Khởi tạo buổi luyện tập (2 câu đầu luôn là câu dễ ngẫu nhiên)
+    function setupSession() {
+      const shuffledEasy = shuffle(QUESTIONS_DB.easy);
+      const firstTwo = shuffledEasy.slice(0, 2);
+      const remainingEasy = shuffledEasy.slice(2);
+      
+      const pool = [
+        ...remainingEasy,
+        ...QUESTIONS_DB.moderate,
+        ...QUESTIONS_DB.challenging
+      ];
+      
+      const shuffledPool = shuffle(pool);
+      remainingQuestions = [...firstTwo, ...shuffledPool];
+      totalQuestions = remainingQuestions.length;
+      currentCount = 0;
+    }
+
+    function resetUI() {
+      cancelAnimationFrame(animationFrame);
+      timerEl.textContent = PREP_TIME;
+      timerProgress.style.strokeDashoffset = 0;
+      timerProgress.classList.remove("text-rose-500");
+      timerProgress.classList.add("text-indigo-600");
+      timerEl.classList.remove("text-rose-500", "pulse-ready");
+      timerEl.classList.add("text-indigo-600");
+      
+      signalEl.textContent = "";
+      signalEl.className = "h-5 text-xs font-bold tracking-widest text-emerald-500 uppercase";
+      
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.add("hidden");
+      hintPromptContainer.classList.add("hidden");
+      hintTextContainer.classList.add("hidden");
+
+      examinerContainer.classList.add("hidden");
+      detailContainer.classList.add("hidden");
+      candidateLabel.classList.add("hidden");
+    }
+
+    function showPromptHint() {
+      hintPromptContainer.classList.remove("hidden");
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.remove("hidden");
+    }
+
+    function showAnswerHint() {
+      hintTextContainer.classList.remove("hidden");
+      btnAnswerHint.classList.add("hidden");
+    }
+
+    function init() {
+      resetUI();
+      setupSession();
+      
+      levelEl.textContent = "Level: -";
+      counterEl.textContent = `Câu: 0/${totalQuestions}`;
+      progressBar.style.width = "0%";
+      
+      questionEl.innerHTML = `Sẵn sàng phản xạ? Bấm nút bắt đầu ngay phía dưới!`;
+      
+      btnText.textContent = "Bắt đầu ngay 🎯";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>`;
+      btnNext.onclick = nextQuestion;
+    }
+
+    function startTimer() {
+      cancelAnimationFrame(animationFrame);
+      const duration = PREP_TIME * 1000;
+      const startTime = performance.now();
+
+      function updateTimer(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const remainingMs = Math.max(duration - elapsed, 0);
+        const remainingSeconds = Math.ceil(remainingMs / 1000);
+
+        timerEl.textContent = remainingSeconds;
+        timerProgress.style.strokeDashoffset = CIRCUMFERENCE * progress;
+
+        if (remainingSeconds <= 3) {
+          timerProgress.classList.remove("text-indigo-600");
+          timerProgress.classList.add("text-rose-500");
+          timerEl.classList.remove("text-indigo-600");
+          timerEl.classList.add("text-rose-500");
+        }
+
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(updateTimer);
+        } else {
+          timerEl.textContent = "🗣️";
+          timerProgress.style.strokeDashoffset = CIRCUMFERENCE;
+          timerEl.classList.add("pulse-ready");
+          
+          signalEl.textContent = "HÃY NÓI NGAY!";
+          signalEl.className = "h-5 text-xs font-extrabold tracking-wider text-rose-500 uppercase animate-bounce";
+          
+          playStartSignal();
+          if (navigator.vibrate) {
+            navigator.vibrate([150, 100, 150]);
+          }
+
+          cardEl.classList.add("shake-anim");
+          setTimeout(() => cardEl.classList.remove("shake-anim"), 350);
+
+          btnPromptHint.classList.remove("hidden");
+        }
+      }
+
+      animationFrame = requestAnimationFrame(updateTimer);
+    }
+
+    function formatQuestionText(text) {
+      return text.replace(/\[(.*?)\]/g, `<span class="text-indigo-600 font-extrabold underline decoration-2 decoration-indigo-300 underline-offset-4 inline">$1</span>`);
+    }
+
+    function nextQuestion() {
+      if (remainingQuestions.length === 0) {
+        resetUI();
+        questionEl.innerHTML = `🎉 Tuyệt vời! Bạn đã hoàn thành tất cả 10 câu luyện tập phản xạ thiết lập khung khái quát. Hãy duy trì tốt tư duy này nhé!`;
+        levelEl.textContent = "Level: Done";
+        counterEl.textContent = `Câu: ${totalQuestions}/${totalQuestions}`;
+        progressBar.style.width = "100%";
+        
+        timerEl.textContent = "✓";
+        timerProgress.style.strokeDashoffset = CIRCUMFERENCE;
+        
+        btnText.textContent = "Luyện tập lại 🔄";
+        btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18"></path>`;
+        btnNext.onclick = init;
+        return;
+      }
+
+      resetUI();
+      currentCount++;
+
+      const item = remainingQuestions.shift();
+
+      counterEl.textContent = `Câu: ${currentCount}/${totalQuestions}`;
+      levelEl.textContent = `Level: ${item.level}`;
+      
+      const pct = (currentCount / totalQuestions) * 100;
+      progressBar.style.width = `${pct}%`;
+
+      if (item.level === "Easy") {
+        levelEl.className = "bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-lg";
+      } else if (item.level === "Moderate") {
+        levelEl.className = "bg-amber-50 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-lg";
+      } else {
+        levelEl.className = "bg-rose-50 text-rose-700 text-xs font-bold px-2.5 py-1 rounded-lg";
+      }
+
+      examinerQuestionEl.textContent = item.examiner;
+      examinerContainer.classList.remove("hidden");
+      
+      detailSentenceEl.textContent = item.given_detail;
+      detailContainer.classList.remove("hidden");
+
+      candidateLabel.classList.remove("hidden");
+
+      questionEl.innerHTML = "Hãy nói Câu 1 (bao gồm Direct Answer và một Umbrella Term bao quát cho các chi tiết trên).";
+
+      hintPrompt.textContent = item.prompt;
+      hintText.innerHTML = formatQuestionText(item.sample_answer);
+
+      btnText.textContent = "Câu Tiếp Theo ➜";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>`;
+
+      startTimer();
+    }
+
+    window.onload = function() {
+      init();
+    };
+  </script>
+</body>
+</html>
