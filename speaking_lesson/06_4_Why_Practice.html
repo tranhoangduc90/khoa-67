@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speaking Flash Drill - Hợp Nhất 3 Mảnh Ghép</title>
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Be Vietnam Pro chuẩn tiếng Việt -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght=0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+    
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    .circular-progress {
+      transition: stroke-dashoffset 0.1s linear;
+    }
+    @keyframes pulse-custom {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .pulse-ready {
+      animation: pulse-custom 0.8s ease-in-out infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-4px); }
+    }
+    .shake-anim {
+      animation: shake 0.35s ease-in-out;
+    }
+    /* Tùy chỉnh Checkbox cho Peer-Feedback */
+    .checklist-checkbox {
+      accent-color: #4f46e5;
+      width: 1.1rem;
+      height: 1.1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+
+  <div id="card" class="bg-white w-full max-w-md min-h-[85vh] md:min-h-[75vh] rounded-3xl shadow-xl border border-slate-100 p-5 flex flex-col justify-between gap-4 transition-all">
+    
+    <!-- Top Header Area -->
+    <div>
+      <div class="flex justify-between items-center mb-2">
+        <div class="space-y-1 text-left">
+          <div class="flex items-center gap-2">
+            <span id="level" class="bg-slate-100 text-slate-600 text-xs font-extrabold px-2.5 py-1 rounded-lg transition-all">Level: -</span>
+            <span id="counter" class="bg-indigo-50 text-indigo-600 text-xs font-extrabold px-2.5 py-1 rounded-lg">Câu: 0/0</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Hoạt động 4: Hợp nhất 3 Bước</div>
+        </div>
+        
+        <!-- Timer -->
+        <div class="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+            <circle class="text-slate-100 stroke-current" stroke-width="4.5" fill="transparent" r="18" cx="22" cy="22" />
+            <circle id="timer-progress" class="text-indigo-600 stroke-current circular-progress" stroke-width="4.5" stroke-linecap="round" fill="transparent" r="18" cx="22" cy="22" stroke-dasharray="113.1" stroke-dashoffset="0" />
+          </svg>
+          <div id="timer" class="absolute font-black text-base text-indigo-600">15</div>
+        </div>
+      </div>
+      
+      <!-- Progress Bar -->
+      <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-3">
+        <div id="progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+      </div>
+    </div>
+
+    <!-- Main Drill Display Area -->
+    <div class="flex-1 flex flex-col items-center py-1 gap-2 w-full">
+      
+      <div id="signal" class="h-4 text-[10px] font-bold tracking-widest text-emerald-500 uppercase"></div>
+
+      <!-- Examiner Question Block -->
+      <div id="examiner-container" class="w-full text-center hidden transition-all duration-300 bg-slate-50 border border-slate-200 rounded-xl p-3">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">🗣️ Examiner Question:</span>
+        <p id="examiner-question" class="text-base font-bold text-slate-800 leading-snug"></p>
+      </div>
+
+      <!-- Start screen placeholder -->
+      <div id="start-screen" class="text-base font-bold text-center px-4 py-8 rounded-2xl block w-full bg-slate-50 text-slate-500 border border-slate-200">
+        Bạn có 15s để nảy số ý tưởng cho cả 3 bước.<br><br>Sẵn sàng hợp nhất? Bấm bắt đầu!
+      </div>
+
+      <!-- Target Direction Block (Khung 3 Bước - Chỉ giữ Outline lý thuyết) -->
+      <div id="candidate-container" class="w-full hidden flex flex-col gap-2">
+        <!-- Bước 1 -->
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 text-left flex items-center gap-3 shadow-sm">
+          <div class="bg-emerald-500 text-white rounded-md w-7 h-7 flex items-center justify-center text-sm font-black shrink-0">1</div>
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-700 block mb-0.5">Trả lời trực diện</span>
+            <span class="text-[11px] text-emerald-600 font-semibold">(Nêu 1 lý do: Đạt được / Tránh né / Ngoại cảnh)</span>
+          </div>
+        </div>
+        <!-- Bước 2 -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5 text-left flex items-center gap-3 shadow-sm">
+          <div class="bg-amber-500 text-white rounded-md w-7 h-7 flex items-center justify-center text-sm font-black shrink-0">2</div>
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-amber-700 block mb-0.5">Khai triển logic</span>
+            <span class="text-[11px] text-amber-600 font-semibold">(Làm rõ chi tiết / Chèn điểm giữa A ➡️ X ➡️ B)</span>
+          </div>
+        </div>
+        <!-- Bước 3 -->
+        <div class="bg-rose-50/70 border border-rose-200 rounded-xl p-3.5 text-left flex items-center gap-3 shadow-sm">
+          <div class="bg-rose-500 text-white rounded-md w-7 h-7 flex items-center justify-center text-sm font-black shrink-0">3</div>
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-rose-700 block mb-0.5">Freestyle Bẻ lái</span>
+            <span class="text-[11px] text-rose-600 font-semibold">(Mở rộng nói thêm Lợi ích / Tác hại)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sequential Socratic Hint Box -->
+      <div id="hint-box" class="w-full space-y-2 mt-1">
+        <!-- Step 1: Question Prompts -->
+        <div id="hint-prompt-container" class="hidden bg-indigo-50/60 border border-indigo-100/80 rounded-xl p-3 text-left transition-all duration-300">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-1.5">❓ Câu hỏi gợi mở tư duy:</span>
+          <div class="text-xs text-slate-700 font-semibold space-y-1">
+            <p><span class="text-emerald-500 font-bold">1.</span> <span id="hint-p1"></span></p>
+            <p><span class="text-amber-500 font-bold">2.</span> <span id="hint-p2"></span></p>
+            <p><span class="text-rose-500 font-bold">3.</span> <span id="hint-p3"></span></p>
+          </div>
+        </div>
+        
+        <!-- Step 2: Sample Keywords -->
+        <div id="hint-text-container" class="hidden bg-emerald-50/60 border border-emerald-100/80 rounded-xl p-3 text-left transition-all duration-300">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-1.5">💡 Từ khóa gợi ý (Band 6.0):</span>
+          <div class="text-xs text-slate-800 font-bold space-y-1">
+            <p><span class="text-emerald-600">1.</span> <span id="hint-t1"></span></p>
+            <p><span class="text-amber-600">2.</span> <span id="hint-t2"></span></p>
+            <p><span class="text-rose-600">3.</span> <span id="hint-t3"></span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Peer Checklist Area -->
+      <div id="peer-checklist" class="w-full hidden mt-1">
+        <div class="bg-slate-100/80 border border-slate-200 rounded-xl p-3">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 block mb-2 text-center">📝 Peer-Feedback (Dành cho bạn cùng bàn)</span>
+          <div class="space-y-1.5">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" class="checklist-checkbox">
+              <span class="text-xs font-medium text-slate-700">Có nêu đủ lý do trực tiếp (câu 1)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" class="checklist-checkbox">
+              <span class="text-xs font-medium text-slate-700">Có dùng từ nối chèn ý/làm rõ logic (câu 2)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" class="checklist-checkbox">
+              <span class="text-xs font-medium text-slate-700">Có bẻ lái nói thêm Lợi/Hại (câu 3)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sample Answer Box -->
+      <div id="sample-answer-box" class="w-full hidden mt-1 bg-indigo-50/80 border border-indigo-200 rounded-xl p-3 text-left">
+        <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 block mb-1.5">💡 Đáp án mẫu (Band 6.0 - 6.5)</span>
+        <div class="text-xs text-slate-700 space-y-2 leading-relaxed">
+          <p><span class="font-bold text-emerald-600">1. </span><span id="sample-s1"></span></p>
+          <p><span class="font-bold text-amber-600">2. </span><span id="sample-s2"></span></p>
+          <p><span class="font-bold text-rose-600">3. </span><span id="sample-s3"></span></p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions Area -->
+    <div class="space-y-2 w-full mt-1">
+      <!-- Hint Buttons -->
+      <button id="btn-prompt-hint" onclick="showPromptHint()" class="hidden w-full bg-slate-100 hover:bg-indigo-50 text-indigo-600 border border-indigo-100 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span>Gợi ý câu hỏi tư duy ❓</span>
+      </button>
+      <button id="btn-answer-hint" onclick="showAnswerHint()" class="hidden w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span>Xem từ khóa gợi ý (Band 6.0) 💡</span>
+      </button>
+
+      <!-- Show Sample Answer Button -->
+      <button id="btn-show-sample" onclick="showSampleAnswer()" class="hidden w-full bg-slate-100 hover:bg-indigo-50 text-indigo-600 border border-indigo-100 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span>Xem đoạn trả lời mẫu 💡</span>
+      </button>
+      
+      <!-- Next Button -->
+      <button id="btn-next" onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md shadow-indigo-600/10 active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span id="btn-text">Bắt đầu ngay 🎯</span>
+        <svg id="btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Cơ sở dữ liệu: Hoạt động 4 (Hợp nhất 3 mảnh ghép) - BỘ 15 CÂU HỎI
+    const QUESTIONS_DB = {
+      easy: [
+        { 
+          examiner: "Why do people listen to music while studying?", 
+          level: "Easy",
+          prompts: [
+            "Họ muốn tránh yếu tố gây xao nhãng nào từ bên ngoài?",
+            "Cụ thể, việc đeo tai nghe giúp họ chặn âm thanh gì?",
+            "Lợi ích của việc này đối với những bài tập nhàm chán là gì?"
+          ],
+          hints: [
+            "avoid outside noise (tránh tiếng ồn bên ngoài)",
+            "block out people talking (chặn tiếng người nói chuyện)",
+            "make boring tasks enjoyable (làm cho việc nhàm chán trở nên thú vị)"
+          ],
+          samples: [
+            "I think students often play background music to avoid getting distracted by outside noises.",
+            "When they put on headphones, it blocks out people talking, which helps them focus completely on their books.",
+            "The best benefit of this habit is that it makes boring tasks feel much more enjoyable."
+          ]
+        },
+        { 
+          examiner: "Why do many students want a part-time job?", 
+          level: "Easy",
+          prompts: [
+            "Mục tiêu lớn nhất họ muốn đạt được về mặt tiền bạc là gì?",
+            "Cụ thể họ có thể mua thứ gì mà không cần phụ thuộc người lớn?",
+            "Tác hại của việc đi làm thêm đối với sức khỏe là gì?"
+          ],
+          hints: [
+            "gain financial independence (có sự tự lập tài chính)",
+            "buy clothes without asking parents (mua quần áo không cần xin bố mẹ)",
+            "reduce time for resting (giảm bớt thời gian nghỉ ngơi)"
+          ],
+          samples: [
+            "The main reason teenagers look for part-time work is to gain financial independence.",
+            "Specifically, they can earn their own money to buy clothes or gadgets without asking their parents.",
+            "However, a major drawback is that it might reduce their time for studying and resting."
+          ]
+        },
+        { 
+          examiner: "Why do friends sometimes argue?", 
+          level: "Easy",
+          prompts: [
+            "Nguyên nhân chính dẫn đến xung đột (ảnh hưởng bên ngoài) là do đâu?",
+            "Sự việc cụ thể: Một người nói đùa, người kia phản ứng thế nào?",
+            "Lợi ích tích cực sau những cuộc cãi vã này là gì?"
+          ],
+          hints: [
+            "because of misunderstandings (bởi vì những sự hiểu lầm)",
+            "take a joke seriously (coi một câu nói đùa là nghiêm túc)",
+            "understand each other better (hiểu nhau tốt hơn về sau)"
+          ],
+          samples: [
+            "I believe close friends have conflicts mainly because of misunderstandings.",
+            "One person might say a joke, but the other person takes it seriously, which leads to negative feelings.",
+            "But the great benefit of these arguments is that they eventually understand each other better afterwards."
+          ]
+        },
+        { 
+          examiner: "Why do many people drink coffee or milk tea?", 
+          level: "Easy",
+          prompts: [
+            "Họ muốn đạt được trạng thái tinh thần nào để làm việc?",
+            "Chất caffeine trong nước giúp bộ não họ làm gì?",
+            "Tác hại nếu uống quá nhiều vào buổi chiều là gì?"
+          ],
+          hints: [
+            "stay awake (giữ trạng thái tỉnh táo)",
+            "boost concentration (tăng cường sự tập trung)",
+            "lose sleep at night (bị mất ngủ vào ban đêm)"
+          ],
+          samples: [
+            "People usually drink coffee or milk tea to stay awake during the day.",
+            "The caffeine inside the drinks strongly boosts their concentration, helping them work much faster.",
+            "However, the drawback is that drinking too much can make them lose sleep at night."
+          ]
+        },
+        { 
+          examiner: "Why do students worry about exams?", 
+          level: "Easy",
+          prompts: [
+            "Họ muốn tránh hậu quả tiêu cực nào ở trường học?",
+            "Cụ thể, nếu điểm thấp thì thái độ của bố mẹ sẽ ra sao?",
+            "Tác hại của sự lo lắng thái quá này lên sức khỏe là gì?"
+          ],
+          hints: [
+            "avoid failing the class (tránh việc trượt môn)",
+            "parents will be angry (bố mẹ sẽ tức giận)",
+            "cause too much stress (gây ra quá nhiều căng thẳng)"
+          ],
+          samples: [
+            "I think students worry a lot because they want to avoid failing the class.",
+            "If they get low scores, their parents will be angry and disappointed.",
+            "The main drawback of this worry is that it causes too much stress for young people."
+          ]
+        },
+        { 
+          examiner: "Why should you be nice to your classmates?", 
+          level: "Easy",
+          prompts: [
+            "Bạn sẽ đạt được lợi ích gì trong môi trường lớp học?",
+            "Lúc gặp bài khó, họ sẽ có hành động gì giúp đỡ bạn?",
+            "Tác hại nếu bạn cư xử tệ và bị ghét trong lớp là gì?"
+          ],
+          hints: [
+            "build a friendly environment (xây dựng môi trường thân thiện)",
+            "help you with difficult homework (giúp bạn làm bài tập khó)",
+            "feel isolated at school (cảm thấy bị cô lập ở trường)"
+          ],
+          samples: [
+            "Being nice to classmates helps you build a friendly learning environment.",
+            "When you are kind, they will actively help you with difficult homework when you need it.",
+            "On the contrary, the drawback of being mean is that you will feel isolated at school."
+          ]
+        }
+      ],
+      moderate: [
+        { 
+          examiner: "Why is teamwork important at school or work?", 
+          level: "Moderate",
+          prompts: [
+            "Làm việc chung giúp đạt được điều gì tốt hơn trong dự án lớn?",
+            "Họ phải cùng nhau làm gì để đạt được điều đó?",
+            "Tác hại/khó khăn lớn nhất khi làm việc nhóm là gì?"
+          ],
+          hints: [
+            "achieve better results (đạt được kết quả tốt hơn)",
+            "solve complex problems together (cùng nhau giải quyết vấn đề phức tạp)",
+            "deal with lazy members (phải đối phó với thành viên lười biếng)"
+          ],
+          samples: [
+            "Collaborating with others is crucial to achieve better results in big projects.",
+            "When people share their ideas, they can solve complex problems much faster than working alone.",
+            "The only drawback is that you sometimes have to deal with lazy members who don't do their part."
+          ]
+        },
+        { 
+          examiner: "Why do people follow influencers online?", 
+          level: "Moderate",
+          prompts: [
+            "Họ bị cuốn theo sự ảnh hưởng (ngoại cảnh) nào trên mạng?",
+            "Họ thường thấy bạn bè làm gì mà bắt chước theo?",
+            "Tác hại của việc hâm mộ thái quá là gì?"
+          ],
+          hints: [
+            "external social trends (các xu hướng mạng xã hội)",
+            "see friends talking about them (thấy bạn bè bàn tán về họ)",
+            "spend too much time staring at screens (tốn quá nhiều thời gian nhìn màn hình)"
+          ],
+          samples: [
+            "People usually subscribe to famous internet personalities because of external social trends.",
+            "They see their friends talking about a famous YouTuber, so they follow them to join the conversation.",
+            "A negative consequence of this is spending too much time staring at screens instead of living in the real world."
+          ]
+        },
+        { 
+          examiner: "Why do people play video games for hours?", 
+          level: "Moderate",
+          prompts: [
+            "Họ muốn tránh/thoát khỏi cảm giác gì sau một ngày làm việc?",
+            "Nhờ đặc điểm nào của game mà họ quên hết thời gian thực?",
+            "Tác hại đối với thị lực và cơ thể khi ngồi quá lâu là gì?"
+          ],
+          hints: [
+            "escape daily stress (thoát khỏi căng thẳng hàng ngày)",
+            "addictive virtual worlds (những thế giới ảo gây nghiện)",
+            "damage their eyes (gây tổn hại cho mắt của họ)"
+          ],
+          samples: [
+            "Gamers often play for hours mainly to escape daily stress.",
+            "Video games have very addictive virtual worlds, making players easily forget about the real time.",
+            "But the clear drawback is that sitting too long can severely damage their eyes."
+          ]
+        },
+        { 
+          examiner: "Why do many people want to be rich or famous?", 
+          level: "Moderate",
+          prompts: [
+            "Định kiến xã hội nào khiến họ ao ước điều đó?",
+            "Khi thấy người giàu trên mạng, họ lầm tưởng điều gì?",
+            "Tác hại/cái giá phải trả của việc quá nổi tiếng là gì?"
+          ],
+          hints: [
+            "society praises wealthy people (xã hội ca ngợi người giàu)",
+            "think money buys happiness (nghĩ rằng tiền mua được hạnh phúc)",
+            "lose personal privacy (đánh mất sự riêng tư cá nhân)"
+          ],
+          samples: [
+            "I believe people chase wealth and fame because society always praises wealthy people.",
+            "They see celebrities on the internet and naturally think money completely buys happiness.",
+            "However, the biggest drawback of being famous is that you easily lose your personal privacy."
+          ]
+        },
+        { 
+          examiner: "Why do people say “just one more episode” at 1 a.m.?", 
+          level: "Moderate",
+          prompts: [
+            "Họ muốn đạt được cảm giác thỏa mãn gì ngay lúc đó?",
+            "Phim thường kết thúc tập bằng tình tiết gì khiến họ tò mò?",
+            "Hậu quả trực tiếp mà cơ thể phải chịu vào sáng hôm sau là gì?"
+          ],
+          hints: [
+            "satisfy their curiosity (thỏa mãn sự tò mò của họ)",
+            "end with exciting situations (kết thúc bằng các tình tiết gay cấn)",
+            "feel completely exhausted (cảm thấy hoàn toàn kiệt sức)"
+          ],
+          samples: [
+            "Viewers stay up late mainly to satisfy their curiosity about the story.",
+            "TV shows usually end an episode with exciting situations, forcing people to watch the next one.",
+            "The major drawback, of course, is that they will feel completely exhausted the next morning."
+          ]
+        }
+      ],
+      challenging: [
+        { 
+          examiner: "Why do people stay in relationships that make them unhappy?", 
+          level: "Challenging",
+          prompts: [
+            "Họ muốn né tránh nỗi sợ hãi tâm lý nào?",
+            "Hành động/suy nghĩ cụ thể của họ để che giấu nỗi sợ đó?",
+            "Tác hại nghiêm trọng nhất của việc này là gì?"
+          ],
+          hints: [
+            "avoid the fear of being lonely (tránh nỗi sợ bị cô đơn)",
+            "quietly accept the pain (âm thầm chấp nhận nỗi đau)",
+            "destroy their mental health (phá hủy sức khỏe tinh thần)"
+          ],
+          samples: [
+            "Many individuals refuse to leave toxic partners mainly to avoid the fear of being lonely.",
+            "They think that having someone is still better than having no one, so they quietly accept the pain.",
+            "The most serious drawback of this choice is that it slowly destroys their mental health over time."
+          ]
+        },
+        { 
+          examiner: "Why do people often ignore advice even when it’s good?", 
+          level: "Challenging",
+          prompts: [
+            "Họ từ chối lời khuyên vì muốn bảo vệ/tránh tổn thương thứ gì?",
+            "Hành động phản kháng cụ thể của họ là gì?",
+            "Lợi ích thực sự nếu họ chịu lắng nghe là gì?"
+          ],
+          hints: [
+            "protect their ego (bảo vệ cái tôi / sự tự ái)",
+            "do things their own way (làm mọi thứ theo cách riêng)",
+            "save time avoiding silly mistakes (tiết kiệm thời gian tránh lỗi ngớ ngẩn)"
+          ],
+          samples: [
+            "Adults frequently reject helpful recommendations because they want to protect their ego.",
+            "In detail, they hate feeling like they are wrong, so they choose to do things their own way to prove their independence.",
+            "But the biggest benefit of finally listening to others is saving a lot of time avoiding silly mistakes."
+          ]
+        },
+        { 
+          examiner: "Why do some people lie even when they know it’s wrong?", 
+          level: "Challenging",
+          prompts: [
+            "Họ muốn né tránh hậu quả trực tiếp gì nếu nói ra sự thật?",
+            "Lời nói dối bảo vệ họ khỏi phản ứng gì của người khác ngay lúc đó?",
+            "Tác hại lâu dài (sự sụp đổ) đối với các mối quan hệ là gì?"
+          ],
+          hints: [
+            "avoid serious punishments (tránh những hình phạt nghiêm trọng)",
+            "protect themselves from angry reactions (bảo vệ bản thân khỏi phản ứng tức giận)",
+            "break people's trust forever (đánh mất niềm tin của mọi người mãi mãi)"
+          ],
+          samples: [
+            "People often tell lies simply to avoid serious punishments.",
+            "When making a mistake, they lie to protect themselves from the angry reactions of others.",
+            "However, the long-term drawback is that it can break people's trust forever once the truth is out."
+          ]
+        },
+        { 
+          examiner: "Why do people get nervous when speaking in public?", 
+          level: "Challenging",
+          prompts: [
+            "Họ sợ hãi (né tránh) ánh nhìn như thế nào từ đám đông?",
+            "Khi bị nhìn chằm chằm, họ sợ bản thân sẽ mắc phải điều gì?",
+            "Lợi ích tuyệt vời nếu họ vượt qua được nỗi sợ này là gì?"
+          ],
+          hints: [
+            "fear of being judged (sợ bị phán xét)",
+            "make stupid mistakes in front of everyone (mắc lỗi ngớ ngẩn trước mặt mọi người)",
+            "become a confident leader (trở thành một nhà lãnh đạo tự tin)"
+          ],
+          samples: [
+            "Individuals feel anxious on stage mainly because of the fear of being judged.",
+            "Having hundreds of eyes staring at them makes them terrified of making stupid mistakes in front of everyone.",
+            "But the great benefit of overcoming this fear is that you can become a very confident leader."
+          ]
+        }
+      ]
+    };
+
+    const PREP_TIME = 15; // Thời gian chuẩn bị dài hơn cho nguyên đoạn
+    const CIRCUMFERENCE = 113.1;
+
+    let remainingQuestions = [];
+    let currentCount = 0;
+    let totalQuestions = 0;
+    let animationFrame = null;
+    let audioContext = null;
+
+    // DOM Elements
+    const levelEl = document.getElementById("level");
+    const counterEl = document.getElementById("counter");
+    const progressBar = document.getElementById("progress-bar");
+    const timerProgress = document.getElementById("timer-progress");
+    const timerEl = document.getElementById("timer");
+    const signalEl = document.getElementById("signal");
+    
+    const startScreen = document.getElementById("start-screen");
+    const examinerContainer = document.getElementById("examiner-container");
+    const examinerQuestionEl = document.getElementById("examiner-question");
+    
+    const candidateContainer = document.getElementById("candidate-container");
+    
+    const hintPromptContainer = document.getElementById("hint-prompt-container");
+    const hintTextContainer = document.getElementById("hint-text-container");
+    const p1 = document.getElementById("hint-p1");
+    const p2 = document.getElementById("hint-p2");
+    const p3 = document.getElementById("hint-p3");
+    const t1 = document.getElementById("hint-t1");
+    const t2 = document.getElementById("hint-t2");
+    const t3 = document.getElementById("hint-t3");
+    
+    const btnPromptHint = document.getElementById("btn-prompt-hint");
+    const btnAnswerHint = document.getElementById("btn-answer-hint");
+
+    const peerChecklist = document.getElementById("peer-checklist");
+    const sampleAnswerBox = document.getElementById("sample-answer-box");
+    const s1 = document.getElementById("sample-s1");
+    const s2 = document.getElementById("sample-s2");
+    const s3 = document.getElementById("sample-s3");
+    
+    const btnShowSample = document.getElementById("btn-show-sample");
+    const btnNext = document.getElementById("btn-next");
+    const btnText = document.getElementById("btn-text");
+    const btnIcon = document.getElementById("btn-icon");
+    const cardEl = document.getElementById("card");
+    const checkboxes = document.querySelectorAll('.checklist-checkbox');
+
+    timerProgress.style.strokeDasharray = CIRCUMFERENCE;
+    timerProgress.style.strokeDashoffset = 0;
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function playAlertBeep(frequency = 600, duration = 0.15) {
+      try {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.06, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + duration);
+        
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (e) {
+        console.warn("Audio error: ", e);
+      }
+    }
+
+    function playStartSignal() {
+      playAlertBeep(880, 0.1);
+      setTimeout(() => playAlertBeep(1200, 0.22), 140);
+    }
+
+    function setupSession() {
+      const shuffledEasy = shuffle(QUESTIONS_DB.easy);
+      const firstTwo = shuffledEasy.slice(0, 2);
+      const remainingEasy = shuffledEasy.slice(2);
+      
+      const pool = [
+        ...remainingEasy,
+        ...QUESTIONS_DB.moderate,
+        ...QUESTIONS_DB.challenging
+      ];
+      
+      const shuffledPool = shuffle(pool);
+      remainingQuestions = [...firstTwo, ...shuffledPool];
+      totalQuestions = remainingQuestions.length;
+      currentCount = 0;
+    }
+
+    function resetUI() {
+      cancelAnimationFrame(animationFrame);
+      timerEl.textContent = PREP_TIME;
+      timerProgress.style.strokeDashoffset = 0;
+      timerProgress.classList.remove("text-rose-500");
+      timerProgress.classList.add("text-indigo-600");
+      timerEl.classList.remove("text-rose-500", "pulse-ready");
+      timerEl.classList.add("text-indigo-600");
+      
+      signalEl.textContent = "";
+      signalEl.className = "h-4 text-[10px] font-bold tracking-widest text-emerald-500 uppercase";
+      
+      startScreen.classList.add("hidden");
+      examinerContainer.classList.add("hidden");
+      candidateContainer.classList.add("hidden");
+      peerChecklist.classList.add("hidden");
+      sampleAnswerBox.classList.add("hidden");
+      btnShowSample.classList.add("hidden");
+      
+      // Reset Hint elements
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.add("hidden");
+      hintPromptContainer.classList.add("hidden");
+      hintTextContainer.classList.add("hidden");
+      
+      checkboxes.forEach(cb => cb.checked = false);
+    }
+
+    function showPromptHint() {
+      hintPromptContainer.classList.remove("hidden");
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.remove("hidden");
+    }
+
+    function showAnswerHint() {
+      hintTextContainer.classList.remove("hidden");
+      btnAnswerHint.classList.add("hidden");
+    }
+
+    function showSampleAnswer() {
+      sampleAnswerBox.classList.remove("hidden");
+      peerChecklist.classList.add("hidden"); // Ẩn checklist đi để hiện đáp án cho gọn
+      hintPromptContainer.classList.add("hidden"); // Ẩn hint khi hiện đáp án
+      hintTextContainer.classList.add("hidden");
+      btnShowSample.classList.add("hidden");
+    }
+
+    function init() {
+      resetUI();
+      setupSession();
+      
+      levelEl.textContent = "Level: -";
+      counterEl.textContent = `Câu: 0/${totalQuestions}`;
+      progressBar.style.width = "0%";
+      
+      startScreen.classList.remove("hidden");
+      startScreen.innerHTML = `Bạn có ${PREP_TIME}s để nảy số ý tưởng.<br><br>Sẵn sàng hợp nhất 3 bước? Bấm nút bắt đầu!`;
+      
+      btnText.textContent = "Bắt đầu ngay 🎯";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>`;
+      btnNext.onclick = nextQuestion;
+    }
+
+    function startTimer() {
+      cancelAnimationFrame(animationFrame);
+      const duration = PREP_TIME * 1000;
+      const startTime = performance.now();
+
+      function updateTimer(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const remainingMs = Math.max(duration - elapsed, 0);
+        const remainingSeconds = Math.ceil(remainingMs / 1000);
+
+        timerEl.textContent = remainingSeconds;
+        timerProgress.style.strokeDashoffset = CIRCUMFERENCE * progress;
+
+        if (remainingSeconds <= 4) {
+          timerProgress.classList.remove("text-indigo-600");
+          timerProgress.classList.add("text-rose-500");
+          timerEl.classList.remove("text-indigo-600");
+          timerEl.classList.add("text-rose-500");
+        }
+
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(updateTimer);
+        } else {
+          timerEl.textContent = "🗣️";
+          timerProgress.style.strokeDashoffset = CIRCUMFERENCE;
+          timerEl.classList.add("pulse-ready");
+          
+          signalEl.textContent = "TRẢ LỜI NGUYÊN ĐOẠN NGAY!";
+          signalEl.className = "h-4 text-[10px] font-extrabold tracking-wider text-rose-500 uppercase animate-bounce";
+          
+          playStartSignal();
+          if (navigator.vibrate) navigator.vibrate([150, 100, 150]);
+
+          cardEl.classList.add("shake-anim");
+          setTimeout(() => cardEl.classList.remove("shake-anim"), 350);
+
+          peerChecklist.classList.remove("hidden");
+          btnShowSample.classList.remove("hidden");
+          // Chỉ hiện nút ý tưởng sau khi đã có gợi ý
+        }
+      }
+
+      animationFrame = requestAnimationFrame(updateTimer);
+    }
+
+    function nextQuestion() {
+      if (remainingQuestions.length === 0) {
+        resetUI();
+        startScreen.classList.remove("hidden");
+        startScreen.className = "text-base md:text-lg font-bold text-center px-4 py-8 rounded-2xl border bg-emerald-50 text-emerald-800 border-emerald-200 block w-full";
+        startScreen.innerHTML = `🎉 Đỉnh cao!<br><br>Bạn đã hoàn thành xuất sắc khả năng Hợp Nhất 3 mảnh ghép để trả lời trôi chảy nguyên câu!`;
+        levelEl.textContent = "Level: Done";
+        counterEl.textContent = `Câu: ${totalQuestions}/${totalQuestions}`;
+        progressBar.style.width = "100%";
+        
+        timerEl.textContent = "✓";
+        timerProgress.style.strokeDashoffset = CIRCUMFERENCE;
+        
+        btnText.textContent = "Luyện tập lại 🔄";
+        btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18"></path>`;
+        btnNext.onclick = init;
+        return;
+      }
+
+      resetUI();
+      currentCount++;
+      const item = remainingQuestions.shift();
+
+      counterEl.textContent = `Câu: ${currentCount}/${totalQuestions}`;
+      levelEl.textContent = `Level: ${item.level}`;
+      const pct = (currentCount / totalQuestions) * 100;
+      progressBar.style.width = `${pct}%`;
+
+      if (item.level === "Easy") levelEl.className = "bg-emerald-50 text-emerald-700 text-xs font-extrabold px-2.5 py-1 rounded-lg";
+      else if (item.level === "Moderate") levelEl.className = "bg-amber-50 text-amber-700 text-xs font-extrabold px-2.5 py-1 rounded-lg";
+      else levelEl.className = "bg-rose-50 text-rose-700 text-xs font-extrabold px-2.5 py-1 rounded-lg";
+
+      // Setup Data
+      examinerQuestionEl.textContent = item.examiner;
+      
+      // Gán dữ liệu Gợi ý
+      p1.textContent = item.prompts[0];
+      p2.textContent = item.prompts[1];
+      p3.textContent = item.prompts[2];
+      
+      t1.textContent = item.hints[0];
+      t2.textContent = item.hints[1];
+      t3.textContent = item.hints[2];
+
+      s1.textContent = item.samples[0];
+      s2.textContent = item.samples[1];
+      s3.textContent = item.samples[2];
+
+      // Show UI
+      examinerContainer.classList.remove("hidden");
+      candidateContainer.classList.remove("hidden");
+      btnPromptHint.classList.remove("hidden"); // Hiện nút Hint ngay khi bắt đầu đếm ngược
+
+      btnText.textContent = "Câu Tiếp Theo ➜";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>`;
+
+      startTimer();
+    }
+
+    window.onload = function() {
+      init();
+    };
+  </script>
+</body>
+</html>
