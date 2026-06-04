@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speaking Flash Drill - Freestyle Phản Xạ Nhanh (Lợi & Hại)</title>
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Be Vietnam Pro tối ưu tuyệt đối cho tiếng Việt -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght=0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+    
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    .circular-progress {
+      transition: stroke-dashoffset 0.1s linear;
+    }
+    @keyframes pulse-custom {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    .pulse-ready {
+      animation: pulse-custom 0.8s ease-in-out infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-4px); }
+    }
+    .shake-anim {
+      animation: shake 0.35s ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+
+  <div id="card" class="bg-white w-full max-w-md min-h-[82vh] md:min-h-[72vh] rounded-3xl shadow-xl border border-slate-100 p-5 md:p-6 flex flex-col justify-between gap-4 transition-all">
+    
+    <!-- Vùng tiêu đề trên cùng -->
+    <div>
+      <div class="flex justify-between items-center mb-2.5">
+        <div class="space-y-1 text-left">
+          <div class="flex items-center gap-2">
+            <span id="level" class="bg-slate-100 text-slate-600 text-xs font-extrabold px-2.5 py-1 rounded-lg transition-all">Level: -</span>
+            <span id="counter" class="bg-indigo-50 text-indigo-600 text-xs font-extrabold px-2.5 py-1 rounded-lg">Câu: 0/0</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Hoạt động 3: Freestyle Phản xạ nhanh</div>
+        </div>
+        
+        <!-- Vòng đếm ngược -->
+        <div class="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+            <circle class="text-slate-100 stroke-current" stroke-width="4.5" fill="transparent" r="18" cx="22" cy="22" />
+            <circle id="timer-progress" class="text-indigo-600 stroke-current circular-progress" stroke-width="4.5" stroke-linecap="round" fill="transparent" r="18" cx="22" cy="22" stroke-dasharray="113.1" stroke-dashoffset="0" />
+          </svg>
+          <div id="timer" class="absolute font-black text-base text-indigo-600">10</div>
+        </div>
+      </div>
+      
+      <!-- Thanh tiến trình -->
+      <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-3">
+        <div id="progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+      </div>
+
+      <!-- Khung gợi ý mẹo nhỏ -->
+      <div class="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs text-slate-500 flex items-center gap-2">
+        <span class="text-indigo-500 font-extrabold">💡 Mẹo:</span>
+        <span>Từ 1 câu bất kỳ, luôn có thể bẻ lái kéo dài ý bằng cách đọc câu thần chú: <strong class="text-emerald-600">The best benefit...</strong> hoặc <strong class="text-rose-500">The main drawback...</strong></span>
+      </div>
+    </div>
+
+    <!-- Vùng hiển thị nội dung chính -->
+    <div class="flex-1 flex flex-col justify-center items-center py-1 gap-2.5">
+      <!-- Tín hiệu hành động -->
+      <div id="signal" class="h-5 text-[11px] font-bold tracking-widest text-emerald-500 uppercase"></div>
+
+      <!-- Khung câu hỏi IELTS của Giám khảo -->
+      <div id="examiner-container" class="w-full text-center hidden transition-all duration-300">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">🗣️ Examiner Topic:</span>
+        <p id="examiner-question" class="text-sm md:text-base font-bold text-slate-700 italic leading-snug px-2"></p>
+        <div class="w-px h-3 bg-slate-200 mx-auto my-1.5"></div>
+      </div>
+
+      <!-- Bối cảnh (Câu 1 + 2 đã nói trước đó) -->
+      <div id="context-container" class="w-full text-center hidden transition-all duration-300">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-0.5">💬 Previous Sentences (Bối cảnh):</span>
+        <p id="context-text" class="text-sm md:text-[15px] font-semibold text-slate-600 leading-snug px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl"></p>
+        <div class="w-px h-3 bg-slate-200 mx-auto my-1.5"></div>
+      </div>
+
+      <!-- Thử thách Freestyle (Nêu Lợi / Hại) -->
+      <div id="candidate-container" class="w-full text-center">
+        <span id="direction-label" class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5 hidden">⚡ Thử thách Freestyle Câu 3:</span>
+        <div id="direction-box" class="text-base md:text-lg font-bold text-center px-4 py-3 rounded-2xl border transition-all duration-300 block w-full bg-slate-100 text-slate-500 border-slate-200 leading-relaxed">
+          Sẵn sàng bẻ lái Lợi - Hại? Bấm nút bắt đầu ngay phía dưới!
+        </div>
+      </div>
+
+      <!-- Khung hiển thị gợi ý từng bước -->
+      <div id="hint-box" class="w-full space-y-2 mt-1">
+        <!-- Bước 1: Câu hỏi tư duy -->
+        <div id="hint-prompt-container" class="hidden bg-indigo-50/60 border border-indigo-100/80 rounded-xl p-3 text-left transition-all duration-300">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-0.5">Câu hỏi gợi mở hướng đi:</span>
+          <p id="hint-prompt" class="text-slate-800 font-bold text-xs italic"></p>
+        </div>
+        
+        <!-- Bước 2: Cụm từ Band 6.0 -->
+        <div id="hint-text-container" class="hidden bg-emerald-50/60 border border-emerald-100/80 rounded-xl p-3 text-left transition-all duration-300">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-500 block mb-1">Cụm từ gợi ý (Band 6.0):</span>
+          <div id="hint-text" class="text-slate-700 text-xs leading-relaxed font-semibold space-y-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vùng Nút bấm -->
+    <div class="space-y-2">
+      <button id="btn-prompt-hint" onclick="showPromptHint()" class="hidden w-full bg-slate-100 hover:bg-indigo-50 text-indigo-600 border border-indigo-100 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span>Gợi ý hướng bẻ lái ❓</span>
+      </button>
+
+      <button id="btn-answer-hint" onclick="showAnswerHint()" class="hidden w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span>Xem từ khóa mẫu (Band 6.0) 💡</span>
+      </button>
+      
+      <button id="btn-next" onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-md shadow-indigo-600/10 active:scale-[0.98] flex items-center justify-center gap-1.5">
+        <span id="btn-text">Bắt đầu ngay 🎯</span>
+        <svg id="btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Cơ sở dữ liệu: Hoạt động 3 - Freestyle Lợi Hại. Ý tưởng ĐƯỢC LÀM MỚI hoàn toàn so với HĐ 1 & 2.
+    const QUESTIONS_DB = {
+      easy: [
+        { 
+          examiner: "Why do students need to learn English?", 
+          context: "I believe many individuals learn this language because it is a mandatory subject at school. They have to pass various national exams to graduate.",
+          direction: "benefit", 
+          starter: "The best benefit of knowing this language is that...",
+          prompt: "Bên cạnh việc thi cử ở trường, nó mang lại siêu lợi thế gì về mảng giải trí cá nhân?", 
+          hints: [
+            "watch Hollywood blockbusters without subtitles (xem bom tấn Hollywood không cần phụ đề)",
+            "understand the meaning of global pop songs (hiểu được ý nghĩa của các bài nhạc pop toàn cầu)"
+          ]
+        },
+        { 
+          examiner: "Why should we sleep early?", 
+          context: "People usually go to bed before midnight because they want to wake up feeling refreshed. It is the only time for the body to recover.",
+          direction: "drawback", 
+          starter: "However, a major drawback of this habit is that...",
+          prompt: "Ngủ quá sớm khiến bạn đánh mất niềm vui gì vào buổi tối với bạn bè?", 
+          hints: [
+            "miss out on late-night conversations with friends (bỏ lỡ những cuộc trò chuyện đêm khuya với bạn bè)",
+            "cannot join exciting evening parties (không thể tham gia các buổi tiệc tối thú vị)"
+          ]
+        },
+        { 
+          examiner: "Why do young people like watching TikTok or Reels?", 
+          context: "I think youngsters open these apps because the short clips give them a quick sense of relaxation. They can laugh instantly after a long day.",
+          direction: "drawback", 
+          starter: "The most serious drawback of these short videos is that...",
+          prompt: "Giải trí thì vui, nhưng nó tước đoạt mất quỹ thời gian học tập của học sinh như thế nào?", 
+          hints: [
+            "waste hours scrolling mindlessly (lãng phí hàng giờ lướt điện thoại vô thức)",
+            "completely forget their daily homework (quên sạch sẽ bài tập về nhà hàng ngày)"
+          ]
+        },
+        { 
+          examiner: "Why do people take selfies?", 
+          context: "Many individuals post their own photos online to show off their new outfits. They love receiving likes and hearts from their followers.",
+          direction: "drawback", 
+          starter: "A huge drawback of taking too many self-portraits is that...",
+          prompt: "Chụp ảnh ảo nhiều quá khiến con người sinh ra tâm lý tự ti/so sánh thế nào ở đời thực?", 
+          hints: [
+            "feel deeply insecure about their real appearance (cảm thấy vô cùng tự ti về ngoại hình thật của mình)",
+            "constantly compare themselves to filtered images (liên tục so sánh bản thân với các bức ảnh đã qua chỉnh sửa)"
+          ]
+        },
+        { 
+          examiner: "Why do students need to do homework?", 
+          context: "Completing evening tasks is required to help children review what teachers explained. It solidifies their classroom knowledge.",
+          direction: "drawback", 
+          starter: "But the obvious drawback of having too many assignments is that...",
+          prompt: "Bài tập quá nhiều lấy đi khoảng không gian nào cần thiết cho sự phát triển tinh thần của trẻ?", 
+          hints: [
+            "have zero free time for outdoor sports (không có chút thời gian rảnh nào cho thể thao ngoài trời)",
+            "feel mentally overwhelmed every single night (cảm thấy quá tải về tinh thần mỗi đêm)"
+          ]
+        }
+      ],
+      moderate: [
+        { 
+          examiner: "Why do students often check their phones in class?", 
+          context: "Teenagers secretly look at their screens because they cannot stand the boring lectures. They desperately need some quick entertainment.",
+          direction: "drawback", 
+          starter: "A significant downside of doing this in class is that...",
+          prompt: "Hành động lén lút này thể hiện thái độ gì đối với giáo viên đang đứng trên bục giảng?", 
+          hints: [
+            "show great disrespect to the teachers (thể hiện sự thiếu tôn trọng lớn đối với giáo viên)",
+            "miss out on critical exam tips (bỏ lỡ những mẹo thi cử vô cùng quan trọng)"
+          ]
+        },
+        { 
+          examiner: "Why do many people want to travel abroad?", 
+          context: "Citizens love flying overseas because they want to taste authentic local cuisines and visit world-famous architectural landmarks.",
+          direction: "drawback", 
+          starter: "The biggest drawback of international trips is that...",
+          prompt: "Dù rất vui, nhưng rào cản lớn nhất ngăn cản mọi người đi du lịch nước ngoài thường xuyên là gì?", 
+          hints: [
+            "cost a massive amount of money (tốn một khoản tiền khổng lồ)",
+            "require complicated visa procedures (đòi hỏi các thủ tục xin visa vô cùng phức tạp)"
+          ]
+        },
+        { 
+          examiner: "Why do people follow fashion trends?", 
+          context: "I suppose people buy trendy items because of the heavy influence of social media models. Everyone wants to look modern and wealthy.",
+          direction: "drawback", 
+          starter: "The major negative aspect of this lifestyle is that...",
+          prompt: "Chạy theo mốt quần áo liên tục gây ra sự lãng phí tiền bạc hoặc tác hại môi trường thế nào?", 
+          hints: [
+            "waste money on clothes they only wear once (lãng phí tiền vào những bộ đồ chỉ mặc đúng một lần)",
+            "contribute to the severe pollution of fast fashion (góp phần vào sự ô nhiễm nghiêm trọng của ngành thời trang nhanh)"
+          ]
+        },
+        { 
+          examiner: "Why do some people love scary movies?", 
+          context: "Many teenagers head to the cinema for terrifying films because they enjoy the adrenaline rush. It is thrilling to scream together with friends.",
+          direction: "drawback", 
+          starter: "However, a negative effect of watching these films is that...",
+          prompt: "Sau khi xem xong, não bộ của họ bị ám ảnh ra sao vào ban đêm?", 
+          hints: [
+            "suffer from terrible nightmares at night (chịu đựng những cơn ác mộng tồi tệ vào ban đêm)",
+            "feel highly anxious when staying alone in the dark (cảm thấy cực kỳ lo âu khi ở một mình trong bóng tối)"
+          ]
+        }
+      ],
+      challenging: [
+        { 
+          examiner: "Why do people sometimes choose jobs they don't like?", 
+          context: "A lot of adults accept awful careers mainly to avoid financial crises. They have to pay for monthly rent and feed their families.",
+          direction: "drawback", 
+          starter: "The most serious drawback of doing a hated job is that...",
+          prompt: "Phải làm việc mình ghét 8 tiếng mỗi ngày bào mòn sức khỏe tinh thần của họ ra sao?", 
+          hints: [
+            "lead to severe mental burnout over time (dẫn đến sự kiệt quệ tinh thần nghiêm trọng theo thời gian)",
+            "completely destroy their daily motivation (phá hủy hoàn toàn động lực sống hàng ngày của họ)"
+          ]
+        },
+        { 
+          examiner: "Why is it hard to change bad habits?", 
+          context: "It is super difficult to break unhealthy routines because they give us instant comfort. Eating junk food, for example, immediately reduces stress.",
+          direction: "benefit", 
+          starter: "But the greatest benefit of successfully overcoming them is that...",
+          prompt: "Khi cuối cùng cũng từ bỏ được thói quen xấu, cá nhân đó giành lại được quyền lực gì cho cuộc đời mình?", 
+          hints: [
+            "take back total control of your personal life (giành lại quyền kiểm soát toàn bộ cuộc sống cá nhân)",
+            "build strong self-discipline for future success (xây dựng tính kỷ luật thép cho thành công trong tương lai)"
+          ]
+        },
+        { 
+          examiner: "Why do people care so much about what others think?", 
+          context: "Individuals often worry about public opinions because they naturally fear being judged. Nobody wants to be isolated from their community.",
+          direction: "drawback", 
+          starter: "The most dangerous drawback of constantly pleasing others is that...",
+          prompt: "Cứ mãi sống vừa lòng thiên hạ, họ sẽ vô tình đánh mất đi thứ giá trị gì của bản thân?", 
+          hints: [
+            "slowly lose their authentic personality (dần dần đánh mất đi tính cách chân thật của mình)",
+            "live a fake life just to fit in (sống một cuộc đời giả tạo chỉ để hòa nhập)"
+          ]
+        }
+      ]
+    };
+
+    const PREP_TIME = 10;
+    const CIRCUMFERENCE = 113.1;
+
+    let remainingQuestions = [];
+    let currentCount = 0;
+    let totalQuestions = 0;
+    let animationFrame = null;
+    let audioContext = null;
+
+    // DOM Elements
+    const levelEl = document.getElementById("level");
+    const counterEl = document.getElementById("counter");
+    const progressBar = document.getElementById("progress-bar");
+    const timerProgress = document.getElementById("timer-progress");
+    const timerEl = document.getElementById("timer");
+    const signalEl = document.getElementById("signal");
+    const directionBox = document.getElementById("direction-box");
+    
+    const examinerContainer = document.getElementById("examiner-container");
+    const examinerQuestionEl = document.getElementById("examiner-question");
+    const contextContainer = document.getElementById("context-container");
+    const contextTextEl = document.getElementById("context-text");
+    const directionLabel = document.getElementById("direction-label");
+    
+    const btnPromptHint = document.getElementById("btn-prompt-hint");
+    const btnAnswerHint = document.getElementById("btn-answer-hint");
+    const btnNext = document.getElementById("btn-next");
+    const btnText = document.getElementById("btn-text");
+    const btnIcon = document.getElementById("btn-icon");
+    
+    const hintPromptContainer = document.getElementById("hint-prompt-container");
+    const hintTextContainer = document.getElementById("hint-text-container");
+    const hintPrompt = document.getElementById("hint-prompt");
+    const hintText = document.getElementById("hint-text");
+    const cardEl = document.getElementById("card");
+
+    timerProgress.style.strokeDasharray = CIRCUMFERENCE;
+    timerProgress.style.strokeDashoffset = 0;
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function playAlertBeep(frequency = 600, duration = 0.15) {
+      try {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.06, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + duration);
+        
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (e) {
+        console.warn("Audio error: ", e);
+      }
+    }
+
+    function playStartSignal() {
+      playAlertBeep(880, 0.1);
+      setTimeout(() => playAlertBeep(1200, 0.22), 140);
+    }
+
+    function setupSession() {
+      const shuffledEasy = shuffle(QUESTIONS_DB.easy);
+      const firstTwo = shuffledEasy.slice(0, 2);
+      const remainingEasy = shuffledEasy.slice(2);
+      
+      const pool = [
+        ...remainingEasy,
+        ...QUESTIONS_DB.moderate,
+        ...QUESTIONS_DB.challenging
+      ];
+      
+      const shuffledPool = shuffle(pool);
+      remainingQuestions = [...firstTwo, ...shuffledPool];
+      totalQuestions = remainingQuestions.length;
+      currentCount = 0;
+    }
+
+    function resetUI() {
+      cancelAnimationFrame(animationFrame);
+      timerEl.textContent = PREP_TIME;
+      timerProgress.style.strokeDashoffset = 0;
+      timerProgress.classList.remove("text-rose-500");
+      timerProgress.classList.add("text-indigo-600");
+      timerEl.classList.remove("text-rose-500", "pulse-ready");
+      timerEl.classList.add("text-indigo-600");
+      
+      signalEl.textContent = "";
+      signalEl.className = "h-5 text-[11px] font-bold tracking-widest text-emerald-500 uppercase";
+      
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.add("hidden");
+      hintPromptContainer.classList.add("hidden");
+      hintTextContainer.classList.add("hidden");
+
+      examinerContainer.classList.add("hidden");
+      contextContainer.classList.add("hidden");
+      directionLabel.classList.add("hidden");
+    }
+
+    function showPromptHint() {
+      hintPromptContainer.classList.remove("hidden");
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.remove("hidden");
+    }
+
+    function showAnswerHint() {
+      hintTextContainer.classList.remove("hidden");
+      btnAnswerHint.classList.add("hidden");
+    }
+
+    function init() {
+      resetUI();
+      setupSession();
+      
+      levelEl.textContent = "Level: -";
+      counterEl.textContent = `Câu: 0/${totalQuestions}`;
+      progressBar.style.width = "0%";
+      
+      directionBox.className = "text-base md:text-lg font-bold text-center px-4 py-3 rounded-2xl border transition-all duration-300 block w-full bg-slate-100 text-slate-500 border-slate-200 leading-relaxed";
+      directionBox.innerHTML = `Sẵn sàng bẻ lái Lợi - Hại?<br>Bấm nút bắt đầu ngay phía dưới!`;
+      
+      btnText.textContent = "Bắt đầu ngay 🎯";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>`;
+      btnNext.onclick = nextQuestion;
+    }
+
+    function startTimer() {
+      cancelAnimationFrame(animationFrame);
+      const duration = PREP_TIME * 1000;
+      const startTime = performance.now();
+
+      function updateTimer(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const remainingMs = Math.max(duration - elapsed, 0);
+        const remainingSeconds = Math.ceil(remainingMs / 1000);
+
+        timerEl.textContent = remainingSeconds;
+        timerProgress.style.strokeDashoffset = CIRCUMFERENCE * progress;
+
+        if (remainingSeconds <= 3) {
+          timerProgress.classList.remove("text-indigo-600");
+          timerProgress.classList.add("text-rose-500");
+          timerEl.classList.remove("text-indigo-600");
+          timerEl.classList.add("text-rose-500");
+        }
+
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(updateTimer);
+        } else {
+          timerEl.textContent = "🗣️";
+          timerProgress.style.strokeDashoffset = CIRCUMFERENCE;
+          timerEl.classList.add("pulse-ready");
+          
+          signalEl.textContent = "NÓI ĐIỂM LỢI/HẠI NGAY!";
+          signalEl.className = "h-5 text-[11px] font-extrabold tracking-wider text-rose-500 uppercase animate-bounce";
+          
+          playStartSignal();
+          if (navigator.vibrate) {
+            navigator.vibrate([150, 100, 150]);
+          }
+
+          cardEl.classList.add("shake-anim");
+          setTimeout(() => cardEl.classList.remove("shake-anim"), 350);
+
+          btnPromptHint.classList.remove("hidden");
+        }
+      }
+
+      animationFrame = requestAnimationFrame(updateTimer);
+    }
+
+    function nextQuestion() {
+      if (remainingQuestions.length === 0) {
+        resetUI();
+        directionBox.className = "text-base md:text-lg font-bold text-center px-4 py-4 rounded-2xl border bg-emerald-50 text-emerald-800 border-emerald-200 leading-relaxed";
+        directionBox.innerHTML = `🎉 Tuyệt vời!<br>Bạn đã thành thạo kỹ năng Freestyle bẻ lái Lợi - Hại để kéo dài câu trả lời mượt mà!`;
+        levelEl.textContent = "Level: Done";
+        counterEl.textContent = `Câu: ${totalQuestions}/${totalQuestions}`;
+        progressBar.style.width = "100%";
+        
+        timerEl.textContent = "✓";
+        timerProgress.style.strokeDashoffset = CIRCUMFERENCE;
+        
+        btnText.textContent = "Luyện tập lại 🔄";
+        btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18"></path>`;
+        btnNext.onclick = init;
+        return;
+      }
+
+      resetUI();
+      currentCount++;
+
+      const item = remainingQuestions.shift();
+
+      counterEl.textContent = `Câu: ${currentCount}/${totalQuestions}`;
+      levelEl.textContent = `Level: ${item.level}`;
+      
+      const pct = (currentCount / totalQuestions) * 100;
+      progressBar.style.width = `${pct}%`;
+
+      if (item.level === "Easy") {
+        levelEl.className = "bg-emerald-50 text-emerald-700 text-xs font-extrabold px-2.5 py-1 rounded-lg";
+      } else if (item.level === "Moderate") {
+        levelEl.className = "bg-amber-50 text-amber-700 text-xs font-extrabold px-2.5 py-1 rounded-lg";
+      } else {
+        levelEl.className = "bg-rose-50 text-rose-700 text-xs font-extrabold px-2.5 py-1 rounded-lg";
+      }
+
+      // Hiện câu hỏi và Bối cảnh
+      examinerQuestionEl.textContent = item.examiner;
+      examinerContainer.classList.remove("hidden");
+      contextTextEl.textContent = `"${item.context}"`;
+      contextContainer.classList.remove("hidden");
+
+      // Cập nhật hướng Freestyle
+      directionLabel.classList.remove("hidden");
+      if (item.direction === "benefit") {
+        directionBox.className = "text-sm md:text-base font-extrabold text-left px-4 py-3 rounded-2xl border transition-all duration-300 block w-full bg-emerald-50 text-emerald-700 border-emerald-200 animate-pulse";
+        directionBox.innerHTML = `<span class="text-[10px] text-emerald-500 uppercase tracking-wider block mb-1">➕ Nêu điểm LỢI (Benefit)</span>"${item.starter} [.....]"`;
+      } else {
+        directionBox.className = "text-sm md:text-base font-extrabold text-left px-4 py-3 rounded-2xl border transition-all duration-300 block w-full bg-rose-50 text-rose-700 border-rose-200 animate-pulse";
+        directionBox.innerHTML = `<span class="text-[10px] text-rose-400 uppercase tracking-wider block mb-1">➖ Nêu điểm HẠI (Drawback)</span>"${item.starter} [.....]"`;
+      }
+
+      hintPrompt.textContent = item.prompt;
+      
+      hintText.innerHTML = "";
+      item.hints.forEach(hint => {
+        const p = document.createElement("p");
+        p.className = "border-b border-emerald-100/50 pb-1.5 pt-1 last:border-0";
+        p.innerHTML = `• <span class="text-slate-800 font-bold">${hint.split(" (")[0]}</span> <span class="text-slate-500 font-normal">(${hint.split(" (")[1]}</span>`;
+        hintText.appendChild(p);
+      });
+
+      btnText.textContent = "Câu Tiếp Theo ➜";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>`;
+
+      startTimer();
+    }
+
+    window.onload = function() {
+      init();
+    };
+  </script>
+</body>
+</html>
