@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IELTS Speaking Flash Drill - Phản Xạ Bật Ý Tưởng</title>
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Sử dụng font Be Vietnam Pro tối ưu tuyệt đối cho tiếng Việt có dấu -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght=0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+    
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    .circular-progress {
+      transition: stroke-dashoffset 0.1s linear;
+    }
+    @keyframes pulse-custom {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .pulse-ready {
+      animation: pulse-custom 0.8s ease-in-out infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      50% { transform: translateX(6px); }
+      75% { transform: translateX(-6px); }
+    }
+    .shake-anim {
+      animation: shake 0.35s ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+
+  <div id="card" class="bg-slate-900 w-full max-w-lg min-h-[85vh] rounded-3xl shadow-2xl border border-slate-800 p-6 flex flex-col justify-between gap-6 transition-all">
+    
+    <!-- Header: Tiến trình & Cấp độ -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <div class="space-y-1 text-left">
+          <div class="flex items-center gap-2">
+            <span id="level" class="bg-slate-800 text-slate-300 text-xs font-extrabold px-3 py-1.5 rounded-xl border border-slate-700 transition-all">Level: -</span>
+            <span id="counter" class="bg-indigo-950/50 text-indigo-400 text-xs font-extrabold px-3 py-1.5 rounded-xl border border-indigo-900/50">Câu: 0/0</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Hoạt động 1: Phản xạ Core & Action</div>
+        </div>
+        
+        <!-- Timer Đếm Ngược Tròn -->
+        <div class="flex items-center gap-3">
+          <!-- Nút Pause/Play hỗ trợ GV khi giảng bài -->
+          <button id="btn-pause" onclick="togglePause()" class="hidden bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl border border-slate-700 transition-all active:scale-95" title="Tạm dừng/Chạy tiếp">
+            <svg id="pause-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
+          
+          <div class="relative w-14 h-14 flex items-center justify-center flex-shrink-0">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+              <circle class="text-slate-800 stroke-current" stroke-width="4" fill="transparent" r="18" cx="22" cy="22" />
+              <circle id="timer-progress" class="text-indigo-500 stroke-current circular-progress" stroke-width="4" stroke-linecap="round" fill="transparent" r="18" cx="22" cy="22" stroke-dasharray="113.1" stroke-dashoffset="0" />
+            </svg>
+            <div id="timer" class="absolute font-black text-lg text-indigo-400">10</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Thanh tiến độ bài học -->
+      <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-4">
+        <div id="progress-bar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
+      </div>
+
+      <!-- Stepper hiển thị Phase hiện tại -->
+      <div class="grid grid-cols-2 gap-2 text-center text-xs font-bold uppercase tracking-wider">
+        <div id="step-1-indicator" class="py-2 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-500 transition-all">
+          1. Gốc rễ (Core)
+        </div>
+        <div id="step-2-indicator" class="py-2 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-500 transition-all">
+          2. Hành động (Action)
+        </div>
+      </div>
+    </div>
+
+    <!-- Khu vực tương tác trung tâm -->
+    <div class="flex-1 flex flex-col justify-center items-center py-2 gap-4">
+      <!-- Trạng thái báo động nảy múa -->
+      <div id="signal" class="h-6 text-xs font-extrabold tracking-widest text-emerald-400 uppercase"></div>
+
+      <!-- Khung Câu hỏi IELTS -->
+      <div id="examiner-container" class="w-full text-center hidden transition-all duration-300">
+        <span class="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 block mb-1">🗣&nbsp;Examiner Question (How):</span>
+        <p id="examiner-question" class="text-lg md:text-xl font-extrabold text-slate-100 leading-snug px-2"></p>
+        <div class="w-12 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent mx-auto my-3"></div>
+      </div>
+
+      <!-- Khung Tư duy ép buộc (Direction Box) -->
+      <div id="direction-container" class="w-full">
+        <span id="direction-label" class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block mb-2 hidden">🎯 Mục tiêu phản xạ:</span>
+        <div id="direction-box" class="text-base font-extrabold text-center px-4 py-4 rounded-2xl border transition-all duration-300 w-full bg-slate-800/50 text-slate-400 border-slate-800 leading-relaxed">
+          Sẵn sàng phản xạ?<br>Bấm nút bắt đầu ngay phía dưới!
+        </div>
+      </div>
+
+      <!-- Khung Gợi ý & Từ vựng mẫu -->
+      <div id="hint-box" class="w-full space-y-3 mt-1">
+        <!-- Câu hỏi dẫn dắt gợi mở -->
+        <div id="hint-prompt-container" class="hidden bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 text-left transition-all duration-300">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 block mb-1">Câu hỏi gợi mở tư duy:</span>
+          <p id="hint-prompt" class="text-slate-200 font-bold text-sm italic leading-relaxed"></p>
+        </div>
+        
+        <!-- Cụm từ khóa gợi ý Band 6.0 -->
+        <div id="hint-text-container" class="hidden bg-emerald-950/20 border border-emerald-900/40 rounded-2xl p-4 text-left transition-all duration-300">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 block mb-2">Cụm từ gợi ý (Band 6.0+):</span>
+          <div id="hint-text" class="text-slate-300 text-xs leading-relaxed font-semibold space-y-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Khu vực phím chức năng -->
+    <div class="space-y-2.5">
+      <div class="grid grid-cols-2 gap-2">
+        <!-- Nút xem câu hỏi gợi ý -->
+        <button id="btn-prompt-hint" onclick="showPromptHint()" class="hidden w-full bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold py-3 px-4 rounded-2xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+          <span>Gợi ý tư duy ❓</span>
+        </button>
+
+        <!-- Nút xem đáp án từ vựng gợi ý -->
+        <button id="btn-answer-hint" onclick="showAnswerHint()" class="hidden w-full bg-emerald-950/30 hover:bg-emerald-900/30 text-emerald-400 border border-emerald-900/40 font-bold py-3 px-4 rounded-2xl text-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5">
+          <span>Từ khóa mẫu 💡</span>
+        </button>
+      </div>
+      
+      <!-- Nút điều hướng chính -->
+      <button id="btn-next" onclick="handleMainAction()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-3.5 px-6 rounded-2xl text-xs tracking-wider uppercase transition-all shadow-lg shadow-indigo-500/10 active:scale-[0.98] flex items-center justify-center gap-2">
+        <span id="btn-text">Bắt đầu ngay 🎯</span>
+        <svg id="btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const SPEAKING_DB = [
+      {
+        id: 1,
+        examiner_question: "How can students improve their concentration while studying?",
+        level: "Easy",
+        phase_1: {
+          type: "barrier",
+          prompt: "Kẻ thù lớn nhất cướp đi sự chú ý của em ngay khi vừa mở sách ra là gì?",
+          hints: [
+            "constant distractions from smartphones (sự xao nhãng liên tục từ điện thoại thông minh)",
+            "noisy study environment (môi trường học tập ồn ào)",
+            "lack of physical energy (thiếu năng lượng thể chất)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Em phải làm động tác vật lý gì với thiết bị hoặc môi trường để có thể ngồi yên học bài?",
+          hints: [
+            "put phones on silent mode (để điện thoại ở chế độ im lặng)",
+            "study in a quiet space (học ở một không gian yên tĩnh)",
+            "use a study timer (sử dụng đồng hồ bấm giờ học tập)"
+          ]
+        }
+      },
+      {
+        id: 2,
+        examiner_question: "How do people usually save money for the future?",
+        level: "Easy",
+        phase_1: {
+          type: "condition",
+          prompt: "Để bắt đầu tiết kiệm được dù chỉ một đồng, điều kiện cơ bản nhất về nhận thức hoặc tư duy quản lý tài chính mà một người phải có là gì?",
+          hints: [
+            "understand their spending habits (hiểu rõ thói quen chi tiêu của mình)",
+            "have a clear financial goal (có mục tiêu tài chính rõ ràng)",
+            "know their monthly income (nắm rõ thu nhập hàng tháng)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Họ có thể áp dụng những thói quen hoặc phương pháp thực tế nào hàng ngày để biến nhận thức đó thành tiền tiết kiệm?",
+          hints: [
+            "track daily expenses (theo dõi chi tiêu hàng ngày)",
+            "cut down on unnecessary stuff (cắt giảm những thứ không cần thiết)",
+            "open a savings account (mở một tài khoản tiết kiệm)"
+          ]
+        }
+      },
+      {
+        id: 3,
+        examiner_question: "How can office workers stay healthy?",
+        level: "Moderate",
+        phase_1: {
+          type: "barrier",
+          prompt: "Đặc thù tai hại nào của công việc văn phòng ép người ta vào thế 'muốn khỏe cũng khó'?",
+          hints: [
+            "sit in front of a computer all day (ngồi trước máy tính cả ngày)",
+            "have a sedentary lifestyle (có lối sống ít vận động)",
+            "lack time for physical exercise (thiếu thời gian tập thể dục)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Họ có thể tranh thủ làm động tác gì ngay tại chỗ ngồi hoặc sau giờ làm để chống lại đặc thù đó?",
+          hints: [
+            "take short breaks to stretch (nghỉ giải lao ngắn để vươn vai)",
+            "walk around the office (đi bộ quanh văn phòng)",
+            "pack healthy lunches (chuẩn bị bữa trưa lành mạnh)"
+          ]
+        }
+      },
+      {
+        id: 4,
+        examiner_question: "How do young people make new friends nowadays?",
+        level: "Easy",
+        phase_1: {
+          type: "condition",
+          prompt: "Để những người trẻ xa lạ có cơ hội kết nối và trở nên thân thiết, điều kiện môi trường hoặc chất xúc tác cơ bản nhất cần có là gì?",
+          hints: [
+            "share similar hobbies (chia sẻ sở thích giống nhau)",
+            "have common interests (có chung mối quan tâm)",
+            "participate in the same activities (tham gia cùng các hoạt động)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Những nền tảng hay không gian sinh hoạt nào đang được giới trẻ tận dụng triệt để nhất để tạo ra sự kết nối đó?",
+          hints: [
+            "join online communities (tham gia các cộng đồng trực tuyến)",
+            "connect through social media apps (kết nối qua các ứng dụng mạng xã hội)",
+            "attend local clubs (tham gia các câu lạc bộ địa phương)"
+          ]
+        }
+      },
+      {
+        id: 5,
+        examiner_question: "How can parents limit their children's screen time?",
+        level: "Moderate",
+        phase_1: {
+          type: "barrier",
+          prompt: "Rào cản lớn nhất từ phía tâm lý trẻ em, hoặc từ chính sự bận rộn của gia đình, khiến việc tách trẻ khỏi màn hình trở nên khó khăn là gì?",
+          hints: [
+            "addicted to games and videos (bị nghiện các trò chơi và video)",
+            "lack of other entertainment sources (thiếu các nguồn giải trí khác)",
+            "feel extremely bored (cảm thấy cực kỳ nhàm chán)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Cha mẹ có thể áp dụng những chiến lược tâm lý hoặc hoạt động thực tế nào để thu hút sự chú ý của trẻ ra khỏi thiết bị điện tử?",
+          hints: [
+            "offer alternative outdoor activities (cung cấp các hoạt động ngoài trời thay thế)",
+            "spend more time playing together (dành nhiều thời gian chơi cùng nhau hơn)",
+            "set clear rules and schedules (đặt ra luật lệ và lịch trình rõ ràng)"
+          ]
+        }
+      },
+      {
+        id: 6,
+        examiner_question: "How do people learn a new practical skill like cooking?",
+        level: "Easy",
+        phase_1: {
+          type: "condition",
+          prompt: "Muốn nấu ăn mà không làm cháy bếp ở lần đầu tiên, điều kiện tiên quyết là em phải có cái gì để bám vào?",
+          hints: [
+            "understand the basic steps (hiểu các bước cơ bản)",
+            "need regular practice (cần sự luyện tập thường xuyên)",
+            "have patience to try again (có sự kiên nhẫn để thử lại)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Nguồn tài nguyên miễn phí nào giúp em nhìn thấy tận mắt các bước đó?",
+          hints: [
+            "watch tutorial videos on YouTube (xem các video hướng dẫn trên YouTube)",
+            "follow step-by-step instructions (làm theo hướng dẫn từng bước)",
+            "take a short training class (tham gia một lớp đào tạo ngắn hạn)"
+          ]
+        }
+      },
+      {
+        id: 7,
+        examiner_question: "How can families reduce the amount of daily garbage?",
+        level: "Moderate",
+        phase_1: {
+          type: "barrier",
+          prompt: "Thói quen mua sắm tiện lợi nào của các bà nội trợ đang trực tiếp tạo ra núi rác mỗi ngày?",
+          hints: [
+            "depend on single-use plastics (phụ thuộc vào đồ nhựa dùng một lần)",
+            "prefer packaged products (ưa chuộng các sản phẩm đóng gói sẵn)",
+            "lack of recycling habits (thiếu thói quen tái chế)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Chỉ cần thay đổi một động tác nhỏ trước khi xách xe đi chợ, họ có thể giải quyết thói quen này như thế nào?",
+          hints: [
+            "bring reusable shopping bags (mang theo túi mua sắm có thể tái sử dụng)",
+            "buy fresh food without packaging (mua thực phẩm tươi không đóng gói)",
+            "sort out household waste (phân loại rác thải sinh hoạt)"
+          ]
+        }
+      },
+      {
+        id: 8,
+        examiner_question: "How do people usually deal with stress from modern work?",
+        level: "Moderate",
+        phase_1: {
+          type: "barrier",
+          prompt: "Đặc thù nào của công việc hiện đại tạo ra rào cản khiến người đi làm luôn cảm thấy mệt mỏi và khó có thể xả stress ngay lập tức?",
+          hints: [
+            "feel constantly exhausted (cảm thấy kiệt sức liên tục)",
+            "suffer from heavy workloads (chịu đựng khối lượng công việc nặng nề)",
+            "have little free time (có rất ít thời gian rảnh rỗi)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Những thói quen, không gian hoặc hoạt động nào thường được họ lựa chọn để cân bằng lại tinh thần một cách thiết thực nhất?",
+          hints: [
+            "enjoy simple hobbies at home (tận hưởng các sở thích đơn giản tại nhà)",
+            "get a good night's sleep (ngủ một giấc thật ngon)",
+            "talk to close friends or family (nói chuyện với bạn bè thân hoặc gia đình)"
+          ]
+        }
+      },
+      {
+        id: 9,
+        examiner_question: "How can someone get up early in the morning without feeling tired?",
+        level: "Easy",
+        phase_1: {
+          type: "condition",
+          prompt: "Để sáng hôm sau không phải vật lộn với cái báo thức, tối hôm trước em bắt buộc phải đảm bảo được yếu tố sinh học nào?",
+          hints: [
+            "get enough sleep hours (ngủ đủ số giờ)",
+            "have a good sleep quality (có chất lượng giấc ngủ tốt)",
+            "feel fully rested (cảm thấy được nghỉ ngơi hoàn toàn)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Hành động dứt khoát nào với thiết bị điện tử giúp em bảo vệ được yếu tố sinh học đó?",
+          hints: [
+            "avoid looking at phone screens (tránh nhìn vào màn hình điện thoại)",
+            "go to bed at a fixed time (đi ngủ vào một giờ cố định)",
+            "drink warm milk before sleeping (uống sữa ấm trước khi ngủ)"
+          ]
+        }
+      },
+      {
+        id: 10,
+        examiner_question: "How do local shops attract customers nowadays?",
+        level: "Moderate",
+        phase_1: {
+          type: "condition",
+          prompt: "Với một khách đi ngang qua đường, điều kiện gì đập vào mắt khiến họ quyết định phanh xe lại và bước vào tiệm?",
+          hints: [
+            "have visible storefronts (có mặt tiền cửa hàng dễ thấy)",
+            "maintain a good reputation (duy trì danh tiếng tốt)",
+            "build customer trust (xây dựng lòng tin của khách hàng)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Cửa hàng dùng mồi nhử trực tiếp nào về mặt tài chính để lôi kéo khách hàng?",
+          hints: [
+            "offer special discounts (cung cấp giảm giá đặc biệt)",
+            "run local online advertisements (chạy quảng cáo trực tuyến tại địa phương)",
+            "provide excellent customer service (cung cấp dịch vụ khách hàng xuất sắc)"
+          ]
+        }
+      },
+      {
+        id: 11,
+        examiner_question: "How can neighbors build a good relationship?",
+        level: "Easy",
+        phase_1: {
+          type: "condition",
+          prompt: "Để hàng xóm xóa bỏ sự phòng thủ với nhau, thái độ tối thiểu trong giao tiếp hàng ngày phải là gì?",
+          hints: [
+            "have open communication (có sự giao tiếp cởi mở)",
+            "show mutual respect (thể hiện sự tôn trọng lẫn nhau)",
+            "willing to interact (sẵn sàng tương tác)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Hành động xã giao miễn phí nào có thể làm ngay khi chạm mặt nhau ở thang máy/ngõ xóm?",
+          hints: [
+            "greet each other with a smile (chào hỏi nhau bằng một nụ cười)",
+            "help with small favors (giúp đỡ những việc vặt nhỏ)",
+            "share local food (chia sẻ đồ ăn địa phương)"
+          ]
+        }
+      },
+      {
+        id: 12,
+        examiner_question: "How do people balance their work and personal life?",
+        level: "Moderate",
+        phase_1: {
+          type: "barrier",
+          prompt: "Cái gì từ công ty luôn đeo bám và phá bĩnh thời gian nghỉ ngơi ở nhà của em?",
+          hints: [
+            "receive constant work messages (nhận tin nhắn công việc liên tục)",
+            "blur the line between home and office (làm mờ ranh giới giữa nhà và văn phòng)",
+            "unable to stop thinking about tasks (không thể ngừng suy nghĩ về nhiệm vụ)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Cần thiết lập kỷ luật 'bàn tay sắt' gì với cái điện thoại để cắt đứt sự đeo bám đó?",
+          hints: [
+            "set clear boundaries (thiết lập ranh giới rõ ràng)",
+            "turn off work notifications (tắt thông báo công việc)",
+            "manage time effectively (quản lý thời gian hiệu quả)"
+          ]
+        }
+      },
+      {
+        id: 13,
+        examiner_question: "How can individuals protect their personal information online?",
+        level: "Moderate",
+        phase_1: {
+          type: "condition",
+          prompt: "Trước khi click vào một đường link trúng thưởng lạ, em bắt buộc phải có hệ tư tưởng/thái độ gì để không sập bẫy?",
+          hints: [
+            "stay aware of cyber threats (giữ cảnh giác các mối đe dọa mạng)",
+            "be careful with unknown sources (cẩn thận với các nguồn không xác định)",
+            "understand privacy settings (hiểu các cài đặt quyền riêng tư)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Thao tác bảo mật cơ bản nhất em phải làm với các tài khoản mạng xã hội của mình là gì?",
+          hints: [
+            "create strong passwords (tạo mật khẩu mạnh)",
+            "enable two-factor authentication (bật xác thực hai yếu tố)",
+            "avoid clicking on strange links (tránh nhấp vào các liên kết lạ)"
+          ]
+        }
+      },
+      {
+        id: 14,
+        examiner_question: "How do tourists usually find good places to eat in a new city?",
+        level: "Easy",
+        phase_1: {
+          type: "condition",
+          prompt: "Khi đến một vùng đất hoàn toàn xa lạ, điều kiện tiên quyết nào giúp du khách đưa ra quyết định chọn nhà hàng một cách tự tin, tránh rủi ro?",
+          hints: [
+            "need reliable recommendations (cần những lời giới thiệu đáng tin cậy)",
+            "look for authentic experiences (tìm kiếm những trải nghiệm đích thực)",
+            "ensure food safety (đảm bảo vệ sinh an toàn thực phẩm)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Du khách ngày nay thường tận dụng những nguồn tài nguyên thông tin nào để tìm kiếm và xác thực các địa điểm ăn uống đó?",
+          hints: [
+            "read online reviews (đọc các đánh giá trực tuyến)",
+            "ask local residents (hỏi xin lời khuyên từ người dân địa phương)",
+            "follow travel bloggers (theo dõi các blogger du lịch)"
+          ]
+        }
+      },
+      {
+        id: 15,
+        examiner_question: "How can public transport be made more attractive to citizens?",
+        level: "Moderate",
+        phase_1: {
+          type: "barrier",
+          prompt: "Cảm giác ám ảnh nhất khiến nhiều người thà chịu tắc đường bằng xe máy còn hơn bước lên xe buýt là gì?",
+          hints: [
+            "suffer from crowded spaces (chịu đựng không gian chật chội)",
+            "experience frequent delays (trải qua sự chậm trễ thường xuyên)",
+            "inconvenient routes (các tuyến đường không thuận tiện)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Nhà nước cần rót tiền vào để nâng cấp cụ thể cái gì trên các chuyến xe đó?",
+          hints: [
+            "improve the frequency (cải thiện tần suất xe)",
+            "upgrade seating comfort (nâng cấp độ thoải mái của ghế ngồi)",
+            "reduce ticket prices (giảm giá vé)"
+          ]
+        }
+      },
+      {
+        id: 16,
+        examiner_question: "How do people maintain a long-distance relationship?",
+        level: "Moderate",
+        phase_1: {
+          type: "condition",
+          prompt: "Xa mặt cách lòng, vậy yếu tố nền tảng nào quyết định việc hai người không nảy sinh sự ghen tuông vô cớ?",
+          hints: [
+            "require absolute trust (yêu cầu sự tin tưởng tuyệt đối)",
+            "maintain emotional connection (duy trì kết nối cảm xúc)",
+            "feel involved in each other's lives (cảm thấy được tham gia vào cuộc sống của nhau)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Nghi thức nào phải lặp đi lặp lại hàng ngày để nuôi dưỡng yếu tố đó?",
+          hints: [
+            "make frequent video calls (thực hiện các cuộc gọi video thường xuyên)",
+            "share daily small updates (chia sẻ những việc nhỏ hàng ngày)",
+            "plan regular visits (lên kế hoạch thăm nhau thường xuyên)"
+          ]
+        }
+      },
+      {
+        id: 17,
+        examiner_question: "How can individuals improve their public speaking skills?",
+        level: "Moderate",
+        phase_1: {
+          type: "barrier",
+          prompt: "Áp lực vô hình nào khiến em run lẩy bẩy và quên sạch chữ khi hàng chục cặp mắt nhìn chằm chằm vào mình?",
+          hints: [
+            "fear of being judged (sợ hãi việc bị phán xét)",
+            "lack self-confidence (thiếu tự tin vào bản thân)",
+            "suffer from stage fright (bị hội chứng sợ sân khấu)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Bài tập thực hành ngớ ngẩn nhưng hiệu quả nhất em có thể làm một mình trong phòng là gì?",
+          hints: [
+            "practice speaking in front of a mirror (luyện tập nói trước gương)",
+            "prepare notes carefully (chuẩn bị ghi chú cẩn thận)",
+            "join a speaking club (tham gia một câu lạc bộ diễn thuyết)"
+          ]
+        }
+      },
+      {
+        id: 18,
+        examiner_question: "How do busy people find time to read books?",
+        level: "Easy",
+        phase_1: {
+          type: "barrier",
+          prompt: "Rào cản lớn nhất về mặt thời gian, không gian hoặc năng lượng thể chất ngăn cản người đi làm duy trì thói quen đọc sách là gì?",
+          hints: [
+            "feel too tired after working (cảm thấy quá mệt mỏi sau giờ làm)",
+            "lack long blocks of free time (thiếu khối thời gian rảnh rỗi dài)",
+            "have extremely tight schedules (có lịch trình cực kỳ kín mít)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Họ có thể lồng ghép việc hấp thụ kiến thức vào nhịp sống hối hả hàng ngày bằng những cách tiếp cận linh hoạt nào?",
+          hints: [
+            "listen to audiobooks while commuting (nghe sách nói trong khi đi lại)",
+            "read a few pages before bed (đọc vài trang trước khi đi ngủ)",
+            "use e-readers during breaks (sử dụng máy đọc sách điện tử trong giờ nghỉ)"
+          ]
+        }
+      },
+      {
+        id: 19,
+        examiner_question: "How can we encourage people to use less electricity at home?",
+        level: "Moderate",
+        phase_1: {
+          type: "condition",
+          prompt: "Để một hộ gia đình tự nguyện và chủ động thay đổi hành vi tiêu thụ điện, điều kiện tiên quyết về mặt nhận thức mà họ cần có là gì?",
+          hints: [
+            "realize the waste of energy (nhận ra sự lãng phí năng lượng)",
+            "have financial awareness (có ý thức tài chính)",
+            "understand environmental impacts (hiểu rõ các tác động môi trường)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Có những biện pháp thực tế hoặc công nghệ nào hỗ trợ các gia đình dễ dàng tối ưu hóa việc sử dụng năng lượng?",
+          hints: [
+            "install energy-saving light bulbs (lắp đặt bóng đèn tiết kiệm năng lượng)",
+            "unplug devices when not in use (rút phích cắm thiết bị khi không sử dụng)",
+            "show them the monthly bills (cho họ xem các hóa đơn hàng tháng)"
+          ]
+        }
+      },
+      {
+        id: 20,
+        examiner_question: "How do people deal with traffic jams in big cities?",
+        level: "Moderate",
+        phase_1: {
+          type: "barrier",
+          prompt: "Thực tế khách quan nào từ cơ sở hạ tầng hoặc nhịp sống đô thị khiến việc di chuyển hàng ngày trở thành một trải nghiệm đầy bức bối?",
+          hints: [
+            "cannot avoid rush hours (không thể tránh khỏi các giờ cao điểm)",
+            "stuck in vehicles for a long time (bị mắc kẹt trong xe cộ một thời gian dài)",
+            "feel stressed and frustrated (cảm thấy căng thẳng và bực bội)"
+          ]
+        },
+        phase_2: {
+          type: "action",
+          prompt: "Mọi người thường áp dụng những chiến thuật gì để thích nghi, né tránh hoặc tự giảm thiểu căng thẳng khi đối mặt với tình trạng này?",
+          hints: [
+            "listen to relaxing podcasts (nghe podcast thư giãn)",
+            "use alternative routes (sử dụng các tuyến đường luân phiên/đường tắt)",
+            "leave home much earlier (rời khỏi nhà sớm hơn nhiều)"
+          ]
+        }
+      }
+    ];
+
+    // Cài đặt thời gian cho các Phase
+    const TIME_PHASE_1 = 10; // 10 giây cho việc bật Gốc rễ
+    const TIME_PHASE_2 = 5;  // 5 giây cho việc bật Action nhanh
+    const CIRCUMFERENCE = 113.1;
+
+    let remainingQuestions = [];
+    let currentQuestion = null;
+    let currentCount = 0;
+    let totalQuestions = 0;
+    
+    let currentPhase = 1; // 1: Core, 2: Action
+    let remainingTime = 0;
+    let timerState = "stopped"; // "running", "paused", "stopped"
+    
+    let startTime = null;
+    let animationFrame = null;
+    let pausedTimeElapsed = 0;
+    let audioContext = null;
+
+    // DOM Elements
+    const cardEl = document.getElementById("card");
+    const levelEl = document.getElementById("level");
+    const counterEl = document.getElementById("counter");
+    const progressBar = document.getElementById("progress-bar");
+    const timerProgress = document.getElementById("timer-progress");
+    const timerEl = document.getElementById("timer");
+    const signalEl = document.getElementById("signal");
+    const directionBox = document.getElementById("direction-box");
+    const directionLabel = document.getElementById("direction-label");
+    const examinerContainer = document.getElementById("examiner-container");
+    const examinerQuestionEl = document.getElementById("examiner-question");
+    
+    const step1Indicator = document.getElementById("step-1-indicator");
+    const step2Indicator = document.getElementById("step-2-indicator");
+    
+    const btnPromptHint = document.getElementById("btn-prompt-hint");
+    const btnAnswerHint = document.getElementById("btn-answer-hint");
+    const btnNext = document.getElementById("btn-next");
+    const btnText = document.getElementById("btn-text");
+    const btnIcon = document.getElementById("btn-icon");
+    const btnPause = document.getElementById("btn-pause");
+    const pauseIcon = document.getElementById("pause-icon");
+    
+    const hintPromptContainer = document.getElementById("hint-prompt-container");
+    const hintTextContainer = document.getElementById("hint-text-container");
+    const hintPrompt = document.getElementById("hint-prompt");
+    const hintText = document.getElementById("hint-text");
+
+    timerProgress.style.strokeDasharray = CIRCUMFERENCE;
+    timerProgress.style.strokeDashoffset = 0;
+
+    // Thuật toán xáo trộn câu hỏi
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // Phát âm thanh cảnh báo kết thúc đếm ngược
+    function playBeep(frequency = 600, duration = 0.15) {
+      try {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.06, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + duration);
+        
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (e) {
+        console.warn("Audio Context blocked by browser safety protocol.");
+      }
+    }
+
+    function playAlarmSignal() {
+      playBeep(880, 0.1);
+      setTimeout(() => playBeep(1200, 0.22), 140);
+    }
+
+    // Thiết lập phiên học ngẫu nhiên (Ưu tiên câu dễ lên trước khởi động)
+    function setupSession() {
+      const easyQuestions = shuffle(SPEAKING_DB.filter(q => q.level === "Easy"));
+      const moderateQuestions = shuffle(SPEAKING_DB.filter(q => q.level === "Moderate"));
+      
+      // Lấy 2 câu dễ để warm-up, sau đó trộn ngẫu nhiên tất cả các câu còn lại
+      const warmUp = easyQuestions.slice(0, 2);
+      const pool = [...easyQuestions.slice(2), ...moderateQuestions];
+      
+      remainingQuestions = [...warmUp, ...shuffle(pool)];
+      totalQuestions = remainingQuestions.length;
+      currentCount = 0;
+    }
+
+    function init() {
+      resetUI();
+      setupSession();
+      
+      levelEl.textContent = "Level: -";
+      counterEl.textContent = `Câu: 0/${totalQuestions}`;
+      progressBar.style.width = "0%";
+      
+      directionBox.className = "text-base font-extrabold text-center px-4 py-5 rounded-2xl border bg-slate-800/40 text-slate-400 border-slate-800 leading-relaxed";
+      directionBox.innerHTML = `Sẵn sàng phản xạ?<br><span class="text-xs text-indigo-400 font-bold">Phương pháp Gốc rễ ➔ Hành động</span>`;
+      
+      btnText.textContent = "Bắt đầu ngay 🎯";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>`;
+      btnPause.classList.add("hidden");
+      
+      step1Indicator.className = "py-2 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-500 transition-all";
+      step2Indicator.className = "py-2 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-500 transition-all";
+    }
+
+    function resetUI() {
+      cancelAnimationFrame(animationFrame);
+      timerState = "stopped";
+      pausedTimeElapsed = 0;
+      
+      timerProgress.style.strokeDashoffset = 0;
+      timerProgress.className = "text-indigo-500 stroke-current circular-progress";
+      timerEl.className = "absolute font-black text-lg text-indigo-400";
+      timerEl.textContent = "10";
+      
+      signalEl.textContent = "";
+      signalEl.className = "h-6 text-xs font-extrabold tracking-widest text-emerald-400 uppercase";
+      
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.add("hidden");
+      hintPromptContainer.classList.add("hidden");
+      hintTextContainer.classList.add("hidden");
+      
+      examinerContainer.classList.add("hidden");
+      directionLabel.classList.add("hidden");
+    }
+
+    // Điều hướng Logic nút điều khiển chính
+    function handleMainAction() {
+      // Nếu đã hoàn thành bài tập, click sẽ reset làm lại từ đầu
+      if (currentCount === totalQuestions && remainingQuestions.length === 0 && timerState === "stopped") {
+         init();
+         return;
+      }
+      
+      if (currentCount === 0 && timerState === "stopped") {
+        // Lần đầu bấm bắt đầu
+        loadNextQuestion();
+      } else if (currentPhase === 1) {
+        // Đang ở Phase 1, chuyển qua Phase 2
+        startPhase2();
+      } else {
+        // Đang ở Phase 2, chuyển qua câu tiếp theo
+        loadNextQuestion();
+      }
+    }
+
+    // Tải câu hỏi mới
+    function loadNextQuestion() {
+      if (remainingQuestions.length === 0) {
+        finishSession();
+        return;
+      }
+      
+      resetUI();
+      currentQuestion = remainingQuestions.shift();
+      currentCount++;
+      currentPhase = 1;
+      
+      // Update UI Header
+      counterEl.textContent = `Câu: ${currentCount}/${totalQuestions}`;
+      levelEl.textContent = `Level: ${currentQuestion.level}`;
+      progressBar.style.width = `${(currentCount / totalQuestions) * 100}%`;
+      
+      if (currentQuestion.level === "Easy") {
+        levelEl.className = "bg-emerald-950/40 text-emerald-400 text-xs font-extrabold px-3 py-1.5 rounded-xl border border-emerald-900/40";
+      } else {
+        levelEl.className = "bg-amber-950/40 text-amber-400 text-xs font-extrabold px-3 py-1.5 rounded-xl border border-amber-900/40";
+      }
+
+      // Show Examiner Question (Đã fix đúng key data examiner_question)
+      examinerQuestionEl.textContent = currentQuestion.examiner_question;
+      examinerContainer.classList.remove("hidden");
+      
+      // Set Phase 1 Layout
+      step1Indicator.className = "py-2 rounded-xl border border-emerald-900/40 bg-emerald-950/20 text-emerald-400 font-extrabold shadow-sm transition-all";
+      step2Indicator.className = "py-2 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-600 transition-all";
+
+      updateDirectionBox(currentQuestion.phase_1.type);
+      
+      // Bật nút xem câu hỏi gợi mở, ẩn nội dung
+      btnPromptHint.classList.remove("hidden");
+      hintPromptContainer.classList.add("hidden");
+      btnAnswerHint.classList.add("hidden");
+      hintTextContainer.classList.add("hidden");
+      
+      btnText.textContent = "Chuyển sang Action ⚡";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />`;
+      btnPause.classList.remove("hidden");
+
+      runTimer(TIME_PHASE_1);
+    }
+
+    // Chuyển sang Phase 2 (Hành động)
+    function startPhase2() {
+      resetUI();
+      currentPhase = 2;
+
+      // Update Phase Stepper UI
+      step1Indicator.className = "py-2 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-500 transition-all";
+      step2Indicator.className = "py-2 rounded-xl border border-indigo-900/40 bg-indigo-950/20 text-indigo-400 font-extrabold shadow-sm transition-all";
+
+      examinerQuestionEl.textContent = currentQuestion.examiner_question;
+      examinerContainer.classList.remove("hidden");
+
+      updateDirectionBox("action");
+
+      // Bật nút xem câu hỏi gợi mở, ẩn nội dung
+      btnPromptHint.classList.remove("hidden");
+      hintPromptContainer.classList.add("hidden");
+      btnAnswerHint.classList.add("hidden");
+      hintTextContainer.classList.add("hidden");
+
+      // Cập nhật nút điều khiển
+      btnText.textContent = currentCount === totalQuestions ? "Hoàn thành buổi học 🎉" : "Câu tiếp theo ➜";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />`;
+      btnPause.classList.remove("hidden");
+
+      runTimer(TIME_PHASE_2);
+    }
+
+    // Cập nhật thông tin khung chỉ hướng tư duy ép buộc
+    function updateDirectionBox(type) {
+      directionLabel.classList.remove("hidden");
+      
+      if (type === "condition") {
+        directionBox.className = "text-sm font-extrabold text-center px-4 py-4 rounded-2xl border transition-all duration-300 w-full bg-emerald-950/20 text-emerald-400 border-emerald-900/40 uppercase tracking-wide animate-pulse";
+        directionBox.innerHTML = "🟢 CONDITION<br><span class='text-xs font-semibold capitalize text-slate-400'>(Tìm điều kiện tiên quyết cần có)</span>";
+      } else if (type === "barrier") {
+        directionBox.className = "text-sm font-extrabold text-center px-4 py-4 rounded-2xl border transition-all duration-300 w-full bg-rose-950/20 text-rose-400 border-rose-900/40 uppercase tracking-wide animate-pulse";
+        directionBox.innerHTML = "🔴 BARRIER<br><span class='text-xs font-semibold capitalize text-slate-400'>(Tìm rào cản ngăn cản hành động)</span>";
+      } else if (type === "action") {
+        directionBox.className = "text-sm font-extrabold text-center px-4 py-4 rounded-2xl border transition-all duration-300 w-full bg-indigo-950/20 text-indigo-400 border-indigo-900/40 uppercase tracking-wide animate-pulse";
+        directionBox.innerHTML = "🔵 ACTION / METHOD<br><span class='text-xs font-semibold capitalize text-slate-400'>(Cách hành động để đạt mốc trên)</span>";
+      }
+    }
+
+    // Đồng hồ đếm ngược mượt mà sử dụng Performance Frame
+    function runTimer(seconds) {
+      cancelAnimationFrame(animationFrame);
+      timerState = "running";
+      updatePauseButtonUI();
+      
+      const totalDuration = seconds * 1000;
+      const initialTime = performance.now() - pausedTimeElapsed;
+
+      function update(now) {
+        if (timerState === "paused") {
+          pausedTimeElapsed = now - initialTime;
+          animationFrame = requestAnimationFrame(update);
+          return;
+        }
+
+        const elapsed = now - initialTime;
+        const progress = Math.min(elapsed / totalDuration, 1);
+        const remainingMs = Math.max(totalDuration - elapsed, 0);
+        remainingSeconds = Math.ceil(remainingMs / 1000);
+
+        timerEl.textContent = remainingSeconds;
+        timerProgress.style.strokeDashoffset = CIRCUMFERENCE * progress;
+
+        // Đổi màu cảnh báo ở 3 giây cuối cùng
+        if (remainingSeconds <= 3) {
+          timerProgress.className = "text-rose-500 stroke-current circular-progress";
+          timerEl.className = "absolute font-black text-lg text-rose-500";
+        } else {
+          timerProgress.className = "text-indigo-500 stroke-current circular-progress";
+          timerEl.className = "absolute font-black text-lg text-indigo-400";
+        }
+
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(update);
+        } else {
+          onTimerComplete();
+        }
+      }
+
+      animationFrame = requestAnimationFrame(update);
+    }
+
+    // Khi hết thời gian suy nghĩ
+    function onTimerComplete() {
+      timerState = "stopped";
+      pausedTimeElapsed = 0;
+      updatePauseButtonUI();
+      btnPause.classList.add("hidden");
+
+      timerEl.textContent = "🗣️";
+      timerEl.className = "absolute font-black text-xl text-emerald-400 pulse-ready";
+      timerProgress.style.strokeDashoffset = CIRCUMFERENCE;
+      timerProgress.className = "text-emerald-500 stroke-current circular-progress";
+
+      signalEl.textContent = "BẬT Ý TƯỞNG RA NGAY!";
+      signalEl.className = "h-6 text-sm font-black tracking-wider text-rose-500 uppercase animate-bounce";
+
+      playAlarmSignal();
+      
+      // Hiệu ứng rung màn hình kích thích phản xạ
+      cardEl.classList.add("shake-anim");
+      setTimeout(() => cardEl.classList.remove("shake-anim"), 350);
+    }
+
+    // Tạm dừng / Tiếp tục đồng hồ
+    function togglePause() {
+      if (timerState === "running") {
+        timerState = "paused";
+      } else if (timerState === "paused") {
+        timerState = "running";
+      }
+      updatePauseButtonUI();
+    }
+
+    function updatePauseButtonUI() {
+      if (timerState === "paused") {
+        pauseIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`;
+        btnPause.className = "bg-amber-950/40 text-amber-400 p-2 rounded-xl border border-amber-900/40 transition-all active:scale-95";
+      } else {
+        pauseIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />`;
+        btnPause.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-xl border border-slate-700 transition-all active:scale-95";
+      }
+    }
+
+    // Hiển thị câu hỏi gợi mở tư duy
+    function showPromptHint() {
+      const currentData = currentPhase === 1 ? currentQuestion.phase_1 : currentQuestion.phase_2;
+      hintPrompt.textContent = currentData.prompt;
+      hintPromptContainer.classList.remove("hidden");
+      
+      btnPromptHint.classList.add("hidden");
+      btnAnswerHint.classList.remove("hidden");
+    }
+
+    // Hiển thị từ vựng Band 6.0 tham khảo
+    function showAnswerHint() {
+      const currentData = currentPhase === 1 ? currentQuestion.phase_1 : currentQuestion.phase_2;
+      
+      hintText.innerHTML = "";
+      currentData.hints.forEach(hint => {
+        const parts = hint.split(" (");
+        const en = parts[0];
+        const vi = parts[1] ? parts[1].replace(")", "") : "";
+        
+        const p = document.createElement("div");
+        p.className = "border-b border-slate-800 pb-2 last:border-0";
+        p.innerHTML = `• <span class="text-emerald-400 font-extrabold text-sm">${en}</span> <span class="text-slate-400 font-normal block pl-3 text-[11px]">${vi}</span>`;
+        hintText.appendChild(p);
+      });
+      
+      hintTextContainer.classList.remove("hidden");
+      btnAnswerHint.classList.add("hidden");
+    }
+
+    // Khi hoàn thành toàn bộ khóa học phản xạ
+    function finishSession() {
+      resetUI();
+      step1Indicator.className = "py-2 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-600 transition-all";
+      step2Indicator.className = "py-2 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-600 transition-all";
+      
+      directionBox.className = "text-base font-extrabold text-center px-4 py-5 rounded-2xl border bg-emerald-950/20 text-emerald-400 border-emerald-900/40 leading-relaxed";
+      directionBox.innerHTML = `🎉 Tuyệt vời!<br><span class="text-xs text-slate-300 font-semibold normal-case block mt-1">Cả lớp đã hoàn thành xuất sắc thử thách phản xạ Core & Action!</span>`;
+      
+      levelEl.textContent = "Level: Done";
+      counterEl.textContent = `Câu: ${totalQuestions}/${totalQuestions}`;
+      progressBar.style.width = "100%";
+      
+      timerEl.textContent = "✓";
+      timerEl.className = "absolute font-black text-xl text-emerald-400";
+      
+      btnText.textContent = "Luyện tập lại từ đầu 🔄";
+      btnIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18"></path>`;
+    }
+
+    window.onload = function() {
+      init();
+    };
+  </script>
+</body>
+</html>
