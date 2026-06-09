@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Speaking Randomizer (Filtered)</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .badge-part { background: #dbeafe; color: #1e40af; }
+        .badge-easy { background: #dcfce7; color: #166534; }
+        .badge-medium { background: #fef08a; color: #854d0e; }
+        .badge-hard { background: #fee2e2; color: #991b1b; }
+        
+        #topic-title {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-height: 40px;
+        }
+        #question-text {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 40px;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #progress {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #1d4ed8; }
+        #debug-info {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="meta-info">
+        <span id="badge-part" class="badge badge-part">Part -</span>
+        <span id="badge-diff" class="badge">Difficulty -</span>
+    </div>
+    <h2 id="topic-title">Loading Database...</h2>
+    <div id="question-text">Press Start to begin practice</div>
+    
+    <div class="controls">
+        <span id="progress">Q: 0/0</span>
+        <button id="next-btn" onclick="nextAction()">Start</button>
+    </div>
+    <div id="debug-info">Loaded 0 topics.</div>
+</div>
+
+<script>
+    const rawData = `
+Ngân hàng câu hỏi IELTS Speaking
+Part 1
+1) Doing something well
+Do you have an experience when your teacher thought you did a good job?
+Do you often tell your friends when they do something well?
+2) Rules
+Are there any rules for students at your school?
+Do you think students would benefit more from more rules?
+Do you prefer to have more or fewer rules at school?
+Have you ever had a really dedicated teacher?
+Have you ever had a really strict teacher?
+Would you like to work as a teacher in a rule-free school?
+Do you have a teacher who does his or her job very well?
+3) Public places
+Have you ever talked with someone you don’t know in public places?
+Do you wear headphones in public places?
+Would you like to see more public places near where you live?
+Do you often go to public places with your friends?
+4) Staying with old people
+Have you ever worked with old people?
+Are you happy to work with people who are older than you?
+Do you enjoy spending time with old people?
+What are the benefits of being friends with or working with old people?
+5) Growing vegetables / fruits
+Are you interested in growing vegetables and fruits?
+Is growing vegetables popular in your country?
+Do many people grow vegetables in your city?
+Do you think it’s easy to grow vegetables?
+Should schools teach students how to grow vegetables?
+6) Going out / cash
+Do you bring food or snacks with you when going out?
+Do you always take your mobile phone with you when going out?
+Do you often bring cash with you?
+How often do you use cash?
+Who do you usually go out with?
+Do you prefer going out or staying at home?
+What do you enjoy doing when you go out?
+7) Quiet places / noisy places
+Do you like quiet or noisy places?
+Would you like to go to quiet or noisy places on weekends when you are free?
+8) Crowded places
+Is the city where you live crowded?
+Is there a crowded place near where you live?
+Do you like crowded places?
+Do most people like crowded places?
+When was the last time you were in a crowded place?
+9) Chatting
+Do you like chatting with friends?
+What do you usually chat about with friends?
+Do you prefer to chat with a group of people or with only one friend?
+Do you prefer to communicate face-to-face or via social media?
+Do you argue with friends?
+10) Art
+Do you like art?
+Do you like visiting art galleries?
+Have you ever visited an art gallery?
+Do you want to be an artist?
+Do you think it would be interesting for you to be an artist?
+Do you like modern art or traditional art?
+11) Shoes
+Do you like buying shoes? How often?
+How often do you buy shoes?
+Have you ever bought shoes online?
+How much money do you usually spend on shoes?
+Which do you prefer, fashionable shoes or comfortable shoes?
+Do you like to wear shoes that are comfortable or good-looking?
+Do people like to wear shoes that are comfortable or good-looking?
+What is your favourite type of shoes?
+12) Plants
+Do you keep plants at home?
+Do you keep plants?
+Have you ever had a plant?
+What plant did you grow when you were young?
+What plants did you grow when you were younger?
+Do you know anything about growing a plant?
+Do Chinese people send plants as gifts?
+Do people in your country send plants as gifts?
+13) Housework and cooking
+Did you do some house cleaning when you were young?
+What housework do you like or dislike doing?
+Do you like cooking?
+How often do you cook?
+Do you enjoy cooking with others?
+Do you like to cook for a large group of people?
+What do you think of working as a waiter?
+14) Plan / schedule
+Do you like making plans?
+Do you use paper or your cellphone to make plans?
+What are the benefits of making plans?
+Why is it that some people don’t make plans?
+15) Praise / encouragement
+Have you had any achievements recently?
+How do you feel when you are praised?
+Do you think parents should often praise and encourage their children?
+When was the last time you praised someone?
+Have you ever been praised or encouraged by your teacher?
+16) Being busy
+Are you often busy?
+Why are you busy?
+When are you busy?
+Are you busier now than when you were a child?
+17) Saying “thank you”
+Have you ever sent a thank you card to others?
+Do people in your country often say ‘thank you’?
+On what occasions do you say ‘thank you’?
+Why do people need to say ‘thank you’?
+18) Spare time / leisure time
+Do you often have free time?
+What do you usually do in your spare time?
+Which day do you have more free time on, Saturday or Sunday?
+Would you like to have more free time in the future?
+19) Machine
+What is your favourite machine in your home?
+Do you think washing machines and sweeping machines are important?
+Do you read the instructions before using a machine?
+Do you think it is important to read the instructions?
+20) Patience
+Are you a patient person?
+What is it that makes you feel impatient?
+How do you feel when you have to do something for a long time?
+Does your job require you to be patient?
+Are you more patient now than when you were a child?
+21) Flowers
+Do you love flowers?
+Do you know anyone who loves flowers?
+Are there a lot of flowers where you live?
+Do you take photos of flowers in your daily life?
+Do people in your country often send flowers to others?
+What kinds of flowers do you know?
+Are there any flowers that have special meanings in Vietnam?
+Have you planted any flowers?
+Have you sent flowers to others?
+22) Text messages
+How often do you send text messages?
+Is sending messages popular in your country?
+Did you send more messages when you were younger?
+Do you reply to messages as soon as you receive them?
+23) Internet
+When did you start using the internet?
+How often do you go online?
+How does the internet influence people?
+Do you think you spend too much time online?
+What would you do without the internet?
+24) Memory
+Are you good at memorising things?
+Have you ever forgotten something important?
+What do you need to remember in your daily life?
+How do you remember important things?
+25) Geography
+How do you like geography?
+Do you think geography is useful?
+Have you ever learned geography?
+Do you want to be a geography teacher?
+Will you learn more about the geography of other countries?
+26) Library
+Do you often go to the library?
+What do you usually do in the library?
+Did you go to the library when you were a kid?
+Do Chinese kids often go to the library?
+27) Small business
+Do you know many small businesses where you live?
+Do you prefer buying things from big companies or small businesses?
+Have you ever worked in small businesses?
+Have you ever thought about starting your own business?
+28) Happy things
+Is there anything that has made you feel happy lately?
+What made you happy when you were little?
+What do you think will make you feel happy in the future?
+When do you feel happy at work? Why?
+Do you feel happy when buying new things?
+Do you think people are happy when buying new things?
+29) Outer space and stars
+Have you ever learnt about outer space and stars?
+Do you like science fiction movies? Why?
+Do you want to know more about outer space?
+Do you want to go into outer space in the future?
+30) Jewelry
+Do you often wear jewelry?
+What type of jewelry do you like?
+Do you usually buy jewelry?
+Why do you think some people wear a piece of jewelry for a long time?
+31) Staying up late
+Do you often stay up late?
+Did you stay up late when you were a kid?
+What do you do when you stay up late?
+What does it feel like the next morning if you stay up late?
+32) Chocolate
+Do you like eating chocolate? Why or why not?
+How often do you eat chocolate?
+Did you often eat chocolate when you were a kid?
+Why do you think chocolate is popular around the world?
+What’s your favourite flavour of chocolate?
+Do you think it is good to use chocolate as gifts to others?
+33) Public transportation
+What kind of public transportation do you usually take?
+When do you usually take public transportation, in your everyday life or when you are travelling?
+Do most people prefer public transportation in your country?
+Did you take public transportation when you were a kid?
+Will there be more people taking public transportation in the future?
+34) Weather
+What’s the weather like where you live?
+What do you think are the effects of climate change in recent years?
+Do you prefer cold or hot weather?
+Do you prefer dry or wet weather?
+Are you in the habit of checking the weather forecast? When and how often?
+Would you like to visit other cities that have different climates from where you live?
+35) Birthday
+What do you usually do on your birthday?
+What did you do on your birthday when you were young?
+Do you think it is important for you to celebrate your birthday?
+Whose birthday do you think is the most important to celebrate in Vietnam?
+36) Writing
+Do you write a lot?
+What do you like to write? Why?
+Do you think the things you write would change?
+Do you prefer typing or handwriting when you are writing?
+How often do you keep diaries?
+What other methods do you use to record your life?
+37) Names
+Does your name have any special meaning?
+Does anyone in your family have the same name as you?
+How would you choose names for your next generation?
+Are there any differences between how Vietnamese name their children now and in the past?
+Are there any names that are more popular than others in Vietnam?
+38) Snacks
+What snacks do you like to eat?
+Did you often eat snacks when you were young?
+When do you usually eat snacks now?
+Do you think it is healthy for you to eat snacks?
+39) Puzzles
+Did you do puzzles in your childhood?
+When do you do puzzles, during your trip or when you feel bored?
+Do you like doing word puzzles or number puzzles? Which is more difficult for you?
+Do you think it is good for old people to do puzzles?
+40) Holidays
+Would you prefer an exciting holiday or a peaceful holiday?
+Where did you go for your last holiday?
+Do you like holidays? Why?
+Which public holiday do you like best?
+What do you do on holidays?
+Do you like to spend your day at home?
+Do you prefer a leisurely or a busy holiday?
+41) Making lists
+Do you make a list when you shop?
+Do you make a list for your work? Does it work?
+Why don’t some people like making lists?
+Do you prefer to make a list on paper or your phone?
+42) Spending time by yourself / being alone
+Do you usually spend time by yourself?
+How do you usually spend your time by yourself?
+Do you like spending time by yourself?
+43) Singing
+Do you like singing? Why?
+Have you ever learnt how to sing?
+Who do you want to sing for?
+Do you think singing can bring happiness to people?
+44) Hobbies
+Do you have any hobbies?
+Did you have any hobbies when you were a child?
+Do you have a hobby that you’ve had since childhood?
+Do you have the same hobbies as your family members?
+45) Books and reading habits
+Which do you prefer, reading books or watching movies?
+Have you ever read a novel that has been adapted into a film?
+Are your reading habits now different than before?
+Do you often read books? When?
+Do you read more or less now than when you were younger?
+46) Computers / tablets
+Would you like to use a computer or tablet?
+In what conditions would you use a computer or tablet?
+When was the first time you used a computer or tablet?
+What would your life be like without computers or tablets?
+In what conditions would it be difficult for you to use a computer or tablet?
+47) Mobile phone
+What was your first mobile phone?
+Do you often use your mobile phone for texting or calls?
+Will you buy a new one in the future?
+How has your mobile phone changed your life?
+Have you ever lost your mobile phone?
+48) Taking photos
+Do you like taking photos?
+Do you like taking selfies?
+What is your favourite family photo?
+Do you want to improve your photography skills?
+Do you like to print out your photos or just keep them on your phone or camera?
+49) Apps
+What kind of apps have you downloaded on your phone?
+What apps do you still use?
+What kind of apps do you spend money on?
+50) Young people / teenagers
+Do you care about teenagers’ fashion trends?
+Do you like spending time with teenagers?
+What activities do young people like to do in your country?
+Do you know what the fashion trend among young people is like in your country?
+51) Party
+Have you been to a party recently?
+Do you prefer to go to small parties or big parties?
+Do you like parties?
+How often did you have a party when you were a kid?
+Have you ever organized a party?
+52) Fishing
+Is fishing popular in your country?
+Do you like eating fish?
+Do you like fishing?
+Did you ever go fishing when you were a child?
+53) Teachers
+Do you have a favorite teacher?
+In what way has your favourite teacher helped you?
+Are you still in touch with your primary school teachers?
+Do you have a teacher from your past that you still remember?
+Do you want to be a teacher in the future?
+Do you remember one of your teachers?
+What were your primary school teachers like?
+Who was your favourite teacher in elementary school? Why?
+54) Staying at home
+Are you a person who likes to stay at home?
+What do you do when you stay at home?
+What is your favourite place at home?
+What did you often do at home as a child?
+Would you like to stay at home a lot in the future?
+What do you like to do in your free time when you’re at home?
+55) Music / musical instruments
+Do a lot of people like music?
+Do schools in your country have music lessons?
+Have you ever learned to play a musical instrument?
+What musical instruments do you enjoy listening to the most?
+Do you think children should learn to play an instrument at school?
+Do you think music education is important for children?
+56) Gifts
+What gift have you received recently?
+Have you ever sent handmade gifts to others?
+Have you ever received a great gift?
+What do you consider when choosing a gift?
+Do you think you are good at choosing gifts?
+57) The city you live in
+What city do you live in?
+Do you like this city? Why?
+How long have you lived in this city?
+Is this city your permanent residence?
+Are there big changes in this city?
+Would you recommend your city to others?
+Are the people friendly in the city?
+Are there people of different ages living in this city?
+Is the city friendly to children and old people?
+Do you often see your neighbors?
+What’s the weather like where you live?
+58) T-shirt
+Do you like wearing T-shirts?
+How often do you wear T-shirts?
+Do you like T-shirts with pictures or prints?
+Do you think older people who wear T-shirts are fashionable?
+Would you buy T-shirts as souvenirs on vacation?
+59) Weekends
+Do you do the same things every weekend?
+Has your weekend routine changed?
+Do you like weekends?
+What did you do last weekend?
+Do you make plans for your weekends?
+What do you usually do on weekends?
+Do you study or work on weekends?
+60) Technology / electronic devices
+What electronic devices have you bought lately?
+Is there any technology you want to buy?
+Is technology important in your life?
+Is there any technology you don’t like?
+What do you think are the trends in technology today compared to when you were young?
+What technology do you often use, computers or cellphones?
+61) Doing sports
+Do you know any schoolmates who are good at sports?
+Do you think it is important for people to exercise?
+What sports do you like?
+Where did you learn how to do it?
+Did you do some sports when you were young?
+What exercise did you do as a kid that you don’t do anymore?
+Should schools encourage young students to take more physical exercise?
+62) Morning routines
+Do you like to get up early in the morning?
+What is your morning routine?
+Is breakfast important?
+What do you do right after getting up in the morning?
+63) Work or studies
+What subjects are you studying?
+Do you like your subject?
+Why did you choose to study that subject?
+Do you think that your subject is popular in your country?
+Do you have any plans for your studies in the next five years?
+What are the benefits of being your age?
+Do you want to change your major?
+Do you prefer to study in the mornings or in the afternoons?
+How much time do you spend on your studies each week?
+Are you looking forward to working?
+What technology do you use when you study?
+What changes would you like to see in your school?
+What work do you do?
+Why did you choose to do that type of work (or that job)?
+Do you like your job?
+What requirements did you need to meet to get your current job?
+Do you have any plans for your work in the next five years?
+What do you think is the most important at the moment?
+Do you want to change to another job?
+Do you miss being a student?
+What technology do you use at work?
+Who helps you the most? And how?
+64) Social media
+When did you start using social media?
+Do you think you spend too much time on social media?
+Do your friends use social media?
+What do people often do on social media?
+65) Home & accommodation
+Who do you live with?
+Do you live in an apartment or a house?
+What kinds of accommodation do you live in?
+Can you describe the place where you live?
+What part of your home do you like the most?
+What room does your family spend most of the time in?
+What do you usually do in your apartment?
+Do you prefer living in a house or an apartment?
+What’s the difference between where you are living now and where you have lived in the past?
+What kind of house or apartment do you want to live in in the future?
+Do you plan to live there for a long time?
+Please describe the room you live in.
+What’s your favorite room in your apartment or house?
+What makes you feel pleasant in your home?
+How long have you lived there?
+Do you think it is important to live in a comfortable environment?
+Are the transport facilities to your home very good?
+66) Hometown
+Where is your hometown?
+Is that a big city or a small place?
+Do you like your hometown?
+What do you like (most) about your hometown?
+Is there anything you dislike about it?
+How long have you been living there?
+Do you like living there?
+Do you think you will continue living there for a long time?
+Please describe your hometown a little.
+What’s your hometown famous for?
+Did you learn about the history of your hometown at school?
+Have you learned anything about the history of your hometown?
+Did you learn about the culture of your hometown in your childhood?
+Are there many young people in your hometown?
+Is your hometown a good place for young people to pursue their careers?
+67) The area you live in
+Do you live in a noisy or a quiet area?
+Are the people in your neighborhood nice and friendly?
+Do you like the area that you live in?
+Where do you like to go in that area?
+Do you know any famous people in your area?
+What are some changes in the area recently?
+Do you know any of your neighbours?
+68) Bags
+Do you usually carry a bag?
+Do you change your bags often?
+What kind of bags would you use when traveling?
+Is a bag an ideal gift?
+Did you use a backpack when you were a child?
+69) Carrying things
+When you go out, what do you carry with you?
+When you go to different places, do you carry different kinds of things?
+What do you do if your item is heavy?
+What is the difference between the things you carry in the evening and in the morning?
+70) Taking a break / having a break
+How often do you take a rest or a break?
+How often do you take a break?
+What do you usually do when you are resting?
+What do you usually do during a break?
+What do you like to do during a break?
+Do you take a nap when you are taking your rest?
+Do you take a nap when you have a rest?
+How do you feel after taking a nap?
+71) Advertisements
+Do you like advertisements?
+How do you feel about advertisements?
+Do you like advertisements on TV?
+What kind of advertising do you like?
+Is there much advertising in your country?
+What are the different places where we see advertisements?
+What advertising do you have in your country?
+Do you often see advertisements when you are on your phone or computer?
+Do you see a lot of advertising on trains or other transport?
+Is there an advertisement that made an impression on you when you were a child?
+72) Museums
+Do you think museums are important?
+Do you like visiting museums and art galleries?
+Do you often visit museums?
+When was the last time you visited a museum?
+Are there many museums in your hometown?
+What did you learn from visiting museums and art galleries?
+73) Dream job / plans for future
+What was your dream job when you were young?
+Have you changed your mind on your dream job?
+74) Borrowing and lending things
+Have you ever borrowed books from others?
+Have you ever borrowed money from others?
+Do you like to lend things to others?
+How do you feel when people don’t return things they borrowed from you?
+75) Sharing things
+When you were a kid, did your parents encourage you to share things with others?
+Do you have anything to share with others?
+What kind of things do you like to share with others?
+Is there anything you don’t want to share?
+What kind of things are not suitable for sharing?
+Who is the first person you would like to share good news with?
+What kind of news do you share with your friends?
+76) Friends
+Are friends important to you?
+What do you and your friends do together?
+What do you value about your friends?
+
+Part 2 – Tổng hợp topic (cue card) + bộ câu hỏi Part 3
+1) Describe a book you read that you found useful
+Part 3 – Questions:
+What are the types of books that young people like to read?
+What should the government do to make libraries better?
+Do you think old people spend more time reading than young people?
+Which one is better, paper books or e-books?
+Have libraries changed a lot with the development of the internet?
+What should we do to prevent modern libraries from closing down?
+2) Describe a popular person
+Part 3 – Questions:
+Why are some students popular in school?
+Is it important for a teacher to be popular?
+Do you think good teachers are always popular among students?
+What are the qualities of being a good teacher?
+Is it easier to become popular nowadays?
+Why do people want to be popular?
+3) Describe a creative person (e.g. an artist, a musician, an architect, etc.) you admire
+Part 3 – Questions:
+Do you think children should learn to play musical instruments?
+How do artists acquire inspiration?
+Do you think pictures and videos in news reports are important?
+What can we do to help children stay creative?
+How does drawing help to enhance children’s creativity?
+What kind of jobs require creativity?
+4) Describe a long journey you had (and would like to take again)
+Part 3 – Questions:
+Do you think it is a good choice to travel by plane?
+What are the differences between group travelling and travelling alone?
+What do we need to prepare for a long journey?
+Why do some people like making long journeys?
+Why do some people prefer to travel in their own country?
+Why do some people prefer to travel abroad?
+5) Describe a person you know who enjoys working for a family business (e.g. a shop, etc.)
+Part 3 – Questions:
+Would you like to start a family business?
+Would you like to work for a family business?
+Why do some people choose to start their own company?
+What are the advantages and disadvantages of family businesses?
+What family businesses do you know in your local area?
+What makes a successful family business?
+6) Describe a wild animal that you want to learn more about
+Part 3 – Questions:
+Why should we protect wild animals?
+Why are some people more willing to protect wild animals than others?
+Do you think it’s important to take children to the zoo to see animals?
+Why do some people attach more importance to protecting rare animals?
+Should people educate children to protect wild animals?
+Is it more important to protect wild animals or the environment?
+7) Describe a time when you broke something
+Part 3 – Questions:
+What kind of things are more likely to be broken by people at home?
+What kind of people like to fix things by themselves?
+Do you think clothes produced in the factory are of better quality than those made by hand?
+Do you think handmade clothes are more valuable?
+Is the older generation better at fixing things?
+Do you think elderly people should teach young people how to fix things?
+8) Describe an important old thing that your family has kept for a long time
+Part 3 – Questions:
+What kind of old things do people in your country like to keep?
+Why do people keep old things?
+What are the differences between the things old people keep and those young people keep?
+What are the differences between the things that people keep today and the things that people kept in the past?
+What can we see in a museum?
+What can we learn from a museum?
+9) Describe a good friend who is important to you
+Part 3 – Questions:
+How do children make friends at school?
+How do children make friends when they are not at school?
+Do you think it is better for children to have a few close friends or many casual friends?
+Do you think a child’s relationship with friends can be replaced by that with other people, like parents or other family members?
+What are the differences between friends made inside and outside the workplace?
+Do you think it’s possible for bosses and their employees to become friends?
+10) Describe a friend of yours who is good at music/singing
+Part 3 – Questions:
+What kind of music is popular in your country?
+What kind of music do young people like?
+What are the differences between young people’s and old people’s preferences in music?
+What are the benefits of children learning a musical instrument?
+Do you know what kind of music children like today?
+Do you think the government should invest more money in concerts?
+11) Describe a great dinner you and your friends or family members enjoyed
+Part 3 – Questions:
+Do people prefer to eat out at restaurants or eat at home during the Spring Festival?
+What food do you eat on special occasions, like during the Spring Festival or the Mid-autumn Festival?
+Why do people like to have meals together during important festivals?
+Is it a hassle to prepare a meal at home?
+What do people often talk about during meals?
+People are spending less and less time having meals with their families these days. Is this good or bad?
+12) Describe an important decision made with the help of other people
+Part 3 – Questions:
+What kind of decisions do you think are meaningful?
+What important decisions should be made by teenagers themselves?
+Why are some people unwilling to make quick decisions?
+Do people like to ask for advice more for their personal life or their work?
+Why do some people like to ask others for advice?
+13) Describe a time when the electricity suddenly went off
+Part 3 – Questions:
+Which is better, electric bicycles or ordinary bicycles?
+Do you think electric bicycles will replace ordinary bicycles in the future?
+Which is better, electric cars or petrol cars?
+How did people manage to live without electricity in the ancient world?
+Is it difficult for the government to replace all the petrol cars with electric cars?
+Do people use more electricity now than before?
+14) Describe an exciting activity you have tried for the first time
+Part 3 – Questions:
+Why are some people unwilling to try new things?
+Do you think fear stops people from trying new things?
+Why are some people keen on doing dangerous activities?
+Do you think that children adapt to new things more easily than adults?
+What can people learn from doing dangerous activities?
+What are the benefits of trying new things?
+15) Describe an interesting traditional story
+Part 3 – Questions:
+What kind of stories do children like?
+What are the benefits of listening to stories before bed?
+Why do most children like listening to stories before bedtime?
+What can children learn from stories?
+Do all stories for children have happy endings?
+Is a good storyline important for a movie?
+16) Describe a place with a lot of trees that you would like to visit (e.g. a forest, oasis)
+Part 3 – Questions:
+Why do people like visiting places with trees or forests?
+17) Describe a natural talent (sports, music, etc.) you want to improve
+Part 3 – Questions:
+Do you think artists with talents should focus on their talents?
+Is it possible for us to know whether children who are 3 or 4 years old will become musicians and painters when they grow up?
+Why do people like to watch talent shows?
+Do you think it is more interesting to watch famous people’s or ordinary people’s shows?
+18) Describe a time when you told your friend an important truth
+Part 3 – Questions:
+Do you think we should tell the truth at all times?
+How do you know when others are telling lies?
+Sometimes people should tell lies. Do you agree?
+Do you think it’s more important to win a game or follow the rules in sports?
+19) Describe an occasion when you lost your way
+Part 3 – Questions:
+Is a paper map still necessary?
+How do people react when they get lost?
+Why do some people get lost more easily than others?
+Do you think it is important to be able to read a map?
+Do you think it is important to do some preparation before you travel to new places?
+How can people find their way when they are lost?
+20) Describe a quiet place you like to go
+Part 3 – Questions:
+Is it easy to find quiet places in your country? Why?
+How do people spend their leisure time in your country?
+How does technology affect the way people spend their leisure time?
+Do you think only old people have time for leisure?
+Why do old people prefer to live in quiet places?
+Why are there more noises made at home now than in the past?
+21) Describe an old person who has an interesting life and you enjoy talking to him/her
+Part 3 – Questions:
+Should companies employ older workers?
+What do you think older people can contribute at work?
+Why do governments make retirement policies?
+When do you think is the best time to retire?
+Do you think people should spend more time with their grandparents?
+Is it beneficial to live with elderly people?
+22) Describe a time when you saw something in the sky (e.g. flying kites, birds, sunset, etc.)
+Part 3 – Questions:
+Would people be willing to get up early to watch and enjoy the sunrise?
+When would people watch the sky?
+Do many people pay attention to the shapes of stars?
+What do people usually see in the sky in the daytime?
+What are the differences between things people see in the sky in the daytime and at night?
+Why do some people like to watch stars at night?
+23) Describe a sport event that you would like to attend as part of the audience
+Part 3 – Questions:
+What kinds of sports events are broadcast on TV or other media in your country?
+Do people in your country enjoy watching football games?
+Do encouragement and applause from the audience have an impact on athletes? How do these affect them?
+Which do people in your country prefer to watch, team sports or individual sports?
+What kinds of sports are the most popular in your country?
+Why do so many children like to watch basketball games?
+24) Describe a place you went to and an outdoor activity you did there
+Part 3 – Questions:
+What sports do young people like?
+What kind of people do extreme sports?
+Why are some people willing to try dangerous extreme sports?
+Should people take more into account the risks that extreme sports may bring?
+Why do people keep inventing new and slightly dangerous sports?
+What risks are there in extreme sports, and who takes these consequences?
+25) Describe an outdoor sport you would like to try for the first time
+Part 3 – Questions:
+What are the differences between indoor sports and outdoor sports?
+What outdoor sports are popular in Vietnam?
+What sports are popular among elderly people?
+Which outdoor sports are popular with children?
+How does weather affect outdoor sports?
+Which is more dangerous, team sports or individual sports?
+26) Describe a place where you saw many animals
+Part 3 – Questions:
+Why do stories and movies for children always feature animals?
+How did animals help people in the past?
+Do you think people are more interested in animals now than they were in the past?
+How do animals help us today?
+Why should we protect animals?
+Do you think children love animals more than old people do?
+27) Describe an advertisement you have seen that introduced a well-known product
+Part 3 – Questions:
+Where do we often see advertisements?
+What are the benefits of advertising?
+Are advertisements good or bad for children?
+How does advertising affect people?
+Do people pay attention to advertisements on public transport?
+Do you think it is good to see the same advertisements everywhere?
+28) Describe a time when a person persuaded you to do something and you were happy about that
+Part 3 – Questions:
+What impact does advertising have on children and their parents?
+What do parents often persuade their children to do?
+Who do children listen to more, their parents or their teachers? Why?
+What are some good ways to persuade children?
+What advice should young people follow?
+How do advertisements persuade people?
+29) Describe a website that sells second-hand items
+Part 3 – Questions:
+Some people think it’s a waste to buy too many clothes for children. What do you think?
+What do people do with the clothes they don’t want anymore?
+Why do people buy second-hand clothes?
+What problems will occur if people don’t recycle?
+Should the government encourage people to recycle items?
+How do people in your country recycle various items they don’t want?
+30) Describe a time when you and some other people made a plan to do an activity
+Part 3 – Questions:
+What kind of plans do young people often make?
+Why can’t people always follow their plans?
+Why do people make plans?
+Is it important to make plans?
+Why do some people like to make plans while others just don’t like to?
+Are there any people who never make plans?
+31) Describe a person from a different cultural background with whom you enjoy spending time
+Part 3 – Questions:
+Is it easy to meet people from different cultural backgrounds in your country?
+What do people from different cultural backgrounds usually talk about with each other?
+Is it good to live in a multicultural society?
+What are the advantages of being friends with people from different cultural backgrounds?
+Why do people choose to travel or live abroad?
+What are the benefits of living in another country?
+32) Describe a city that you have been to and would like to visit again
+Part 3 – Questions:
+What’s the difference between the city and the countryside?
+Some people say large cities are suitable for old people. What do you think?
+Do you think it is possible that all of the population move to cities?
+Do you think people in the countryside are friendlier than people in the city?
+Are there any changes in your city?
+What should the government do to improve citizens’ safety?
+33) Describe a shop/store you enjoy visiting
+Part 3 – Questions:
+Do people in your country go to the shopping mall frequently?
+How have people’s shopping habits changed in recent decades?
+Do you think shops and shopping malls will disappear in the future?
+What are the differences between shopping in street markets and big shopping malls?
+What are the differences in the shopping habits of different age groups?
+What are the differences between shopping online and in-store?
+34) Describe a person you disliked at first but ended up being friends with
+Part 3 – Questions:
+What do you think of making friends online?
+Is it a good idea to make friends with people who are much older than you?
+Do you enjoy meeting new people?
+Do you think friendship is important?
+Why is it difficult for some people to make friends with others?
+Do we benefit from having friends with different personalities?
+35) Describe an impressive conversation you had that you remember well
+Part 3 – Questions:
+What topics do young people like to talk about?
+Is it important to have good communication skills at work?
+What are the differences between talking with friends online and face-to-face?
+What are the differences between online and onsite meetings in a company?
+36) Describe a friend of yours who is well-dressed and is good at dressing up
+Part 3 – Questions:
+Do most people in your country prefer to buy clothes online or at the street market? Why?
+Do you think young people know more about fashion and are better at dressing up than elderly people?
+Do you think people would use clothing to show their identity?
+Why do many people prefer to buy rather expensive clothes?
+What are the differences between cheap and expensive clothes?
+Why do some people care so much about their clothing?
+37) Describe an article on health you read in a magazine or on the Internet
+Part 3 – Questions:
+How do today’s people keep healthy?
+Is it difficult to keep healthy?
+Why can’t many people keep healthy?
+Where can people find information about keeping healthy?
+Do schools have the responsibility to provide health education?
+What can parents do to help improve their children’s health awareness?
+38) Describe an unusual but interesting building you would like to visit
+Part 3 – Questions:
+Do you think old buildings should be preserved?
+Do you think a city’s buildings affect its vibe or atmosphere?
+What factors do you consider when choosing a house or an apartment?
+Why do some people choose to build houses by themselves?
+39) Describe a famous person you would like to meet
+Part 3 – Questions:
+Do people become famous because of their talent?
+What can children do with their fame?
+What can today’s children do to become famous?
+What are the advantages and disadvantages of being a famous child?
+40) Describe something that you did with someone/a group of people
+Part 3 – Questions:
+How do you get along with your neighbors?
+How do neighbors help each other?
+Do you think neighbors help each other more often in the countryside than in the city?
+How do children learn to cooperate with each other?
+Do you think parents should teach children how to cooperate with others? How?
+Do you think it’s important for children to learn about cooperation?
+41) Describe a time when someone gave you something that you really wanted
+Part 3 – Questions:
+Do you think shopping is good for a country’s economy?
+Why do people like shopping more now than in the past?
+How should children spend their allowance money?
+What kinds of gifts do young people like to receive as rewards?
+How should bosses reward employees?
+Should employees have their own goals?
+42) Describe your first day at school that you remember
+Part 3 – Questions:
+What would parents prepare when their kids go to school on the first day?
+How do children socialize with each other?
+Is socialization important for children?
+43) Describe a piece of technology you own/that you feel is difficult to use
+Part 3 – Questions:
+What technology do people currently use?
+Why do big companies introduce new products frequently?
+Why are people so keen on buying iPhones even though they haven’t changed much from one iPhone to the next?
+Why do technology companies keep upgrading their products?
+What changes has the development of technology brought about in our lives?
+Does the development of technology affect the way we study? How?
+Do you find it difficult to use the latest technology?
+How will older people use technology?
+44) Describe your favorite place in your house where you can relax
+Part 3 – Questions:
+Why is it difficult for some people to relax?
+What are the benefits of doing exercise?
+Do people in your country exercise after work?
+What is the place where people spend most of their time at home?
+Which is more important, mental relaxation or physical relaxation?
+45) Describe a person you have met who you want to work/study with
+Part 3 – Questions:
+Why should children be kind to their classmates?
+Can children choose their deskmates?
+What matters most about a colleague’s personality?
+Are good colleagues important at work?
+What kind of people are popular at work?
+Are knowledgeable people popular at work?
+46) Describe a website you often visit
+Part 3 – Questions:
+What are the most popular and least popular apps in Vietnam?
+What’s the difference between the internet and television?
+Why do some people like to read the news on the internet instead of getting it from TV?
+Is the library still necessary? Why?
+What kinds of people would still go to the library to read and study?
+What are the differences between old people and young people when they use the internet?
+47) Describe a noisy place you have been to
+Part 3 – Questions:
+Do you think it is good for children to make noise?
+Should children not be allowed to make noise under any circumstances?
+What kinds of noises are there in our life?
+Which area is exposed to noise more, the city or the countryside?
+How would people usually respond to noises in your country?
+How can people consider others’ feelings when chatting in public?
+48) Describe a person who inspired you to do something interesting
+Part 3 – Questions:
+What qualities make someone a role model?
+Why should children learn from role models?
+Who can influence children more, teachers or parents?
+What kind of international news inspires people?
+Besides parents and teachers, who else can motivate children?
+Can online teaching motivate students to learn? How?
+49) Describe a place in your country (or part of your country) that you would like to recommend to visitors/travelers
+Part 3 – Questions:
+Is it important to take photos while traveling?
+Can you trust other people’s travel journals on the Internet?
+What factors affect how people feel about traveling?
+Will you go to a foreign country to travel because of the distinct landscape?
+How can tourists have a good travel experience?
+What kinds of comments do travelers typically leave online after a trip?
+50) Describe someone you like to spend time with
+Part 3 – Questions:
+Do you think it’s important to spend some time alone?
+Do you think it is important for us to get along with different kinds of people?
+What kinds of people are easy to get along with?
+How do leaders get along with their subordinates?
+Do people have time for themselves nowadays?
+Do you like talking with older people? Why?
+51) Describe an interesting discussion you had with your friend
+Part 3 – Questions:
+Should parents consider their children’s opinions on everything? Why?
+Why do some young people refuse to communicate with others?
+When do children normally form their own views?
+Do children have strong opinions?
+Should parents require their kids to obey them?
+In what industries do you think communication is a necessary skill?
+52) Describe a kind of foreign food you like and you have had
+Part 3 – Questions:
+Do most people like to eat the food they are familiar with or try new food?
+What kinds of foreign food are popular in your country?
+Do you like to cook at home?
+Is it expensive to eat out in your country?
+What’s the difference between Vietnamese food and Western food?
+53) Describe one of your grandparents’ job
+Part 3 – Questions:
+What jobs do you think are rather difficult?
+What qualities do people need to do difficult jobs?
+Do you think difficult jobs deserve higher salaries?
+What are the differences between difficult jobs and easy jobs?
+Do you think robots can replace human beings in every industry?
+What role can robots play in the car manufacturing process?
+54) Describe a person who helps to protect the environment
+Part 3 – Questions:
+Why can recycling help the environment?
+What have people done to damage the environment?
+Do you think technology can improve environment-related problems?
+Is it important to teach students environmental protection at school?
+55) Describe a foreign country you would like to visit in the future
+Part 3 – Questions:
+What do you think of national identity?
+What are the advantages of working in an international company?
+How does travelling abroad affect young people?
+How do people get information about other countries?
+Do you think reading is a good way to get to know other countries? Why?
+What do you think makes countries different?
+56) Describe someone else’s room you enjoy spending time in
+Part 3 – Questions:
+Do you like to invite your friends to your home?
+Do most people visit other people’s houses during the Spring Festival?
+Why do people often take gifts with them when they visit others’ homes?
+What are the most enjoyable parts of having a meal together with your family?
+Who likes to stay at home more, young people or old people?
+Do you think old people will be able to keep up with the pace of technology in 50 years?
+57) Describe an ideal and perfect place where you would like to stay (e.g. a house, an apartment)
+Part 3 – Questions:
+What are apartments like in your country?
+Why are apartments popular in some places while not in other places?
+What would people normally consider when they rent or buy a house or an apartment?
+Do different people have different preferences for houses or apartments?
+Why do some people choose to live in the city center?
+What do you think buildings will be like in the future?
+58) Describe a time when you missed or were late for an important meeting/event
+Part 3 – Questions:
+Are you a punctual person?
+Do you think it is important to be on time?
+Do you always avoid being late?
+Why are people often late for meetings or appointments?
+Are people in your country often late for meetings?
+Do you think people are born with time management skills or they can develop them?
+59) Describe a time you made a promise to someone
+Part 3 – Questions:
+What kinds of promises do people often make?
+Do parents in China make promise to their children?
+Do children keep their promises?
+Why do some people fail to keep their promises?
+Do you often keep your promises?
+Is it useful to write down promises?
+60) Describe an energetic person that you know
+Part 3 – Questions:
+What kinds of jobs need a lot of physical work?
+What’s the difference between the payment for physical work and that for mental work?
+Can physical workers receive higher salaries in the future?
+Do you think machines could replace human workers in the future?
+Do you think you are an energetic person?
+Do you think there was more physical labour in the past than there is now?
+61) Describe an important decision that you made
+Part 3 – Questions:
+Do you think children sometimes have to make important decisions?
+What important decisions do teenagers need to make after graduation?
+Who can children turn to for help when making a decision?
+Do you think advertisements can influence our decisions when shopping?
+Do you think the influence of advertising is good?
+How do people usually make important decisions?
+    `;
+
+    // Database Engine: Parser
+    let questionsDB = [];
+    
+    function parseDatabase() {
+        const lines = rawData.split('\n')
+                             .map(l => l.replace(/\\s*/g, '').trim())
+                             .filter(l => l);
+                             
+        let currentPart = 0;
+        let currentTopic = null;
+        let readingP3Qs = false;
+        
+        let p1Count = 0;
+        let p3Count = 0;
+
+        for (const line of lines) {
+            if (line.includes('Part 1')) {
+                currentPart = 1;
+                continue;
+            }
+            if (line.includes('Part 2 – Tổng hợp topic')) {
+                currentPart = 3;
+                if (currentTopic) questionsDB.push(currentTopic);
+                currentTopic = null;
+                continue;
+            }
+
+            const topicMatch = line.match(/^\d+\)\s+(.*)/);
+            
+            if (currentPart === 1) {
+                if (topicMatch) {
+                    if (currentTopic) questionsDB.push(currentTopic);
+                    p1Count++;
+                    let diff = p1Count <= 25 ? 'easy' : (p1Count <= 50 ? 'medium' : 'hard');
+                    currentTopic = { id: 'p1_' + p1Count, part: 1, diff: diff, topic: topicMatch[1], questions: [] };
+                } else if (currentTopic && line.endsWith('?')) {
+                    // Loại bỏ câu hỏi nếu bắt đầu bằng describe
+                    if (!line.toLowerCase().startsWith('describe') && !line.toLowerCase().startsWith('please describe') && !line.toLowerCase().startsWith('can you describe')) {
+                        currentTopic.questions.push(line);
+                    }
+                }
+            } else if (currentPart === 3) {
+                if (topicMatch) {
+                    if (currentTopic) questionsDB.push(currentTopic);
+                    p3Count++;
+                    let diff = p3Count <= 20 ? 'easy' : (p3Count <= 40 ? 'medium' : 'hard');
+                    
+                    // Cắt bỏ chữ "Describe " trên tiêu đề topic để tránh nhầm lẫn giao diện với Part 2
+                    let topicTitle = topicMatch[1];
+                    if (topicTitle.toLowerCase().startsWith('describe ')) {
+                        topicTitle = topicTitle.substring(9);
+                        topicTitle = topicTitle.charAt(0).toUpperCase() + topicTitle.slice(1);
+                    }
+                    
+                    currentTopic = { id: 'p3_' + p3Count, part: 3, diff: diff, topic: topicTitle, questions: [] };
+                    readingP3Qs = false;
+                } else if (line.includes('Part 3 – Questions:')) {
+                    readingP3Qs = true;
+                } else if (readingP3Qs && currentTopic) {
+                    if (!line.includes('Part 2') && !line.includes('Part 3')) {
+                        // Loại bỏ câu hỏi nếu bắt đầu bằng describe
+                        if (!line.toLowerCase().startsWith('describe')) {
+                            currentTopic.questions.push(line);
+                        }
+                    }
+                }
+            }
+        }
+        if (currentTopic) questionsDB.push(currentTopic);
+        
+        // Filter empty topics
+        questionsDB = questionsDB.filter(t => t.questions.length > 0);
+        document.getElementById('debug-info').innerText = `Loaded ${questionsDB.length} topics from database.`;
+    }
+
+    // Initialize Database
+    parseDatabase();
+
+    // State Variables
+    let sequenceStep = 0; // 0: P1 Easy, 1: P1 Easy, 2: P3 Easy, 3+: Random
+    let usedTopicIds = new Set();
+    let currentTopic = null;
+    let currentQIndex = 0;
+
+    // DOM Elements
+    const elPart = document.getElementById('badge-part');
+    const elDiff = document.getElementById('badge-diff');
+    const elTopic = document.getElementById('topic-title');
+    const elQuestion = document.getElementById('question-text');
+    const elProgress = document.getElementById('progress');
+    const elBtn = document.getElementById('next-btn');
+
+    function getRandomItem(array) {
+        if (array.length === 0) return null;
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function getNextTopic() {
+        let availablePool = [];
+
+        if (sequenceStep === 0 || sequenceStep === 1) {
+            availablePool = questionsDB.filter(q => q.part === 1 && q.diff === 'easy' && !usedTopicIds.has(q.id));
+        } else if (sequenceStep === 2) {
+            availablePool = questionsDB.filter(q => q.part === 3 && q.diff === 'easy' && !usedTopicIds.has(q.id));
+        } else {
+            availablePool = questionsDB.filter(q => !usedTopicIds.has(q.id));
+        }
+
+        if (availablePool.length === 0) {
+            availablePool = questionsDB.filter(q => !usedTopicIds.has(q.id));
+        }
+
+        if (availablePool.length === 0) return null;
+
+        const selected = getRandomItem(availablePool);
+        usedTopicIds.add(selected.id);
+        sequenceStep++;
+        return selected;
+    }
+
+    function renderUI() {
+        if (!currentTopic) {
+            elQuestion.innerText = "You have completed all topics!";
+            elTopic.innerText = "FINISHED";
+            elBtn.style.display = 'none';
+            return;
+        }
+
+        elPart.innerText = `Part ${currentTopic.part}`;
+        elDiff.innerText = currentTopic.diff;
+        
+        elDiff.className = 'badge';
+        if (currentTopic.diff === 'easy') elDiff.classList.add('badge-easy');
+        else if (currentTopic.diff === 'medium') elDiff.classList.add('badge-medium');
+        else elDiff.classList.add('badge-hard');
+
+        elTopic.innerText = currentTopic.topic;
+        elQuestion.innerText = currentTopic.questions[currentQIndex];
+        elProgress.innerText = `Q: ${currentQIndex + 1}/${currentTopic.questions.length}`;
+        elBtn.innerText = "Next Question";
+    }
+
+    function nextAction() {
+        if (!currentTopic) {
+            currentTopic = getNextTopic();
+            currentQIndex = 0;
+            renderUI();
+            return;
+        }
+
+        currentQIndex++;
+        
+        if (currentQIndex >= currentTopic.questions.length) {
+            currentTopic = getNextTopic();
+            currentQIndex = 0;
+        }
+        
+        renderUI();
+    }
+</script>
+</body>
+</html>
