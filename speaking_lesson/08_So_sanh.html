@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speaking Flash Drill - Tư Duy So Sánh</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .circular-progress { transition: stroke-dashoffset 0.1s linear; }
+    @keyframes pulse-custom {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .pulse-ready { animation: pulse-custom 0.8s ease-in-out infinite; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-4px); }
+    }
+    .shake-anim { animation: shake 0.35s ease-in-out; }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4">
+
+  <div id="card" class="bg-white w-full max-w-md min-h-[75vh] md:min-h-[65vh] rounded-3xl shadow-xl border border-slate-100 p-5 md:p-6 flex flex-col justify-between gap-5 transition-all">
+    
+    <!-- Header -->
+    <div>
+      <div class="flex justify-between items-center mb-3">
+        <div class="space-y-1 text-left">
+          <div class="flex items-center gap-2">
+            <span id="level" class="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-lg">Level: -</span>
+            <span id="counter" class="bg-indigo-50 text-indigo-600 text-xs font-bold px-2.5 py-1 rounded-lg">Câu: 0/0</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Tư duy: So Sánh Trực Tiếp</div>
+        </div>
+        
+        <!-- Timer -->
+        <div class="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 44 44">
+            <circle class="text-slate-100 stroke-current" stroke-width="4.5" fill="transparent" r="18" cx="22" cy="22" />
+            <circle id="timer-progress" class="text-indigo-600 stroke-current circular-progress" stroke-width="4.5" stroke-linecap="round" fill="transparent" r="18" cx="22" cy="22" stroke-dasharray="113.1" stroke-dashoffset="0" />
+          </svg>
+          <div id="timer" class="absolute font-extrabold text-base text-indigo-600">10</div>
+        </div>
+      </div>
+      
+      <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden mb-3">
+        <div id="progress-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col justify-center items-center py-2 gap-4">
+      
+      <!-- Examiner Question -->
+      <div id="examiner-container" class="w-full text-center hidden">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">🗣️ Examiner:</span>
+        <p id="examiner-question" class="text-base md:text-lg font-bold text-slate-800 leading-relaxed px-2"></p>
+      </div>
+
+      <!-- Action Signal -->
+      <div id="signal" class="h-6 text-sm font-extrabold tracking-widest text-emerald-500 uppercase mt-2 hidden animate-bounce">TỚI LƯỢT BẠN NÓI! 🎙️</div>
+
+      <div id="welcome-text" class="text-base font-bold text-slate-600 text-center px-4">
+        Nhấn Bắt đầu để kiểm tra phản xạ tư duy So Sánh (A vs B).
+      </div>
+
+      <!-- Hint 1: Analysis (Điểm chung + Khía cạnh) -->
+      <div id="hint-analysis" class="w-full hidden mt-2 flex flex-col gap-2 transition-all">
+        <div class="w-px h-4 bg-slate-200 mx-auto"></div>
+        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3.5 text-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500 block mb-1.5">🧠 Gợi ý Phân tích</span>
+            <div class="flex flex-col gap-1.5 text-sm">
+                <div class="font-medium text-slate-600"><span class="text-slate-400">Điểm chung:</span> <span id="hint-diemchung" class="text-slate-800 font-bold"></span></div>
+                <div class="font-medium text-slate-600"><span class="text-slate-400">Khía cạnh so sánh:</span> <span id="hint-khiacanh" class="text-indigo-700 font-bold"></span></div>
+            </div>
+        </div>
+      </div>
+
+      <!-- Hint 2: Keywords -->
+      <div id="hint-keywords" class="w-full hidden mt-2 flex flex-col gap-2 transition-all">
+        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-2 text-center">🔑 Từ vựng gợi ý</span>
+            <div class="space-y-3">
+                <div>
+                    <span class="text-[10px] font-semibold text-slate-500 block mb-1">Topic-related:</span>
+                    <div id="tags-topic" class="flex flex-wrap gap-1.5"></div>
+                </div>
+                <div>
+                    <span class="text-[10px] font-semibold text-slate-500 block mb-1">Functional (So sánh):</span>
+                    <div id="tags-functional" class="flex flex-wrap gap-1.5"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="space-y-2.5">
+      <!-- Buttons Gợi ý -->
+      <button id="btn-hint-analysis" onclick="showAnalysis()" class="hidden w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98]">
+        Gợi ý hướng phân tích 🧠
+      </button>
+
+      <button id="btn-hint-keywords" onclick="showKeywords()" class="hidden w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold py-2.5 px-4 rounded-xl text-xs transition-all active:scale-[0.98]">
+        Bí từ? Xem Keyword gợi ý 🔑
+      </button>
+      
+      <!-- Next Button -->
+      <button id="btn-next" onclick="nextQuestion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2">
+        <span id="btn-text">Bắt đầu ngay 🎯</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const QUESTIONS_DB = [
+      // EASY (11 câu)
+      { examiner: "Is it better to study at home or at school?", diemChung: "Môi trường học tập", khiaCanh: "Mức độ tập trung", topic: ["distractions", "structured environment", "peer pressure", "concentrate"], functional: ["whereas", "while", "on the contrary"], level: "Easy" },
+      { examiner: "Is it better to live in the city or in the countryside?", diemChung: "Nơi sinh sống", khiaCanh: "Nhịp sống (Pace of life)", topic: ["bustling", "peaceful", "tranquil", "fast-paced"], functional: ["in contrast", "on the other hand", "compared to"], level: "Easy" },
+      { examiner: "Would you rather go to school by flying car or teleportation?", diemChung: "Phương tiện di chuyển tương lai", khiaCanh: "Tốc độ và tính tức thời", topic: ["instant travel", "avoid traffic congestion", "commute time"], functional: ["whereas", "much more... than", "unlike"], level: "Easy" },
+      { examiner: "Would you rather have a robot teacher or a human teacher?", diemChung: "Người hướng dẫn", khiaCanh: "Sự đồng cảm (Empathy)", topic: ["emotional support", "programmed logic", "understand feelings"], functional: ["while", "unlike", "conversely"], level: "Easy" },
+      { examiner: "If you could learn English with music or with games, which would you choose?", diemChung: "Công cụ học tập", khiaCanh: "Tính tương tác (Interactivity)", topic: ["catchy tunes", "interactive tasks", "active engagement"], functional: ["similarly", "however", "whereas"], level: "Easy" },
+      { examiner: "Would you rather learn from a book or from a YouTube channel?", diemChung: "Nguồn tiếp thu kiến thức", khiaCanh: "Tính trực quan (Visuals)", topic: ["visual aids", "imagination", "dynamic demonstrations"], functional: ["whereas", "in comparison", "while"], level: "Easy" },
+      { examiner: "Is it better to travel by motorbike or by bicycle in your city?", diemChung: "Phương tiện cá nhân", khiaCanh: "Thời gian & Sức lực", topic: ["physical effort", "speed", "exhaust fumes", "eco-friendly"], functional: ["while", "much faster than", "on the flip side"], level: "Easy" },
+      { examiner: "Would you rather live in a big city or a small town?", diemChung: "Khu dân cư", khiaCanh: "Sự tiện lợi (Convenience)", topic: ["amenities", "access to healthcare", "limited options"], functional: ["conversely", "whereas", "in contrast"], level: "Easy" },
+      { examiner: "Do you think it's better to take notes by hand or on a computer?", diemChung: "Cách lưu trữ thông tin", khiaCanh: "Tốc độ vs. Ghi nhớ", topic: ["typing speed", "muscle memory", "retain information"], functional: ["although", "on the other hand", "whereas"], level: "Easy" },
+      { examiner: "Do you think online learning is better than learning in a classroom?", diemChung: "Phương thức giáo dục", khiaCanh: "Tương tác xã hội", topic: ["face-to-face interaction", "flexibility", "feel isolated"], functional: ["while", "unlike", "compared to"], level: "Easy" },
+      { examiner: "Is it better to live with your parents or alone as a young adult?", diemChung: "Môi trường sống (Thanh niên)", khiaCanh: "Sự tự lập", topic: ["independent", "split bills", "comfort zone", "financial burden"], functional: ["on the contrary", "whereas", "while"], level: "Easy" },
+
+      // MODERATE (11 câu)
+      { examiner: "Should students work part-time or focus only on studying?", diemChung: "Phân bổ thời gian", khiaCanh: "Trải nghiệm thực tế vs. Lý thuyết", topic: ["practical skills", "academic performance", "time management", "hands-on experience"], functional: ["while", "on the other hand", "conversely"], level: "Moderate" },
+      { examiner: "Do you prefer a native English teacher or a teacher who speaks your first language and has mastered English?", diemChung: "Giáo viên ngôn ngữ", khiaCanh: "Sự thấu hiểu khó khăn học tập", topic: ["pronunciation", "shared struggles", "language barrier", "grammar translation"], functional: ["whereas", "in contrast", "while"], level: "Moderate" },
+      { examiner: "What’s the difference between living in the city and the countryside?", diemChung: "Môi trường sống", khiaCanh: "Cơ hội việc làm & Tiện ích", topic: ["career prospects", "tranquil lifestyle", "healthcare access"], functional: ["significantly different", "while", "compared to"], level: "Moderate" },
+      { examiner: "What are the differences between cities and towns?", diemChung: "Quy mô khu dân cư", khiaCanh: "Mật độ dân số & Hạ tầng", topic: ["densely populated", "close-knit community", "infrastructure"], functional: ["compared to", "whereas", "unlike"], level: "Moderate" },
+      { examiner: "What are the differences between driving in the countryside and driving in the city?", diemChung: "Trải nghiệm lái xe", khiaCanh: "Áp lực giao thông", topic: ["traffic congestion", "scenic routes", "road rage", "smooth drive"], functional: ["totally different", "in contrast", "whereas"], level: "Moderate" },
+      { examiner: "Why do some people choose to do their shopping in a street market rather than in a shopping mall?", diemChung: "Địa điểm mua sắm", khiaCanh: "Sự linh hoạt về giá (Bargaining)", topic: ["bargain", "fixed prices", "fresh produce", "air-conditioned"], functional: ["whereas", "unlike", "on the other hand"], level: "Moderate" },
+      { examiner: "Which are more effective: adverts on TV or adverts on social media?", diemChung: "Kênh quảng cáo", khiaCanh: "Khả năng nhắm mục tiêu (Targeting)", topic: ["broad audience", "personalized algorithms", "interactive"], functional: ["much more targeted", "whereas", "while"], level: "Moderate" },
+      { examiner: "Do men and women use the Internet for different purposes?", diemChung: "Hành vi trực tuyến", khiaCanh: "Mục đích sử dụng chính", topic: ["online gaming", "social networking", "practical information", "entertainment"], functional: ["generally speaking", "while", "tend to"], level: "Moderate" },
+      { examiner: "Do men and women spend their free time differently? How?", diemChung: "Hoạt động giải trí", khiaCanh: "Tính cạnh tranh vs. Giao tiếp", topic: ["competitive sports", "deep conversations", "socialize", "action-oriented"], functional: ["tend to", "whereas", "in comparison"], level: "Moderate" },
+      { examiner: "How different is life in the countryside compared to life in the city?", diemChung: "Lối sống", khiaCanh: "Sự kết nối cộng đồng", topic: ["close-knit", "anonymous", "fast-paced", "sense of belonging"], functional: ["significantly different", "in comparison", "whereas"], level: "Moderate" },
+      { examiner: "What are the advantages of e-books compared to paper books?", diemChung: "Định dạng sách", khiaCanh: "Tính di động (Portability)", topic: ["lightweight", "tactile experience", "eye strain", "storage capacity"], functional: ["although", "on the other hand", "whereas"], level: "Moderate" },
+
+      // CHALLENGING (2 câu)
+      { examiner: "How has education changed compared to the past?", diemChung: "Hệ thống giáo dục", khiaCanh: "Vai trò của công nghệ & Tương tác", topic: ["rote learning", "interactive platforms", "accessible online", "passive listening"], functional: ["traditionally", "whereas now", "unlike the past"], level: "Challenging" },
+      { examiner: "Do people’s leisure activities change as they get older? How?", diemChung: "Hoạt động giải trí", khiaCanh: "Mức độ vận động thể chất", topic: ["extreme sports", "low-impact exercises", "energetic", "sedentary"], functional: ["as people age", "compared to when they were young", "tend to shift"], level: "Challenging" }
+    ];
+
+    const PREP_TIME = 10;
+    const CIRCUMFERENCE = 113.1;
+
+    let remainingQuestions = [];
+    let currentCount = 0;
+    let totalQuestions = 0;
+    let animationFrame = null;
+    let audioContext = null;
+
+    // Elements
+    const el = {
+      level: document.getElementById("level"),
+      counter: document.getElementById("counter"),
+      progress: document.getElementById("progress-bar"),
+      timerProg: document.getElementById("timer-progress"),
+      timer: document.getElementById("timer"),
+      signal: document.getElementById("signal"),
+      welcome: document.getElementById("welcome-text"),
+      
+      examinerContainer: document.getElementById("examiner-container"),
+      examinerQ: document.getElementById("examiner-question"),
+      
+      hintAnalysis: document.getElementById("hint-analysis"),
+      hintDiemChung: document.getElementById("hint-diemchung"),
+      hintKhiaCanh: document.getElementById("hint-khiacanh"),
+      
+      hintKeywords: document.getElementById("hint-keywords"),
+      tagsTopic: document.getElementById("tags-topic"),
+      tagsFunc: document.getElementById("tags-functional"),
+      
+      btnAnalysis: document.getElementById("btn-hint-analysis"),
+      btnKeywords: document.getElementById("btn-hint-keywords"),
+      btnNext: document.getElementById("btn-next"),
+      btnText: document.getElementById("btn-text"),
+      card: document.getElementById("card")
+    };
+
+    el.timerProg.style.strokeDasharray = CIRCUMFERENCE;
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function playBeep(freq, dur) {
+      try {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain); gain.connect(audioContext.destination);
+        osc.type = "sine"; osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.06, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + dur);
+        osc.start(); osc.stop(audioContext.currentTime + dur);
+      } catch (e) {}
+    }
+
+    function playStart() { playBeep(880, 0.1); setTimeout(() => playBeep(1200, 0.22), 140); }
+
+    function setupSession() {
+      const easyMod = QUESTIONS_DB.filter(q => q.level !== "Challenging");
+      const challenging = QUESTIONS_DB.filter(q => q.level === "Challenging");
+
+      const shuffledEasyMod = shuffle(easyMod);
+      const firstSix = shuffledEasyMod.splice(0, 6); // Ép 6 câu đầu chỉ gồm Easy/Moderate
+
+      const remainingPool = shuffle([...shuffledEasyMod, ...challenging]); // Trộn Challenging vào nửa sau
+
+      remainingQuestions = [...firstSix, ...remainingPool];
+      totalQuestions = remainingQuestions.length;
+      currentCount = 0;
+    }
+
+    function resetUI() {
+      cancelAnimationFrame(animationFrame);
+      el.timer.textContent = PREP_TIME;
+      el.timerProg.style.strokeDashoffset = 0;
+      el.timerProg.className = "text-indigo-600 stroke-current circular-progress";
+      el.timer.className = "absolute font-extrabold text-base text-indigo-600";
+      
+      el.signal.classList.add("hidden");
+      el.welcome.classList.add("hidden");
+      
+      el.hintAnalysis.classList.add("hidden");
+      el.hintKeywords.classList.add("hidden");
+      
+      el.btnAnalysis.classList.add("hidden");
+      el.btnKeywords.classList.add("hidden");
+    }
+
+    function createTags(arr, containerId, colorClass) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = arr.map(w => `<span class="px-2 py-1 bg-${colorClass}-100 text-${colorClass}-700 text-[11px] font-bold rounded-md">${w}</span>`).join('');
+    }
+
+    function showAnalysis() {
+      el.hintAnalysis.classList.remove("hidden");
+      el.btnAnalysis.classList.add("hidden");
+      el.btnKeywords.classList.remove("hidden"); // Mở khóa nút Keyword
+    }
+
+    function showKeywords() {
+      el.hintKeywords.classList.remove("hidden");
+      el.btnKeywords.classList.add("hidden");
+    }
+
+    function init() {
+      resetUI();
+      setupSession();
+      el.welcome.classList.remove("hidden");
+      el.level.textContent = "Level: -";
+      el.counter.textContent = `Câu: 0/${totalQuestions}`;
+      el.progress.style.width = "0%";
+      el.btnText.textContent = "Bắt đầu Drill 🎯";
+      el.btnNext.onclick = nextQuestion;
+    }
+
+    function startTimer() {
+      const duration = PREP_TIME * 1000;
+      const startTime = performance.now();
+
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const remainSec = Math.ceil(Math.max(duration - elapsed, 0) / 1000);
+
+        el.timer.textContent = remainSec;
+        el.timerProg.style.strokeDashoffset = CIRCUMFERENCE * progress;
+
+        if (remainSec <= 3) {
+          el.timerProg.classList.replace("text-indigo-600", "text-rose-500");
+          el.timer.classList.replace("text-indigo-600", "text-rose-500");
+        }
+
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(update);
+        } else {
+          el.timer.textContent = "🗣️";
+          el.timer.classList.add("pulse-ready");
+          el.signal.classList.remove("hidden");
+          
+          playStart();
+          if (navigator.vibrate) navigator.vibrate([150, 100, 150]);
+          el.card.classList.add("shake-anim");
+          setTimeout(() => el.card.classList.remove("shake-anim"), 350);
+        }
+      }
+      animationFrame = requestAnimationFrame(update);
+    }
+
+    function nextQuestion() {
+      if (remainingQuestions.length === 0) {
+        resetUI();
+        el.welcome.innerHTML = `🎉 Tuyệt vời! Bạn đã hoàn thành xuất sắc vòng Drill tư duy so sánh trực tiếp.`;
+        el.welcome.classList.remove("hidden");
+        el.examinerContainer.classList.add("hidden");
+        el.level.textContent = "Status: Done";
+        el.level.className = "bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg";
+        el.counter.textContent = `Câu: ${totalQuestions}/${totalQuestions}`;
+        el.progress.style.width = "100%";
+        el.timer.textContent = "✓";
+        el.btnText.textContent = "Luyện tập vòng mới 🔄";
+        el.btnNext.onclick = init;
+        return;
+      }
+
+      resetUI();
+      currentCount++;
+      const item = remainingQuestions.shift();
+
+      el.counter.textContent = `Câu: ${currentCount}/${totalQuestions}`;
+      el.level.textContent = `Level: ${item.level}`;
+      el.progress.style.width = `${(currentCount / totalQuestions) * 100}%`;
+
+      const colors = { Easy: "emerald", Moderate: "amber", Challenging: "rose" };
+      const c = colors[item.level];
+      el.level.className = `bg-${c}-50 text-${c}-700 text-xs font-bold px-2.5 py-1 rounded-lg`;
+
+      // Set data
+      el.examinerQ.textContent = item.examiner;
+      el.examinerContainer.classList.remove("hidden");
+      
+      el.hintDiemChung.textContent = item.diemChung;
+      el.hintKhiaCanh.textContent = item.khiaCanh;
+      createTags(item.topic, "tags-topic", "blue");
+      createTags(item.functional, "tags-functional", "emerald");
+
+      el.btnText.textContent = "Qua câu tiếp theo ➜";
+      el.btnAnalysis.classList.remove("hidden");
+      startTimer();
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
