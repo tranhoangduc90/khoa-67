@@ -372,7 +372,6 @@
   <div class="shell">
     <header>
       <div class="brand">
-        <div class="eyebrow">Khoa 67</div>
         <h1>Nộp bài tập hằng ngày</h1>
       </div>
       <div class="status-pill" aria-live="polite">
@@ -393,8 +392,10 @@
             </div>
 
             <div class="field">
-              <label for="studentName">Học viên</label>
-              <input id="studentName" name="studentName" type="text" autocomplete="name" placeholder="Nhập đúng họ tên" required>
+              <label for="studentSelect">Học viên</label>
+              <select id="studentSelect" name="studentSelect" required disabled>
+                <option value="">Chọn học viên</option>
+              </select>
             </div>
           </div>
 
@@ -439,27 +440,294 @@
   <script>
     const WEBHOOK_URL = 'https://ducizone.ddns.net/webhook/0510dc1f-669b-4fa8-be7a-31d596f562a9';
     const REJECT_IF_BLOCKED_LINKS_FOUND = true;
-    const CLASS_LIST = [
-      'IC2063',
-      'IC2091',
-      'IC2103',
-      'IC2115',
-      'IC2111',
-      'IC2129',
-      'IC2131',
-      'IC2150',
-      'IC2146',
-      'IC2145',
-      'IC2168',
-      'IC2139',
-      'IC2172',
-      'IC2181',
-      'IC2200'
-    ];
+    const CLASS_STUDENTS = {
+      'IC2063': [
+        'Chinh Hoàng Thị Tuyết',
+        'Đức Lâm Bùi',
+        'Minh Anh Đoàn',
+        'minh khang',
+        'Minh Thư Đỗ',
+        'Ngân Hồng',
+        'Nguyễn Hữu Bình',
+        'phương thảo lê',
+        'Quỳnh Lã Hương',
+        'Thảo Vi',
+        'Thị Thu Hà Vũ',
+        'Trần Thị Khánh Trâm',
+        'Vân Phan'
+      ],
+      'IC2091': [
+        'An Đặng',
+        'Băng Yên 50. Nguyễn',
+        'Chi Mai',
+        'Đào Thị An Na',
+        'Đỗ giaminh',
+        'Hoàng Anh Nguyễn',
+        'Luongdtx 8',
+        'Ngọc Anh Nguyễn',
+        'Ngọc Ánh Phạm',
+        'Phong Đoàn',
+        'Quỳnh Anh',
+        'Quỳnh Nguyễn',
+        'Thương Hoàng',
+        'Trần Thị Trang',
+        'Trang Đặng',
+        'Trang Đỗ Thị',
+        'trường lê',
+        'Yến Nguyễn'
+      ],
+      'IC2103': [
+        'Đan Phương Nguyễn',
+        'Đức Trần Văn',
+        'Giang Nguyễn',
+        'Hải Anh Phạm',
+        'Hân Vũ',
+        'Hiếu Đinh',
+        'Hoài Trần',
+        'Huyền Vương',
+        'Khánh Huyền Trần Thị',
+        'Khánh Ly Lê Thị',
+        'Lê Thành Trung',
+        'Linh Khánh',
+        'Lucy La',
+        'Phuong Anh Ng Thi',
+        'Phương Linh Lê Thị',
+        'Quỳnh Chi Phạm Hoàng',
+        'Trần Quang'
+      ],
+      'IC2115': [
+        'Diệu Huyền (Diệu)',
+        'Đức Phạm',
+        'Lê Thị Kiều Ngân',
+        'Linh Nguyễn Khánh',
+        'mai đỗ',
+        'Minh Anh Nguyễn Đức',
+        'Ngọc Ánh Dương',
+        'Ngoc Le',
+        'Nhi Nguyễn Phương Bảo',
+        'Tài Phạm Đức',
+        'Thị Khánh Linh Nguyễn',
+        'Thơ Lưu',
+        'Thư Nguyễn Minh',
+        'vy lê',
+        'Vy Thảo'
+      ],
+      'IC2111': [
+        'Bach Nguyen',
+        'Duong Dinh',
+        'Hiền Trang Trần',
+        'Hoài An Vũ Lương (An)',
+        'Hồng Nguyễn',
+        'Lan Hương',
+        'le quan bui',
+        'Lê Vy Nguyễn',
+        'Nguyễn Tiến Dũng',
+        'Như Ý Trần',
+        'Phạm Việt Tùng',
+        'Quang Trần Minh',
+        'Thảo Hoàng',
+        'Thảo Nguyên Nguyễn thị',
+        'Thảo Nguyễn',
+        'Trang Bàn Thùy',
+        'Tuệ Lâm Nguyễn',
+        'Vu Thuy'
+      ],
+      'IC2129': [
+        'An Hà Nguyễn Thị',
+        'Ánh Hoàng',
+        'Diệp Hồng',
+        'Diệu Linh Nguyễn Thị',
+        'Đô Nguyễn',
+        'Hà Ngô',
+        'Kien Nguyen',
+        'Lê Hương Giang',
+        'Lê Phương Anh 4',
+        'Ly Pham',
+        'nguyen nhanduc',
+        'Thanh Bùi',
+        'Thành Phạm',
+        'Thu Hằng',
+        'Thư Ngô Minh',
+        'Trang Bùi'
+      ],
+      'IC2131': [
+        'Anh Vũ',
+        'HaiYen Truong',
+        'Khánh Ly Nguyễn',
+        'Lê Viết Khánh Đạt',
+        'Linh Phạm',
+        'Loan Đào',
+        'Long Do',
+        'minh ngọc nguyễn',
+        'Ngọc Bích',
+        'Ngọc Minh',
+        'Ngọc Thẩm',
+        'nguyen cao',
+        'nguyetcat dinh',
+        'Phương Anh',
+        'Phương Thanh',
+        'Quỳnh Anh Nguyễn',
+        'Quỳnh Trúc (cy)',
+        'Thái Cấn Xuân',
+        'Trinh Đỗ'
+      ],
+      'IC2150': [
+        'Hân Nguyễn Ngọc',
+        'Hoàng Dũng',
+        'Hoàng Tuyết Nhung',
+        'Khải',
+        'Kvy Hoàng',
+        'Linh Bùi',
+        'Linh Hoang',
+        'Minh Hà',
+        'Ngan Kim',
+        'Ngoc Le',
+        'Phuong Anh Ng Thi',
+        'Phương Dương',
+        'QNhư Hồ',
+        'Thanh Hằng',
+        'Tiểu Phương',
+        'Trâm Thùy',
+        'Tú Uyên',
+        'Vân Anh Hoàng'
+      ],
+      'IC2146': [
+        'Cẩm Nhung Lương',
+        'Danny “Pig” Thomas',
+        'Đức Trần Văn',
+        'Dương Nguyễn Tùng',
+        'Gia Bao Phung',
+        'gialinh',
+        'Hà Phương Đinh',
+        'Hiền Nguyễn',
+        'Hồng Phan',
+        'Khánh Huy Đỗ',
+        'Kiên Nguyễn',
+        'Nam Nguyễn',
+        'Nguyễn Ngọc Tuấn Anh',
+        'Nguyễn Tường Vy Hoàng',
+        'Tùng Mạnh',
+        'Tuyết Thanh Nguyễn Thị',
+        'Vân Anh Hoàng',
+        'Yến Linh Nguyễn'
+      ],
+      'IC2145': [
+        'Chung Đinh Mạnh',
+        'Hằng Hồ',
+        'Hồng Ngọc Trần',
+        'Huukhoa Trần',
+        'Khang Minh',
+        'Long Vũ',
+        'Mai Anh Doãn',
+        'Nam Nguyên đức',
+        'Ngọc Hoa Trương',
+        'Nguyễn Ánh Nguyệt',
+        'Nguyễn Hương',
+        'Nguyễn Trọng Hồng Phúc',
+        'Nhật Nguyễn Viết',
+        'Phạm Thắng',
+        'Quân Phan',
+        'Thảo Phương',
+        'Trần Duy Khánh',
+        'Việt Hà Lê'
+      ],
+      'IC2168': [
+        'Đức Nè',
+        'Giang Huong',
+        'Giang Quỳnh',
+        'Hải (Cá trên trời)',
+        'Lê thu hảo',
+        'Lê Thu Ngân',
+        'Ngọc Lê',
+        'Nguyen Son',
+        'Phương Lê Thị Thu',
+        'Phương Linh Nguyễn',
+        'Thái Sơn Trần',
+        'Thu Thuỷ Lê',
+        'Van Anh'
+      ],
+      'IC2139': [
+        '09 .Đặng Dũng 10a3',
+        'Cấn Phát',
+        'Dịu Hiền',
+        'Đỗ Thùy Dung',
+        'Hoai Thuong',
+        'Huệ Hồng',
+        'Hương Vũ',
+        'LâmAnh Nguyễn',
+        'Nga Trần',
+        'Ngọc Hiệp Nguyễn',
+        'Ngọc Linh Chi Nguyễn',
+        'Nguyễn Thị Thu Trang',
+        'Phương Nguyễn',
+        'Phượng Nguyễn',
+        'Thu Trang Bùi',
+        'Tùng'
+      ],
+      'IC2172': [
+        '21.Nguyễn Tiến Dũng',
+        'Bảo Lê',
+        'Diệp Lê',
+        'Giang Đặng Trà',
+        'hân ph',
+        'Hằng Nguyễn',
+        'Hương Lê',
+        'Huyền Đỗ',
+        'Khang Vũ',
+        'Khánh ly Trần',
+        'Minh Đức Phùng Đỗ',
+        'N.T Hướng',
+        'Ngô Nguyễn',
+        'Quỳnh Anh Tống',
+        'Tran Oanh',
+        'Trang Vũ',
+        'Trang Duong',
+        'Yến Dung Nguyễn'
+      ],
+      'IC2181': [
+        '24. Nguyễn Hoàng Thảo Nhi',
+        'Bùi Huyền Linh',
+        'Kiều Phạm',
+        'Lenary Như',
+        'Linh Đặng',
+        'Linh Nguyễn',
+        'Ly Phạm',
+        'Minh Đức Dương',
+        'nguyễn lý',
+        'Nguyễn Thu Thảo',
+        'Như Thảo Phạm',
+        'Phương Anh Tạ',
+        'Phương Nguyễn Thảo',
+        'Thanh Phương Phùng',
+        'Thuỳ Linh Phạm',
+        'Trinh Mai',
+        'Trường Nguyễn Thế',
+        'Vũ Chi'
+      ],
+      'IC2200': [
+        'Bùi Huyền Trang',
+        'Chiều Trần Xuân',
+        'Đức Phạm Minh',
+        'Dz Quang',
+        'khanh hoa ng',
+        'Lâm Nhật Phong',
+        'Minh Hoàn Trần',
+        'Minh Lâm',
+        'Nguyen Tien Dung',
+        'Nhật Minh Phan',
+        'Phương Linh Trần Thị 38',
+        'thao linh nguyen',
+        'The Bao',
+        'Thu Vân Đỗ',
+        'Trương Thị Minh Ngọc',
+        'Vũ Nαm Khάnh',
+        'Yến Nhi Ngô'
+      ]
+    };
 
     const STORAGE_KEY = 'khoa67SubmissionProfile';
     const classSelect = document.getElementById('classSelect');
-    const studentName = document.getElementById('studentName');
+    const studentSelect = document.getElementById('studentSelect');
     const linkInput = document.getElementById('linkInput');
     const submitForm = document.getElementById('submitForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -553,18 +821,17 @@
     function saveProfile() {
       const profile = {
         lop: classSelect.value,
-        hocVien: studentName.value.trim()
+        hocVien: studentSelect.value
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
     }
 
     function loadProfile() {
       try {
-        const profile = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-        if (CLASS_LIST.includes(profile.lop)) classSelect.value = profile.lop;
-        if (profile.hocVien) studentName.value = profile.hocVien;
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
       } catch (error) {
         localStorage.removeItem(STORAGE_KEY);
+        return {};
       }
     }
 
@@ -600,7 +867,7 @@
       const extracted = extractLinks(linkInput.value);
       currentLinks = extracted.links;
       currentBlocked = extracted.blocked;
-      const hasProfile = Boolean(classSelect.value && studentName.value.trim());
+      const hasProfile = Boolean(classSelect.value && studentSelect.value);
       const blockedOk = !REJECT_IF_BLOCKED_LINKS_FOUND || currentBlocked.length === 0;
       submitBtn.disabled = !(hasProfile && currentLinks.length > 0 && blockedOk);
       renderPreview();
@@ -611,7 +878,7 @@
       submitBtn.disabled = isBusy || submitBtn.disabled;
       submitBtn.textContent = isBusy ? 'Đang gửi...' : 'Gửi bài';
       classSelect.disabled = isBusy;
-      studentName.disabled = isBusy;
+      studentSelect.disabled = isBusy || !classSelect.value;
       linkInput.disabled = isBusy;
       clearBtn.disabled = isBusy;
       connectionStatus.textContent = isBusy ? 'Đang gửi bài' : 'Sẵn sàng nhận bài';
@@ -636,9 +903,9 @@
       updateState();
 
       const lop = classSelect.value;
-      const hocVien = studentName.value.trim();
+      const hocVien = studentSelect.value;
       if (!lop || !hocVien) {
-        setResult('error', 'Vui lòng nhập đủ lớp và tên học viên.');
+        setResult('error', 'Vui lòng chọn đủ lớp và tên học viên.');
         return;
       }
 
@@ -692,19 +959,45 @@
       linkInput.focus();
     }
 
+    function populateStudents(selectedStudent = '') {
+      const lop = classSelect.value;
+      const students = (CLASS_STUDENTS[lop] || []).slice().sort((a, b) => a.localeCompare(b, 'vi'));
+      studentSelect.innerHTML = '<option value="">Chọn học viên</option>';
+      studentSelect.disabled = !lop;
+
+      students.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        studentSelect.appendChild(option);
+      });
+
+      if (students.includes(selectedStudent)) {
+        studentSelect.value = selectedStudent;
+      }
+    }
+
     function init() {
-      CLASS_LIST.slice().sort((a, b) => a.localeCompare(b, 'vi')).forEach(lop => {
+      Object.keys(CLASS_STUDENTS).sort((a, b) => a.localeCompare(b, 'vi')).forEach(lop => {
         const option = document.createElement('option');
         option.value = lop;
         option.textContent = lop;
         classSelect.appendChild(option);
       });
 
-      loadProfile();
+      const profile = loadProfile();
+      if (CLASS_STUDENTS[profile.lop]) {
+        classSelect.value = profile.lop;
+      }
+      populateStudents(profile.hocVien);
       updateState();
 
-      classSelect.addEventListener('change', updateState);
-      studentName.addEventListener('input', updateState);
+      classSelect.addEventListener('change', () => {
+        populateStudents();
+        clearResult();
+        updateState();
+      });
+      studentSelect.addEventListener('change', updateState);
       linkInput.addEventListener('input', () => {
         clearResult();
         updateState();
