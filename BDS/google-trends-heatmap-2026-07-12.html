@@ -1,5 +1,29 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Heat map nhu cầu tìm kiếm bất động sản</title>
+</head>
+<body>
 <div id="bds-locality-search-heatmap" aria-labelledby="bds-locality-search-heatmap-label">
   <style>
+    #bds-locality-search-heatmap {
+      --border: #cbd5d1;
+      --muted: #94a3b8;
+      --viz-series-1: #0f766e;
+      --viz-series-2: #087f5b;
+      --viz-series-3: #d97706;
+      --destructive: #c2410c;
+      --muted-foreground: #64748b;
+      --foreground: #173b3f;
+      color: var(--foreground);
+      background: #f7faf8;
+      border: 1px solid #d7e3dd;
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
     #bds-locality-search-heatmap {
       display: grid;
       gap: 1rem;
@@ -71,6 +95,21 @@
       min-height: 3rem;
       white-space: normal;
       text-align: left;
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--foreground);
+      background: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    #bds-locality-search-heatmap .heat-tile:hover,
+    #bds-locality-search-heatmap .heat-tile[aria-pressed="true"] {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(23, 59, 63, 0.14);
     }
 
     #bds-locality-search-heatmap .trend-mark {
@@ -254,3 +293,5 @@
     }());
   </script>
 </div>
+</body>
+</html>
