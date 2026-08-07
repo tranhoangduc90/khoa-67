@@ -7,8 +7,9 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const html = fs.readFileSync(path.resolve(here, '../kiem-tra-reading.html'), 'utf8');
 
-test('chưa nhúng webhook production vào bản xem trước', () => {
-  assert.match(html, /__READING_WEBHOOK_URL__/);
+test('đã nhúng đúng webhook production', () => {
+  assert.doesNotMatch(html, /__READING_WEBHOOK_URL__/);
+  assert.match(html, /https:\/\/ducizone\.ddns\.net\/webhook\/reading-homework-check-20260807/);
 });
 
 test('gửi form theo kiểu không tạo CORS preflight', () => {
