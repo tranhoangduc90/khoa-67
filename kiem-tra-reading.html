@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://ducizone.ddns.net; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+  <link rel="icon" href="data:,">
+  <title>Kiểm tra bài Reading</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #172a46;
+      --red: #c62828;
+      --blue: #2359a8;
+      --line: #d9dee7;
+      --muted: #596579;
+      --surface: #f6f8fb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--surface);
+      color: var(--navy);
+      font-family: Arial, sans-serif;
+    }
+    main {
+      width: min(620px, 100%);
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 12px 36px rgba(23, 42, 70, .08);
+    }
+    h1 { margin: 0 0 10px; font-size: clamp(24px, 5vw, 32px); }
+    p { margin: 0 0 24px; color: var(--muted); line-height: 1.55; }
+    label { display: block; margin-bottom: 8px; font-weight: 700; }
+    textarea {
+      width: 100%;
+      min-height: 116px;
+      resize: vertical;
+      padding: 13px 14px;
+      border: 1px solid #aeb8c7;
+      border-radius: 9px;
+      font: inherit;
+      line-height: 1.45;
+    }
+    textarea:focus { outline: 3px solid rgba(35, 89, 168, .18); border-color: var(--blue); }
+    button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 13px 18px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--red);
+      color: #fff;
+      font: 700 16px Arial, sans-serif;
+      cursor: pointer;
+    }
+    button:hover { background: #a91f1f; }
+    button:disabled { cursor: wait; opacity: .65; }
+    .result {
+      display: none;
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--blue);
+      border-radius: 6px;
+      background: #eef4ff;
+      line-height: 1.5;
+    }
+    .result.show { display: block; }
+    .result.error { border-left-color: var(--red); background: #fff1f1; color: #7a1b1b; }
+    .lesson { display: block; margin-top: 5px; font-weight: 700; }
+    .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+    .note { margin: 12px 0 0; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Kiểm tra bài Reading</h1>
+    <p>Dán một link Google Docs của bài Homework. Hệ thống sẽ nhận diện bài và chuyển vào đúng luồng chấm Reading.</p>
+
+    <form id="reading-form" novalidate>
+      <label for="doc-link">Link bài Homework</label>
+      <textarea id="doc-link" name="doc_link" required autocomplete="off" spellcheck="false" placeholder="https://docs.google.com/document/d/..."></textarea>
+      <div class="hp" aria-hidden="true">
+        <label for="website">Không điền ô này</label>
+        <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      <button id="submit-button" type="submit">Kiểm tra bài</button>
+      <p class="note">Mỗi lượt chỉ xử lý một Google Docs. Trang không lưu link trên trình duyệt.</p>
+    </form>
+
+    <div id="result" class="result" role="status" aria-live="polite"></div>
+  </main>
+
+  <script>
+    const API_URL = 'https://ducizone.ddns.net/webhook/reading-homework-check-20260807';
+    const form = document.getElementById('reading-form');
+    const input = document.getElementById('doc-link');
+    const button = document.getElementById('submit-button');
+    const result = document.getElementById('result');
+
+    function extractGoogleDocLink(value) {
+      const direct = value.match(/https:\/\/docs\.google\.com\/document\/d\/[A-Za-z0-9_-]{20,}[^\s]*/i);
+      if (direct) return direct[0];
+      const drive = value.match(/https:\/\/drive\.google\.com\/[^\s]*[?&]id=[A-Za-z0-9_-]{20,}[^\s]*/i);
+      return drive ? drive[0] : '';
+    }
+
+    function show(message, isError = false, lesson = '') {
+      result.className = `result show${isError ? ' error' : ''}`;
+      result.replaceChildren(document.createTextNode(message));
+      if (lesson) {
+        const detail = document.createElement('span');
+        detail.className = 'lesson';
+        detail.textContent = `Bài được nhận diện: ${lesson}`;
+        result.appendChild(detail);
+      }
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const docUrl = extractGoogleDocLink(input.value.trim());
+      if (!docUrl) {
+        show('Vui lòng dán đúng một link Google Docs.', true);
+        input.focus();
+        return;
+      }
+      if (API_URL.startsWith('__')) {
+        show('Bản xem trước chưa được kết nối với hệ thống chấm.', true);
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Đang kiểm tra…';
+      show('Hệ thống đang đọc và nhận diện tài liệu.');
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 45000);
+
+      try {
+        const body = new URLSearchParams({
+          doc_url: docUrl,
+          website: document.getElementById('website').value,
+          dry_run: '0',
+        });
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body,
+          signal: controller.signal,
+          cache: 'no-store',
+        });
+        const payload = await response.json().catch(() => ({}));
+        const message = payload.message || 'Hệ thống chưa trả về kết quả rõ ràng. Vui lòng thử lại.';
+        show(message, !response.ok || payload.ok === false, payload.lesson || '');
+      } catch (error) {
+        show(error.name === 'AbortError'
+          ? 'Hệ thống phản hồi quá lâu. Vui lòng thử lại sau.'
+          : 'Không kết nối được hệ thống chấm. Vui lòng thử lại.', true);
+      } finally {
+        window.clearTimeout(timeout);
+        button.disabled = false;
+        button.textContent = 'Kiểm tra bài';
+      }
+    });
+  </script>
+</body>
+</html>
