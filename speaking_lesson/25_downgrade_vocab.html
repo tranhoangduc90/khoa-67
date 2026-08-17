@@ -105,6 +105,11 @@
 
                 <!-- Gợi ý (Bị ẩn lúc đầu) -->
                 <div id="suggestions-container" class="hide flex-1">
+                    <div class="bg-slate-800 text-white p-4 rounded-xl shadow-md text-center fade-in-up mb-6">
+                        <span class="text-slate-400 text-sm font-bold uppercase tracking-wider block mb-1">Từ học thuật (Tham khảo):</span>
+                        <span id="target-vocab-text" class="text-2xl font-black text-emerald-400"></span>
+                    </div>
+
                     <div class="flex items-center gap-3 mb-6">
                         <span class="bg-green-100 text-green-700 p-2 rounded-lg text-xl">💡</span>
                         <h3 class="text-xl font-black text-slate-700 uppercase tracking-wide">Giải pháp "Mẫu Giáo":</h3>
@@ -365,6 +370,7 @@
         questionText: document.getElementById('question-text'),
         
         suggestionsContainer: document.getElementById('suggestions-container'),
+        targetVocabText: document.getElementById('target-vocab-text'),
         suggestionsList: document.getElementById('suggestions-list'),
         
         showSuggestionsBtn: document.getElementById('show-suggestions-btn'),
@@ -466,12 +472,9 @@
         
         const currentData = currentSessionData[currentQuestion];
         DOM.suggestionsList.innerHTML = '';
-        
-        // Render Từ vựng Academic (Tham khảo cho GV)
-        const targetCard = document.createElement('div');
-        targetCard.className = `md:col-span-2 bg-slate-800 text-white p-4 rounded-xl shadow-md text-center fade-in-up mb-2`;
-        targetCard.innerHTML = `<span class="text-slate-400 text-sm font-bold uppercase tracking-wider block mb-1">Từ học thuật (Tham khảo):</span> <span class="text-2xl font-black text-emerald-400">${currentData.target_vocab}</span>`;
-        DOM.suggestionsList.appendChild(targetCard);
+
+        // Hiển thị từ học thuật phía trên tiêu đề giải pháp "Mẫu Giáo".
+        DOM.targetVocabText.textContent = currentData.target_vocab;
 
         // Render Các cách nói lớp 6
         currentData.suggestions.forEach((sugg, index) => {
