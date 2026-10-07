@@ -1,0 +1,17 @@
+{
+  "course": "67",
+  "active_classes": [
+    "IC2314",
+    "IC2304",
+    "IC2273",
+    "IC2270",
+    "IC2262",
+    "IC2238",
+    "IC2228",
+    "IC2213",
+    "IC2207",
+    "IC2200"
+  ],
+  "verified_at": "2026-10-07T03:21:29.683274Z",
+  "source": "Portal: course_classes.status=on_going; Classroom: roster"
+}

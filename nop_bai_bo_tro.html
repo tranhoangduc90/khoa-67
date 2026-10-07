@@ -687,7 +687,20 @@
         throw new Error('File danh sách lớp-học viên không đúng định dạng.');
       }
 
-      CLASS_STUDENTS = data;
+      // Giữ phạm vi khóa 67 theo Portal dù luồng cũ bổ sung lại lớp khác vào file.
+      const scopeResponse = await fetch('data/nop_bai_bo_tro_scope.json?v=' + Date.now(), { cache: 'no-store' });
+      if (!scopeResponse.ok) {
+        throw new Error('Không tải được phạm vi lớp đang học.');
+      }
+      const scope = await scopeResponse.json();
+      if (scope.course !== '67' || !Array.isArray(scope.active_classes)) {
+        throw new Error('Phạm vi lớp không đúng định dạng.');
+      }
+      CLASS_STUDENTS = Object.fromEntries(
+        scope.active_classes
+          .filter(lop => Object.prototype.hasOwnProperty.call(data, lop) && Array.isArray(data[lop]))
+          .map(lop => [lop, data[lop]])
+      );
     }
 
     function populateStudents(selectedStudent = '') {
@@ -711,14 +724,23 @@
     async function init() {
       await loadClassStudents();
 
-      Object.keys(CLASS_STUDENTS).sort((a, b) => a.localeCompare(b, 'vi')).forEach(lop => {
+      // Xếp mã lớp từ Z đến A, so sánh phần số để lớp lớn đứng trước.
+      const classOrder = new Intl.Collator('vi', { numeric: true, sensitivity: 'base' });
+      Object.keys(CLASS_STUDENTS).sort((a, b) => classOrder.compare(b, a)).forEach(lop => {
         const option = document.createElement('option');
         option.value = lop;
         option.textContent = lop;
         classSelect.appendChild(option);
       });
 
+      // Link cá nhân chọn sẵn đúng lớp và học viên trong danh sách hiện hành.
       const profile = loadProfile();
+      const linkedClass = new URLSearchParams(location.search).get('class');
+      const linkedStudent = new URLSearchParams(location.hash.slice(1)).get('student');
+      if (linkedClass && Object.prototype.hasOwnProperty.call(CLASS_STUDENTS, linkedClass)) {
+        profile.lop = linkedClass;
+        profile.hocVien = linkedStudent || '';
+      }
       if (CLASS_STUDENTS[profile.lop]) {
         classSelect.value = profile.lop;
       }
